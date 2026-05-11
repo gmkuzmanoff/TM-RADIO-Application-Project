@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+    <ProduceReferenceAssemblyInOutDir>true</ProduceReferenceAssemblyInOutDir>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Fonts\RobotoCondensed\RobotoCondensed-Bold.ttf" />
+    <None Remove="Resources\Fonts\RobotoCondensed\RobotoCondensed-BoldItalic.ttf" />
+    <None Remove="Resources\Fonts\RobotoCondensed\RobotoCondensed-Italic.ttf" />
+    <None Remove="Resources\Fonts\RobotoCondensed\RobotoCondensed-Light.ttf" />
+    <None Remove="Resources\Fonts\RobotoCondensed\RobotoCondensed-LightItalic.ttf" />
+    <None Remove="Resources\Fonts\RobotoCondensed\RobotoCondensed-Regular.ttf" />
+    <None Remove="Resources\Fonts\Ubuntu\Ubuntu-Regular.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Fonts\RobotoCondensed\RobotoCondensed-Bold.ttf" />
+    <EmbeddedResource Include="Resources\Fonts\RobotoCondensed\RobotoCondensed-BoldItalic.ttf" />
+    <EmbeddedResource Include="Resources\Fonts\RobotoCondensed\RobotoCondensed-Italic.ttf" />
+    <EmbeddedResource Include="Resources\Fonts\RobotoCondensed\RobotoCondensed-Light.ttf" />
+    <EmbeddedResource Include="Resources\Fonts\RobotoCondensed\RobotoCondensed-LightItalic.ttf" />
+    <EmbeddedResource Include="Resources\Fonts\RobotoCondensed\RobotoCondensed-Regular.ttf" />
+    <EmbeddedResource Include="Resources\Fonts\Ubuntu\Ubuntu-Regular.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
+    <PackageReference Include="LibVLCSharp" Version="3.9.3" />
+    <PackageReference Include="m3uParser.NET" Version="1.0.17" />
+    <PackageReference Include="TagLibSharp" Version="2.3.0" />
+    <PackageReference Include="VideoLAN.LibVLC.Android" Version="3.5.3" />
+    <PackageReference Include="Xamarin.CommunityToolkit" Version="2.0.6" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2662" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Mono.Android">
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v13.0\Mono.Android.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

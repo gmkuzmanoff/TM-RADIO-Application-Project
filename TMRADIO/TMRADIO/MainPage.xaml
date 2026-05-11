@@ -1,0 +1,436 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+             NavigationPage.HasNavigationBar="False"
+             x:Class="TMRADIO.MainPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="FontFamily" Value="Ubuntu-Regular.ttf"/>
+            </Style>
+            <Style x:Key="MainGridStyle" TargetType="Grid">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush EndPoint="0.6,0.8">
+                            <GradientStop Color="#140720" Offset="0.2"/>
+                            <GradientStop Color="#2D0F4A" Offset="0.5"/>
+                            <GradientStop Color="#be375b" Offset="0.6"/>
+                            <GradientStop Color="#38274f" Offset="0.6"/>
+                            <!--<GradientStop Color="#6e3845" Offset="0.6"/>-->
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
+    <ContentPage.Content>
+        <Grid>
+            <!--#region Grid Home-->
+            <Grid x:Name="grid_home" Style="{DynamicResource MainGridStyle}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="150"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="1" Text="Home" TextColor="Wheat" FontSize="Title" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Image Grid.Column="2" Source="home" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+                <!--#region Frame Main Shows Autoscroll list-->
+                <Frame Grid.Row="1" Padding="0" Margin="0,0" VerticalOptions="Fill" HorizontalOptions="Fill" BackgroundColor="Transparent">
+                    <CarouselView x:Name="lv_mainShows" Margin="0" IsBounceEnabled="False" PeekAreaInsets="90" VerticalScrollBarVisibility="Never" Loop="True">
+                        <CarouselView.ItemTemplate>
+                            <DataTemplate>
+                                <StackLayout Padding="5">
+                                    <Label Text="{Binding Title}" HorizontalTextAlignment="Center" HorizontalOptions="Center" MaxLines="1" TextColor="Wheat" FontSize="14" LineBreakMode="TailTruncation"/>
+                                    <Frame Padding="0" Margin="0" CornerRadius="0" HasShadow="False" WidthRequest="200" HeightRequest="200" HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Image Source="{Binding ImageSource}" Aspect="Fill"/>
+                                    </Frame>
+                                    <!--<Label Text="{Binding Description}" HorizontalOptions="Center" HorizontalTextAlignment="Center" TextColor="Gray" FontSize="11"/>-->
+                                </StackLayout>
+                            </DataTemplate>
+                        </CarouselView.ItemTemplate>
+                    </CarouselView>
+                </Frame>
+                <!--#endregion-->
+                <!--#region Frame Recently played shows-->
+                <Frame x:Name="frame_recentlyPlayed" IsVisible="false" Grid.Row="2" Padding="0" Margin="10,0" VerticalOptions="Center" HorizontalOptions="Fill" BackgroundColor="Transparent">
+                    <StackLayout Margin="0" BackgroundColor="Transparent" HeightRequest="150">
+                        <Frame Padding="0" Margin="0" BackgroundColor="Transparent">
+                            <Label Text="Recently played" TextColor="Wheat" FontSize="14"/>
+                        </Frame>
+                        <Frame Padding="0" Margin="0,3" BackgroundColor="Transparent">
+                            <CollectionView x:Name="cview_recently" HorizontalOptions="Center" ItemSizingStrategy="MeasureFirstItem" SelectionMode="Single" SelectionChanged="RecentlyPlayedListItemTapped">
+                                <CollectionView.ItemsLayout>
+                                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"/>
+                                </CollectionView.ItemsLayout>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackLayout Margin="0" Padding="0" WidthRequest="100" HorizontalOptions="Center" VerticalOptions="Center" Spacing="0.5" BackgroundColor="Transparent">
+                                            <Frame Padding="0" CornerRadius="15" HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="100" HeightRequest="100">
+                                                <Image Source="{Binding ImageArt}" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="500" HeightRequest="500"/>
+                                            </Frame>
+                                            <Label Text="{Binding Title}" HorizontalTextAlignment="Center" TextColor="Wheat" FontSize="Micro" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding Show}" HorizontalOptions="Center" TextColor="Gray" FontSize="Micro" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                        </StackLayout>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </Frame>
+                    </StackLayout>
+                </Frame>
+                <!--#endregion-->
+                <!--#region Frame TM RADIO LIVE-->
+                <StackLayout Grid.Row="3">
+                    <Frame Padding="0" Margin="10,0" BackgroundColor="Transparent">
+                        <Label Text="Live Stream" TextColor="Wheat" FontSize="14"/>
+                    </Frame>
+                    <Frame Padding="0" Margin="10,3" HorizontalOptions="Fill" CornerRadius="15">
+                        <Grid>
+                            <Grid.Background>
+                                <LinearGradientBrush EndPoint="0.4,-0.5">
+                                    <GradientStop Color="#1A0B2E" Offset="0.2"/>
+                                    <GradientStop Color="#2D0F4A" Offset="0.6"/>
+                                    <GradientStop Color="#178787" Offset="0.6"/>
+                                </LinearGradientBrush>
+                            </Grid.Background>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Image Source="logo" Grid.RowSpan="2" BackgroundColor="Transparent" VerticalOptions="Center" HorizontalOptions="Center"/>
+
+                            <StackLayout Padding="0" Grid.Row="0" Grid.Column="1" Orientation="Vertical" VerticalOptions="Center">
+                                <Label x:Name="lbl_tmradiolive_title"  Text="{Binding Source={x:Reference lbl_title}, Path=Text}" TextColor="Aquamarine" FontFamily="RobotoCondensed-Italic" FontSize="Subtitle" MaxLines="2" LineBreakMode="TailTruncation"/>
+                            </StackLayout>
+                            <!--Frame LISTEN NOW! button-->
+                            <Frame Grid.Row="1" Grid.Column="1" Margin="0,0,5,7" Padding="5" HeightRequest="40" CornerRadius="15" VerticalOptions="Start" HorizontalOptions="End" BackgroundColor="Firebrick">
+                                <Button x:Name="btn_listenNow" Text="Listen Now!" TextColor="Wheat" FontSize="12" BackgroundColor="Firebrick" Clicked="ListenNowClicked"/>
+                            </Frame>
+                        </Grid>
+                    </Frame>
+                </StackLayout>
+                <!--#endregion-->
+                <!--#region Frame Menu Buttons-->
+                <Frame Grid.Row="4" Padding="20,0" Margin="0,0" BackgroundColor="#170d17" CornerRadius="5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Frame Grid.Column="0" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
+                            <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
+                                <ImageButton x:Name="btn_broadcast" WidthRequest="35" Margin="0" Padding="0" Source="speaker" BackgroundColor="Transparent" Clicked="PlayerMenuClicked"/>
+                                <Label Text="player" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                            </StackLayout>
+                        </Frame>
+                        <Frame Grid.Column="1" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
+                            <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
+                                <ImageButton x:Name="btn_shedule" WidthRequest="35" Margin="0" Padding="0" Source="calendar" BackgroundColor="Transparent" Clicked="SheduleMenuClicked"/>
+                                <Label Text="shedule" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                            </StackLayout>
+                        </Frame>
+                        <Frame Grid.Column="2" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
+                            <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
+                                <ImageButton x:Name="btn_browse" WidthRequest="35" Margin="0" Padding="0" Source="history" BackgroundColor="Transparent" Clicked="HystoryMenuClicked"/>
+                                <Label Text="history" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                            </StackLayout>
+                        </Frame>
+                        <Frame Grid.Column="3" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
+                            <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
+                                <ImageButton x:Name="btn_about" WidthRequest="35" Margin="0" Padding="0" Source="about" BackgroundColor="Transparent" Clicked="AboutMenuClicked"/>
+                                <Label Text="about" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                            </StackLayout>
+                        </Frame>
+                        <!--<Frame Grid.Column="4" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
+                            <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
+                                <ImageButton x:Name="btn_settings" WidthRequest="35" Margin="0" Padding="0" Source="settings" BackgroundColor="Transparent"/>
+                                <Label Text="settings" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                            </StackLayout>
+                        </Frame>-->
+                        <Frame Grid.Column="4" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
+                            <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
+                                <ImageButton x:Name="btn_power_off" WidthRequest="35" Margin="0" Padding="0" BackgroundColor="Transparent" Source="power_off" Clicked="PowerOffMenuClicked"/>
+                                <Label Text="exit" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                            </StackLayout>
+                        </Frame>
+                    </Grid>
+                </Frame>
+                <!--#endregion-->
+            </Grid>
+            <!--#endregion-->
+            <!--#region Grid Player-->
+            <Grid x:Name="grid_nowPlaying" Style="{DynamicResource MainGridStyle}" TranslationY="800" IsVisible="false">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="250"/>
+                    <RowDefinition Height="1.1*"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
+                    <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
+                        <ImageButton x:Name="btn_playerBack" Padding="3" BackgroundColor="Transparent" Source="arrow_back" Clicked="PlayerBackArrowClicked"/>
+                        <Label Text="Now playing" TextColor="Wheat" FontSize="Title"/>
+                        <Image Source="speaker" BackgroundColor="Transparent"/>
+                    </FlexLayout>
+                </Frame>
+                <Label IsVisible="false" x:Name="lbl_currListeners" Grid.Row="1" Margin="20,10" HorizontalOptions="End" FontSize="Body" TextColor="#5d5d5d"/>
+                <Label IsVisible="false" x:Name="lbl_bitrate" Grid.Row="1" Margin="20,10" FontSize="Body" VerticalOptions="Start" HorizontalOptions="Start" TextColor="#5d5d5d"/>
+                <Frame Grid.Row="1" x:Name="frame_player_imageArt" Padding="0" Margin="20,0" HasShadow="True" WidthRequest="250" HeightRequest="250" HorizontalOptions="Center" VerticalOptions="Center" CornerRadius="15">
+                    <Frame.Background>
+                        <LinearGradientBrush EndPoint="0.5,0.5">
+                            <GradientStop Color="Wheat" Offset="0.2"/>
+                            <GradientStop Color="#2D0F4A" Offset="0.5"/>
+                            <GradientStop Color="#be375b" Offset="0.6"/>
+                            <GradientStop Color="Khaki" Offset="0.8"/>
+                        </LinearGradientBrush>
+                    </Frame.Background>
+                    <Image x:Name="img_logo" Margin="0" Source="logo" Aspect="Fill"/>
+                </Frame>
+                <Frame Grid.Row="2" Padding="0" VerticalOptions="Center" HorizontalOptions="Center" BackgroundColor="Transparent" IsClippedToBounds="True">
+                    <StackLayout Margin="20,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackLayout Grid.Column="0" HeightRequest="50" HorizontalOptions="Start" VerticalOptions="Center">
+                                <Label x:Name="lbl_title" Text="" TextColor="Wheat" HorizontalTextAlignment="Start" HorizontalOptions="Start" FontSize="Subtitle" MaxLines="2" FontFamily="RobotoCondensed-Bold" LineBreakMode="TailTruncation"/>
+                                <Label x:Name="lbl_album" Text="" TextColor="Gray" HorizontalTextAlignment="Start" HorizontalOptions="Start" FontSize="Small" MaxLines="1" FontFamily="RobotoCondensed-Regular" LineBreakMode="TailTruncation"/>
+                            </StackLayout>
+                            <ImageButton x:Name="btn_playlist" Grid.Column="1" WidthRequest="30" HeightRequest="30" VerticalOptions="Center" HorizontalOptions="EndAndExpand" Source="playlist" BackgroundColor="Transparent" Clicked="PlaylistClicked"/>
+                        </Grid>
+                        <StackLayout Margin="0,20,0,0">
+                            <Slider x:Name="slider" ThumbColor="Goldenrod" Minimum="0" Maximum="1" Value="0" ValueChanged="SliderValueChanged" DragCompleted="SliderDragCompleted" DragStarted="SliderDragStarted"/>
+                            <!--<ProgressBar x:Name="pb_progress_bar" BackgroundColor="#5d5d5d" ProgressColor="Lime" Progress="0" HeightRequest="3"/>-->
+                            <FlexLayout HorizontalOptions="CenterAndExpand" AlignItems="Center" JustifyContent="SpaceBetween">
+                                <Label x:Name="lbl_current_time" Text="0:00:00" TextColor="Wheat" FontSize="Caption"/>
+                                <Label x:Name="lbl_duration" Text="0:00:00" TextColor="Wheat" FontSize="Caption"/>
+                            </FlexLayout>
+                        </StackLayout>
+                    </StackLayout>
+                </Frame>
+                <Frame Grid.Row="3" Padding="0" VerticalOptions="Center" HorizontalOptions="Center" BackgroundColor="Transparent">
+                    <Grid Margin="30,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ImageButton x:Name="btn_skipToPrev" Grid.Column="0" WidthRequest="30" VerticalOptions="Center" HorizontalOptions="Center" Source="skip_prev" BackgroundColor="Transparent" Clicked="SkipToPrevClicked"/>
+                        <ImageButton x:Name="btn_30bTmRadio" Grid.Column="1" WidthRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="rewind" BackgroundColor="Transparent" Clicked="RewindClicked"/>
+                        <ImageButton x:Name="btn_pauseTmRadio" Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center" Source="pause" BackgroundColor="Transparent" Clicked="PauseClicked"/>
+                        <ImageButton x:Name="btn_playTmRadio" Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center" Source="play" BackgroundColor="Transparent" Clicked="PlayClicked"/>
+                        <ImageButton x:Name="btn_30fTmRadio" Grid.Column="3" WidthRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="fast_forward" BackgroundColor="Transparent" Clicked="FastForwardClicked"/>
+                        <ImageButton x:Name="btn_skipToNext" Grid.Column="4" WidthRequest="30" VerticalOptions="Center" HorizontalOptions="Center" Source="skip_next" BackgroundColor="Transparent" Clicked="SkipToNextClicked"/>
+                    </Grid>
+                </Frame>
+                <Frame Grid.Row="4" Padding="20,0" Margin="0,0" BackgroundColor="#170d17">
+                    <Label x:Name="lbl_descriptiion" TextColor="#222f5b" FontSize="20" Padding="5" VerticalTextAlignment="End" HorizontalTextAlignment="Center" VerticalOptions="EndAndExpand" HorizontalOptions="CenterAndExpand"/>
+                </Frame>
+            </Grid>
+            <!--#endregion-->
+            <!--#region Grid Playlist-->
+            <Grid x:Name="grid_playlist" Style="{DynamicResource MainGridStyle}" IsVisible="false" Opacity="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
+                    <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
+                        <ImageButton x:Name="btn_playlistClose" Padding="3" BackgroundColor="Transparent" Source="close" Clicked="PlaylistCloseClicked"/>
+                        <Label Text="Playlist" TextColor="Wheat" FontSize="Title"/>
+                        <Image Source="playlist2" BackgroundColor="Transparent"/>
+                    </FlexLayout>
+                </Frame>
+                <Frame Grid.Row="1" Padding="0" Margin="20,0" VerticalOptions="Center" BackgroundColor="Transparent">
+                    <Label x:Name="lbl_playlistCount" Text="Sessions: 0" TextColor="CornflowerBlue" FontSize="21"/>
+                </Frame>
+                <Frame Grid.Row="2" Grid.RowSpan="5" Padding="0" Margin="10" VerticalOptions="Center" CornerRadius="10" BackgroundColor="Transparent">
+                    <ListView x:Name="lv_playlist" BackgroundColor="Transparent" CachingStrategy="RetainElement" HasUnevenRows="True" SeparatorVisibility="Default" SeparatorColor="Wheat" ItemAppearing="PlaylistItemAppearing" ItemTapped="PlaylistItemTapped">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell Height="90">
+                                    <Grid Margin="5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="3*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Frame Grid.Column="0" Padding="5" BackgroundColor="#170d17">
+                                            <Image Source="{Binding ImageSource}"/>
+                                        </Frame>
+                                        <StackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="{Binding Title}" FontSize="13" TextColor="Wheat"/>
+                                            <Label Text="{Binding Description}" FontSize="11" TextColor="Gray"/>
+                                        </StackLayout>
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Frame>
+            </Grid>
+            <!--#endregion-->
+            <!--#region Grid Shedule-->
+            <Grid x:Name="grid_shedule" Style="{DynamicResource MainGridStyle}" TranslationY="800" IsVisible="false">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="0.7*"/>
+                    <RowDefinition Height="0.5*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="0.5*"/>
+                </Grid.RowDefinitions>
+                <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
+                    <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
+                        <ImageButton x:Name="btn_sheduleBack" Padding="3" BackgroundColor="Transparent" Source="arrow_back" Clicked="SheduleBackArrowClicked"/>
+                        <Label Text="Shedule" TextColor="Wheat" FontSize="Title"/>
+                        <Image Source="calendar" BackgroundColor="Transparent"/>
+                    </FlexLayout>
+                </Frame>
+                <Frame Grid.Row="1" Padding="0" Margin="20,0" BackgroundColor="Transparent">
+                    <Label x:Name="lbl_UTCtime" HorizontalTextAlignment="Start" TextColor="Lime" FontSize="12"/>
+                </Frame>
+                <Frame Grid.Row="2" Grid.RowSpan="4" BackgroundColor="Transparent">
+                    <StackLayout>
+                        <ListView x:Name="list_shedule" ItemsSource="{Binding sheduleViewModels}" HasUnevenRows="True">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ViewCell>
+                                        <StackLayout Orientation="Vertical" Padding="5">
+                                            <Label Text="{Binding Date}" TextDecorations="None" HorizontalTextAlignment="Start" FontSize="18" TextColor="CornflowerBlue">
+                                                <Label.Style>
+                                                    <Style TargetType="Label">
+                                                        <Style.Triggers>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding Date}" Value="">
+                                                                <Setter Property="IsVisible" Value="false"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Label.Style>
+                                            </Label>
+                                            <Label Text="{Binding Shows}" HorizontalOptions="Start" VerticalOptions="Start" FontSize="13" TextColor="Wheat"/>
+                                        </StackLayout>
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                            <ListView.Footer>
+                                <Label x:Name="lbl_shedule" TextColor="Wheat" FontSize="Body"/>
+                            </ListView.Footer>
+                        </ListView>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+            <!--#endregion-->
+            <!--#region Grid Browser-->
+            <Grid x:Name="grid_browser" Style="{DynamicResource MainGridStyle}" TranslationY="800" IsVisible="false">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="0.7*"/>
+                    <RowDefinition Height="0.5*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="0.5*"/>
+                </Grid.RowDefinitions>
+                <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
+                    <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
+                        <ImageButton x:Name="btn_browserBack" Padding="3" BackgroundColor="Transparent" Source="arrow_back" Clicked="HistoryBackArrowClicked"/>
+                        <Label Text="Time Machine" TextColor="Wheat" FontSize="Title"/>
+                        <Image Source="history" BackgroundColor="Transparent"/>
+                    </FlexLayout>
+                </Frame>
+                <Frame Grid.Row="1" Padding="0" Margin="10,0" BackgroundColor="Transparent">
+                    <Label Text="Find your favourite show" FontFamily="RobotoCondensed-Regular" TextColor="Wheat" FontSize="14"/>
+                </Frame>
+                <StackLayout Grid.Row="2" Grid.RowSpan="5">
+                    <Frame Padding="0" Margin="10,0,10,10" CornerRadius="5">
+                        <SearchBar x:Name="Search_bar" BackgroundColor="Bisque" TextColor="Black" Placeholder="... Search" PlaceholderColor="Gray" TextChanged="SearchbarTextChanged"/>
+                    </Frame>
+                    <Frame Padding="0" Margin="10,0" BackgroundColor="Transparent">
+                        <ListView x:Name="list_browser" SeparatorVisibility="Default" SeparatorColor="Wheat" HasUnevenRows="True" CachingStrategy="RetainElement" BackgroundColor="Transparent" GroupDisplayBinding="{Binding Key}" IsGroupingEnabled="True" ItemTapped="HistoryListItemTapped">
+                            <ListView.GroupHeaderTemplate>
+                                <DataTemplate>
+                                    <ViewCell Height="60">
+                                        <Label Text="{Binding Key}" Margin="10,0" VerticalOptions="Center" TextColor="CornflowerBlue" FontSize="21"/>
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.GroupHeaderTemplate>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ViewCell Height="90">
+                                        <Grid Margin="5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="1*"/>
+                                                <ColumnDefinition Width="3*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Frame Grid.Column="0" Padding="0" HeightRequest="70" WidthRequest="70" HorizontalOptions="Center" VerticalOptions="Center" HasShadow="True" BackgroundColor="Wheat" CornerRadius="10">
+                                                <Image Source="{Binding ImageSource}" Aspect="Fill"/>
+                                            </Frame>
+                                            <StackLayout Grid.Column="1" VerticalOptions="Center" Margin="5,0,0,0">
+                                                <Label Text="{Binding Title}" HorizontalTextAlignment="Start" FontSize="Body" TextColor="Wheat"/>
+                                                <Label Text="{Binding Description}"  HorizontalTextAlignment="Start" FontSize="Caption" TextColor="Gray"/>
+                                            </StackLayout>
+                                        </Grid>
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Frame>
+                </StackLayout>
+            </Grid>
+            <!--#endregion-->
+            <!--#region Grid About-->
+            <Grid x:Name="grid_about" Style="{DynamicResource MainGridStyle}" TranslationY="800" IsVisible="false">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
+                    <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
+                        <ImageButton x:Name="btn_aboutBack" Padding="3" BackgroundColor="Transparent" Source="arrow_back" Clicked="AboutBackArrowClicked"/>
+                        <Label Text="About TM-Radio" TextColor="Wheat" FontSize="Title"/>
+                        <Image Source="about" BackgroundColor="Transparent"/>
+                    </FlexLayout>
+                </Frame>
+                <Frame Grid.Row="1" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
+                    <ScrollView>
+                        <StackLayout>
+                            <Label x:Name="lbl_aboutText" FontSize="Subtitle" TextColor="Wheat" CharacterSpacing="0" LineHeight="1.5" LineBreakMode="WordWrap"/>
+                            <Label Text="You can find TM Radio (music and profiles) on following sites and social networks:" FontSize="Subtitle" TextColor="Goldenrod"/>
+
+                            <FlexLayout JustifyContent="SpaceAround" AlignItems="Center" HeightRequest="50">
+                                <ImageButton x:Name="btn_facebook" Source="facebook" BackgroundColor="Transparent" Clicked="FacebookLinkClicked"/>
+                                <ImageButton x:Name="btn_twitter" Source="twitter" BackgroundColor="Transparent" Clicked="TwitterLinkClicked"/>
+                                <ImageButton x:Name="btn_web" Source="web" BackgroundColor="Transparent" Clicked="WebsiteLinkClicked"/>
+                            </FlexLayout>
+                        </StackLayout>
+                    </ScrollView>
+                </Frame>
+            </Grid>
+            <!--#endregion-->
+        </Grid>
+    </ContentPage.Content>
+    
+</ContentPage>
