@@ -42,7 +42,7 @@
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <AndroidTlsProvider>
     </AndroidTlsProvider>
-    <AndroidSupportedAbis />
+    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -117,10 +117,6 @@
     <AndroidResource Include="Resources\drawable\logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable\arrow_rotate_left.png" />
-    <AndroidResource Include="Resources\drawable\arrow_rotate_right.png" />
-    <AndroidResource Include="Resources\drawable\circle_pause.png" />
-    <AndroidResource Include="Resources\drawable\circle_play.png" />
     <AndroidResource Include="Resources\drawable\compact_disc.png" />
   </ItemGroup>
   <ItemGroup>
