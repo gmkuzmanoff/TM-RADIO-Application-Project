@@ -115,7 +115,9 @@ namespace TMRADIO.Droid
                PlaybackStateCompat.ActionSkipToPrevious |
                PlaybackStateCompat.ActionSeekTo);
 
-            playbackState.SetState(sessionState, (long)vlcPlayer.CurrentPosition, vlcPlayer.PlayerRate());
+            long position = (long)(vlcPlayer.CurrentPosition / 1 * vlcPlayer.MediaDuration());
+
+            playbackState.SetState(sessionState, position, vlcPlayer.PlayerRate());
 
             mediaSession.SetPlaybackState(playbackState.Build());
         }
@@ -296,11 +298,21 @@ namespace TMRADIO.Droid
 
         public void StopSession()
         {
-            if(mediaSession != null)
+            try
             {
-                mediaSession.Active = false;
-                mediaSession.Dispose();
+                if (mediaSession != null)
+                {
+                    notificationManager.Cancel(NOTIFICATION_ID);
+                    mediaSession.Active = false;
+                    mediaSession.Dispose();
+                    vlcPlayer.PlayerDispose();
+                }
             }
+            catch
+            {
+
+            }
+            
         }
         
         public string MediaSource()

@@ -1,11 +1,10 @@
-﻿using Android.Bluetooth;
-using Android.Content;
+﻿using Android.Content;
+using Android.Graphics;
 using Android.Support.V4.Media.Session;
-using Android.Util;
 using Android.Views;
 using Android.Widget;
-using Google.Android.Material.Snackbar;
 using System;
+using System.Net.Http;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using Xamarin.Forms;
@@ -72,7 +71,8 @@ namespace TMRADIO.Droid.MediaSession
                         break;
                 }
 
-                NotificationViewModel model = new NotificationViewModel()
+                //Create notification
+                NotificationViewModel notificationViewModel = new NotificationViewModel()
                 {
                     Title = title,
                     Artist = artist,
@@ -81,7 +81,27 @@ namespace TMRADIO.Droid.MediaSession
                     Duration = session.GetMediaDuration(),
                     Position = session.GetCurrentPosition()
                 };
-                session.ShowMediaNotification(model);
+                session.ShowMediaNotification(notificationViewModel);
+
+                //Create metadata
+                //byte[] image = new HttpClient().GetByteArrayAsync(albumArt).Result;
+                MetadataViewModel metadataViewModel = new MetadataViewModel()
+                {
+                    Title = title,
+                    Artist = artist,
+                    AlbumArt = mediaSource == TMRADIO_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt),
+                    Album = album,
+                    Duration = session.GetMediaDuration()
+                };
+                //Set metadata
+                Device.StartTimer(TimeSpan.FromSeconds(5), () =>
+                {
+                    session.SetPlaybackState();
+                    session.SetMetadata(metadataViewModel);
+                    session.InitializeSession();
+
+                    return false;
+                });
                 Toast.MakeText(context, $"Callback:  {keycode.KeyCode} pressed!", ToastLength.Long).Show();
                 //Log.Debug($"[{context.PackageName}]", $"Intent: {keycode}");
             }

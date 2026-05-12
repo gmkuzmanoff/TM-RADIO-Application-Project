@@ -6,7 +6,6 @@ using Android.OS;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -15,7 +14,6 @@ using System.Xml.Linq;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using TMRADIO.Services;
-using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using static TMRADIO.Constants.Links;
@@ -43,6 +41,7 @@ namespace TMRADIO
         private bool isStateEnded;
         private bool isStateError;
         private bool isStateOpening;
+        private readonly int maxCountOfRecentlyPlayedEpisodes = 15;
         private readonly ObservableCollection<Shedule> sheduleViewModels;
         private readonly ObservableCollection<ShowViewModel> mainShowViewModels;
         private readonly ObservableCollection<ShowViewModel> oldShowViewModels;
@@ -83,28 +82,46 @@ namespace TMRADIO
                 XDocument xdoc = new XDocument();
                 XElement root = new XElement("Episodes");
                 xdoc.Add(root);
+                XElement newEpisode = new XElement("Episode");
+                newEpisode.Add(
+                    new XElement("Title", "Citric Waves 113 Ugly Cat"),
+                    new XElement("Image", "https://www.tm-radio.com/pic/djs/UglyCatMusic/WhatsApp_Image_2025-09-05_at_11.46.58_AM.jpeg"),
+                    new XElement("Show", "Citric Waves"),
+                    new XElement("Url", "https://www.tm-radio.com/access_mp3.php?mp3=qarh97"),
+                    new XElement("Description", "Citric Waves 113 Ugly Cat (from January 29th)"));
+                xdoc.Element("Episodes").AddFirst(newEpisode);
                 xdoc.Save(XmlRecentlyPlayedFile);
             }
             GetRecentlyPlayed();
             cview_recently.ItemsSource = recentlyPlayedEpisodes;
-            if (recentlyPlayedEpisodes.Any())
-            {
-                frame_recentlyPlayed.IsVisible = true;
-            }
             #endregion
 
-            GetRadioMetadataLoop(radioViewModel);
+            try
+            {
+                GetRadioMetadataLoop(radioViewModel);
 
-            session.InitializeSession();
+                lbl_aboutText.Text = AboutTmRadio;
 
-            lbl_aboutText.Text = AboutTmRadio;
+                //Get Main Shows and insert models into list as source
+                GetMainShows();
+                lv_mainShows.ItemsSource = mainShowViewModels;
 
-            //Get Main Shows and insert models into list as source
-            GetMainShows();
-            lv_mainShows.ItemsSource = mainShowViewModels;
-
-            //Main Shows Scroll Animation
-            AutoScroll(mainShowViewModels);
+                //Main Shows Scroll Animation
+                AutoScroll(mainShowViewModels);
+            }
+            catch
+            {
+                Task.Run(async () =>
+                {
+                    bool isOK = await DisplayAlert("TMRADIO", "This application REQUIRE internet connection!", "", "exit", FlowDirection.LeftToRight);
+                    if (!isOK)
+                    {
+                        radioService.CleanTempDir();
+                        session.StopSession();
+                        Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
+                    }
+                });
+            }
 
             //Player Timer
             timer = new Timer
@@ -314,26 +331,27 @@ namespace TMRADIO
 
             //Create notification data
             notificationViewModel.Title = radioViewModel.Title;
-            notificationViewModel.Artist = "www.tm-radio.com";
-            notificationViewModel.Album = radioViewModel.StreamDescription;
+            notificationViewModel.Artist = radioViewModel.StreamTitle;
+            notificationViewModel.Album = radioViewModel.Info;
             notificationViewModel.Duration = 1000;
             notificationViewModel.Position = session.GetCurrentPosition();
             //Create metadata
             byte[] tmlogo = new HttpClient().GetByteArrayAsync(TMRADIO_LOGO).Result;
             metadataViewModel.Title = radioViewModel.Title;
-            metadataViewModel.Artist = "www.tm-radio.com";
-            metadataViewModel.Album = radioViewModel.StreamDescription;
+            metadataViewModel.Artist = radioViewModel.StreamTitle;
+            metadataViewModel.Album = radioViewModel.Info;
             metadataViewModel.AlbumArt = BitmapFactory.DecodeByteArray(tmlogo, 0, tmlogo.Length);
             metadataViewModel.Duration = 1000;
 
             ShowNotification();
+            ShowMetadata();
 
             img_logo.Source = radioViewModel.Logo;
             lbl_tmradiolive_title.Text = radioViewModel.Title.Replace(" - ", " | ");
             lbl_title.Text = lbl_tmradiolive_title.Text;
-            lbl_album.Text = "www.tm-radio.com";
+            lbl_album.Text = radioViewModel.Info;
             lbl_currListeners.Text = $"👨‍💼 {radioViewModel.StreamCurrentListeners}";
-            lbl_bitrate.Text = $"{radioViewModel.StreamGenre} | {radioViewModel.StreamBitrate} Kbps";
+            lbl_bitrate.Text = $"{radioViewModel.StreamGenre} | {radioViewModel.StreamBitrate}";
             lbl_descriptiion.Text = radioViewModel.StreamDescription;
             lbl_duration.Text = "0:00:00";
 
@@ -352,12 +370,12 @@ namespace TMRADIO
 
                         //Create notification data
                         notificationViewModel.Title = radioViewModel.Title;
-                        notificationViewModel.Artist = "www.tm-radio.com";
-                        notificationViewModel.Album = radioViewModel.StreamDescription;
+                        notificationViewModel.Artist = radioViewModel.StreamTitle;
+                        notificationViewModel.Album = radioViewModel.Info;
                         //Create metadata
                         metadataViewModel.Title = radioViewModel.Title;
-                        metadataViewModel.Artist = "www.tm-radio.com";
-                        metadataViewModel.Album = radioViewModel.StreamDescription;
+                        metadataViewModel.Artist = radioViewModel.StreamTitle;
+                        metadataViewModel.Album = radioViewModel.Info;
 
                         ShowNotification();
                     }
@@ -413,6 +431,7 @@ namespace TMRADIO
             session.Play();
 
             ShowNotification();
+            ShowMetadata();
         }
 
         public void PauseClicked(object sender, EventArgs e)
@@ -427,6 +446,7 @@ namespace TMRADIO
             }
 
             ShowNotification();
+            ShowMetadata();
         }
 
         public void RewindClicked(object sender, EventArgs e)
@@ -434,6 +454,7 @@ namespace TMRADIO
             if (!isRadioSelected)
             {
                 session.Rewind();
+                ShowMetadata();
             }
         }
 
@@ -442,6 +463,7 @@ namespace TMRADIO
             if (!isRadioSelected)
             {
                 session.FastForward();
+                ShowMetadata();
             }
         }
 
@@ -491,6 +513,7 @@ namespace TMRADIO
                     session.Play();
 
                     ShowNotification();
+                    ShowMetadata();
                     CreateXmlRecentPlayed(nextEpisode);
                 }
             }
@@ -542,6 +565,7 @@ namespace TMRADIO
                     session.Play();
 
                     ShowNotification();
+                    ShowMetadata();
                     CreateXmlRecentPlayed(prevEpisode);
                 }
             }
@@ -591,6 +615,7 @@ namespace TMRADIO
                     session.Play();
 
                     ShowNotification();
+                    ShowMetadata();
                     CreateXmlRecentPlayed(nextEpisode);
                 }
             }
@@ -918,7 +943,8 @@ namespace TMRADIO
                 new XElement("Url", episode.Url),
                 new XElement("Description", episode.Description));
             xdoc.Element("Episodes").AddFirst(newEpisode);
-            if (recentlyPlayedEpisodes.Count > 15)
+            //Delete the last episode from the file if all episodes > 15
+            if (recentlyPlayedEpisodes.Count > maxCountOfRecentlyPlayedEpisodes)
             {
                 xdoc.Element("Episodes").LastNode.Remove();
             }
@@ -1005,6 +1031,8 @@ namespace TMRADIO
             session.SetCurrentTime(slider.Value);
             session.Play();
             timer.Start();
+
+            ShowMetadata();
         }
 
         private void SliderDragStarted(object sender, EventArgs e)

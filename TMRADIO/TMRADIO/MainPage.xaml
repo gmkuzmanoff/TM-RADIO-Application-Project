@@ -65,8 +65,8 @@
                 </Frame>
                 <!--#endregion-->
                 <!--#region Frame Recently played shows-->
-                <Frame x:Name="frame_recentlyPlayed" IsVisible="false" Grid.Row="2" Padding="0" Margin="10,0" VerticalOptions="Center" HorizontalOptions="Fill" BackgroundColor="Transparent">
-                    <StackLayout Margin="0" BackgroundColor="Transparent" HeightRequest="150">
+                <Frame x:Name="frame_recentlyPlayed" Grid.Row="3" Padding="0" VerticalOptions="Center" HorizontalOptions="Fill" BackgroundColor="#170d37">
+                    <StackLayout Margin="10,0,0,0" BackgroundColor="Transparent">
                         <Frame Padding="0" Margin="0" BackgroundColor="Transparent">
                             <Label Text="Recently played" TextColor="Wheat" FontSize="14"/>
                         </Frame>
@@ -92,7 +92,7 @@
                 </Frame>
                 <!--#endregion-->
                 <!--#region Frame TM RADIO LIVE-->
-                <StackLayout Grid.Row="3">
+                <StackLayout Grid.Row="2" VerticalOptions="Center">
                     <Frame Padding="0" Margin="10,0" BackgroundColor="Transparent">
                         <Label Text="Live Stream" TextColor="Wheat" FontSize="14"/>
                     </Frame>
@@ -127,7 +127,7 @@
                 </StackLayout>
                 <!--#endregion-->
                 <!--#region Frame Menu Buttons-->
-                <Frame Grid.Row="4" Padding="20,0" Margin="0,0" BackgroundColor="#170d17" CornerRadius="5">
+                <Frame Grid.Row="4" Padding="10,0" Margin="0,0" BackgroundColor="#170d17" CornerRadius="0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
@@ -188,7 +188,7 @@
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
-                        <ImageButton x:Name="btn_playerBack" Padding="3" BackgroundColor="Transparent" Source="arrow_back" Clicked="PlayerBackArrowClicked"/>
+                        <ImageButton x:Name="btn_playerBack" Padding="5" BackgroundColor="Transparent" Source="arrow_back" Clicked="PlayerBackArrowClicked"/>
                         <Label Text="Now playing" TextColor="Wheat" FontSize="Title"/>
                         <Image Source="speaker" BackgroundColor="Transparent"/>
                     </FlexLayout>
@@ -260,7 +260,7 @@
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
-                        <ImageButton x:Name="btn_playlistClose" Padding="3" BackgroundColor="Transparent" Source="close" Clicked="PlaylistCloseClicked"/>
+                        <ImageButton x:Name="btn_playlistClose" Padding="5" BackgroundColor="Transparent" Source="close" Clicked="PlaylistCloseClicked"/>
                         <Label Text="Playlist" TextColor="Wheat" FontSize="Title"/>
                         <Image Source="playlist2" BackgroundColor="Transparent"/>
                     </FlexLayout>
@@ -305,7 +305,7 @@
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
-                        <ImageButton x:Name="btn_sheduleBack" Padding="3" BackgroundColor="Transparent" Source="arrow_back" Clicked="SheduleBackArrowClicked"/>
+                        <ImageButton x:Name="btn_sheduleBack" Padding="5" BackgroundColor="Transparent" Source="arrow_back" Clicked="SheduleBackArrowClicked"/>
                         <Label Text="Shedule" TextColor="Wheat" FontSize="Title"/>
                         <Image Source="calendar" BackgroundColor="Transparent"/>
                     </FlexLayout>
@@ -356,7 +356,7 @@
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
-                        <ImageButton x:Name="btn_browserBack" Padding="3" BackgroundColor="Transparent" Source="arrow_back" Clicked="HistoryBackArrowClicked"/>
+                        <ImageButton x:Name="btn_browserBack" Padding="5" BackgroundColor="Transparent" Source="arrow_back" Clicked="HistoryBackArrowClicked"/>
                         <Label Text="Time Machine" TextColor="Wheat" FontSize="Title"/>
                         <Image Source="history" BackgroundColor="Transparent"/>
                     </FlexLayout>
@@ -409,7 +409,7 @@
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
-                        <ImageButton x:Name="btn_aboutBack" Padding="3" BackgroundColor="Transparent" Source="arrow_back" Clicked="AboutBackArrowClicked"/>
+                        <ImageButton x:Name="btn_aboutBack" Padding="5" BackgroundColor="Transparent" Source="arrow_back" Clicked="AboutBackArrowClicked"/>
                         <Label Text="About TM-Radio" TextColor="Wheat" FontSize="Title"/>
                         <Image Source="about" BackgroundColor="Transparent"/>
                     </FlexLayout>

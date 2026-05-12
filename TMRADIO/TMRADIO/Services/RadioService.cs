@@ -9,8 +9,6 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Xml.Linq;
-using TagLib.IFD.Tags;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using static TMRADIO.Constants.Links;
@@ -37,12 +35,12 @@ namespace TMRADIO.Services
                 string[] annotation = annotationNode.InnerText.Split('\n');
 
                 model.StreamTitle = annotation[0].Split(':')[1].Trim();
-                model.StreamDescription = annotation[1].Split(':')[1].Trim() + ": " + annotation[1].Split(':')[2].Trim();
-                model.StreamContentType = annotation[2].Split(':')[1].Trim();
-                model.StreamBitrate = annotation[3].Split(':')[1].Trim();
+                model.StreamDescription = "Best of Underground :: Techno, Tech House, Progressive & Deep House"; //annotation[1].Split(':')[1].Trim() + ": " + annotation[1].Split(':')[2].Trim();
+                model.StreamContentType = "audio/mpeg"; //annotation[2].Split(':')[1].Trim();
+                model.StreamBitrate = "256 Kbps"; //annotation[3].Split(':')[1].Trim();
                 model.StreamCurrentListeners = annotation[4].Split(':')[1].Trim();
                 model.StreamPeakListeners = annotation[5].Split(':')[1].Trim();
-                model.StreamGenre = annotation[6].Split(':')[1].Trim();
+                model.StreamGenre = "Techno"; //annotation[6].Split(':')[1].Trim();
             }
             catch (Exception)
             {
