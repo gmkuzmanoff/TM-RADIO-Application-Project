@@ -22,8 +22,8 @@ The project focuses on simplicity, stability, and a smooth listening experience 
 - **Language:** C#  
 - **Framework:** Xamarin.Forms 5 (Cross‑Platform)  
 - **IDE:** Visual Studio 2022  
-- **Minimum Android Version:** API 26 (Android 8.0)  
-- **Target Android Version:** Android 13+  
+- **Minimum Android Version:** API 21 (Android 5.0)  
+- **Target Android Version:** API 33 (Android 13+) 
 - **Streaming Protocol:** HTTP/ICY audio stream
 
 ---
