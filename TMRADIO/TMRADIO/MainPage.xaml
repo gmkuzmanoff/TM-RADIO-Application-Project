@@ -127,8 +127,8 @@
                 </StackLayout>
                 <!--#endregion-->
                 <!--#region Frame Menu Buttons-->
-                <Frame Grid.Row="4" Padding="10,0" Margin="0,0" BackgroundColor="#170d17" CornerRadius="0">
-                    <Grid>
+                <Frame Grid.Row="4" Padding="0,1,0,0" Margin="0,0" BackgroundColor="LimeGreen" CornerRadius="0">
+                    <Grid BackgroundColor="#170d17">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
@@ -139,25 +139,25 @@
                         <Frame Grid.Column="0" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
                             <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
                                 <ImageButton x:Name="btn_broadcast" WidthRequest="35" Margin="0" Padding="0" Source="speaker" BackgroundColor="Transparent" Clicked="PlayerMenuClicked"/>
-                                <Label Text="player" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                                <Label Text="player" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="9" TextColor="Wheat"/>
                             </StackLayout>
                         </Frame>
                         <Frame Grid.Column="1" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
                             <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
                                 <ImageButton x:Name="btn_shedule" WidthRequest="35" Margin="0" Padding="0" Source="calendar" BackgroundColor="Transparent" Clicked="SheduleMenuClicked"/>
-                                <Label Text="shedule" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                                <Label Text="shedule" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="9" TextColor="Wheat"/>
                             </StackLayout>
                         </Frame>
                         <Frame Grid.Column="2" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
                             <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
                                 <ImageButton x:Name="btn_browse" WidthRequest="35" Margin="0" Padding="0" Source="history" BackgroundColor="Transparent" Clicked="HystoryMenuClicked"/>
-                                <Label Text="on-demand" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                                <Label Text="on-demand" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="9" TextColor="Wheat"/>
                             </StackLayout>
                         </Frame>
                         <Frame Grid.Column="3" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
                             <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
                                 <ImageButton x:Name="btn_about" WidthRequest="35" Margin="0" Padding="0" Source="about" BackgroundColor="Transparent" Clicked="AboutMenuClicked"/>
-                                <Label Text="about" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                                <Label Text="about" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="9" TextColor="Wheat"/>
                             </StackLayout>
                         </Frame>
                         <!--<Frame Grid.Column="4" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
@@ -169,7 +169,7 @@
                         <Frame Grid.Column="4" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
                             <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
                                 <ImageButton x:Name="btn_power_off" WidthRequest="35" Margin="0" Padding="0" BackgroundColor="Transparent" Source="power_off" Clicked="PowerOffMenuClicked"/>
-                                <Label Text="exit" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                                <Label Text="exit" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="9" TextColor="Wheat"/>
                             </StackLayout>
                         </Frame>
                     </Grid>
@@ -357,7 +357,7 @@
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
                         <ImageButton x:Name="btn_browserBack" Padding="5" BackgroundColor="Transparent" Source="arrow_back" Clicked="HistoryBackArrowClicked"/>
-                        <Label Text="On-Demand Streaming" TextColor="Wheat" FontSize="Title"/>
+                        <Label Text="On-Demand" TextColor="Wheat" FontSize="Title"/>
                         <Image Source="history" BackgroundColor="Transparent"/>
                     </FlexLayout>
                 </Frame>
