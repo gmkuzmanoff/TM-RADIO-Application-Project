@@ -8,7 +8,7 @@ The project focuses on simplicity, stability, and a smooth listening experience 
 
 ## 🚀 Features
 
-- 📡 **Live Radio Streaming** – Listen to TM‑Radio’s electronic music stream and countless sessions.
+- 📡 **Live Radio & On-Demand Streaming** – Listen to TM‑Radio’s electronic music stream and countless sessions.
 - 🎵 **High‑Quality Audio Playback** – Stable playback with properly used Media Session.
 - 📱 **Modern Android UI** – Clean user-flriendly interface built for Android 8+.
 - 🔊 **Background Playback** – Music continues even when minimized and corresponding with bluetooth media devices.
