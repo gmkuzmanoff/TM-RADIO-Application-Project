@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
@@ -113,7 +114,7 @@ namespace TMRADIO
             {
                 Task.Run(async () =>
                 {
-                    bool isOK = await DisplayAlert("TMRADIO", "This application REQUIRE internet connection!", "", "exit", FlowDirection.LeftToRight);
+                    bool isOK = await DisplayAlert("TMRADIO", "This application REQUIRE network connection!", "", "exit", FlowDirection.LeftToRight);
                     if (!isOK)
                     {
                         radioService.CleanTempDir();

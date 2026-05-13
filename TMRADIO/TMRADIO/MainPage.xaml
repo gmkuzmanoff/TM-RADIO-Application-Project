@@ -33,7 +33,7 @@
                     <RowDefinition Height="60"/>
                     <RowDefinition Height="200"/>
                     <RowDefinition/>
-                    <RowDefinition Height="150"/>
+                    <RowDefinition Height="160"/>
                     <RowDefinition Height="60"/>
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
@@ -65,9 +65,9 @@
                 </Frame>
                 <!--#endregion-->
                 <!--#region Frame Recently played shows-->
-                <Frame x:Name="frame_recentlyPlayed" Grid.Row="3" Padding="0" VerticalOptions="Center" HorizontalOptions="Fill" BackgroundColor="#170d37">
+                <Frame x:Name="frame_recentlyPlayed" Grid.Row="3" Padding="0" VerticalOptions="Center" HorizontalOptions="Fill" BackgroundColor="#1A0B2E">
                     <StackLayout Margin="10,0,0,0" BackgroundColor="Transparent">
-                        <Frame Padding="0" Margin="0" BackgroundColor="Transparent">
+                        <Frame Padding="0" Margin="0,3,0,0" BackgroundColor="Transparent">
                             <Label Text="Recently played" TextColor="Wheat" FontSize="14"/>
                         </Frame>
                         <Frame Padding="0" Margin="0,3" BackgroundColor="Transparent">
@@ -151,7 +151,7 @@
                         <Frame Grid.Column="2" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
                             <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
                                 <ImageButton x:Name="btn_browse" WidthRequest="35" Margin="0" Padding="0" Source="history" BackgroundColor="Transparent" Clicked="HystoryMenuClicked"/>
-                                <Label Text="history" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
+                                <Label Text="on-demand" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="10" TextColor="Wheat"/>
                             </StackLayout>
                         </Frame>
                         <Frame Grid.Column="3" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
@@ -247,7 +247,7 @@
                     </Grid>
                 </Frame>
                 <Frame Grid.Row="4" Padding="20,0" Margin="0,0" BackgroundColor="#170d17">
-                    <Label x:Name="lbl_descriptiion" TextColor="#222f5b" FontSize="20" Padding="5" VerticalTextAlignment="End" HorizontalTextAlignment="Center" VerticalOptions="EndAndExpand" HorizontalOptions="CenterAndExpand"/>
+                    <Label x:Name="lbl_descriptiion" TextColor="#222f5b" FontSize="22" Padding="5" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" VerticalOptions="Center" HorizontalOptions="CenterAndExpand"/>
                 </Frame>
             </Grid>
             <!--#endregion-->
@@ -357,7 +357,7 @@
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
                         <ImageButton x:Name="btn_browserBack" Padding="5" BackgroundColor="Transparent" Source="arrow_back" Clicked="HistoryBackArrowClicked"/>
-                        <Label Text="Time Machine" TextColor="Wheat" FontSize="Title"/>
+                        <Label Text="On-Demand Streaming" TextColor="Wheat" FontSize="Title"/>
                         <Image Source="history" BackgroundColor="Transparent"/>
                     </FlexLayout>
                 </Frame>
