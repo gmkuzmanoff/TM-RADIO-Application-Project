@@ -247,7 +247,7 @@
                     </Grid>
                 </Frame>
                 <Frame Grid.Row="4" Padding="20,0" Margin="0,0" BackgroundColor="#170d17">
-                    <Label x:Name="lbl_descriptiion" TextColor="#222f5b" FontSize="22" Padding="5" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" VerticalOptions="Center" HorizontalOptions="CenterAndExpand"/>
+                    <Label x:Name="lbl_descriptiion" TextColor="#222f5b" FontSize="20" Padding="5" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" VerticalOptions="Center" HorizontalOptions="CenterAndExpand"/>
                 </Frame>
             </Grid>
             <!--#endregion-->
