@@ -425,6 +425,14 @@
                                 <ImageButton x:Name="btn_twitter" Source="twitter" BackgroundColor="Transparent" Clicked="TwitterLinkClicked"/>
                                 <ImageButton x:Name="btn_web" Source="web" BackgroundColor="Transparent" Clicked="WebsiteLinkClicked"/>
                             </FlexLayout>
+                            <BoxView HeightRequest="1" Margin="5" BackgroundColor="LightGray" HorizontalOptions="FillAndExpand" />
+                            <StackLayout Padding="5" HorizontalOptions="Fill" VerticalOptions="FillAndExpand" BackgroundColor="#140720">
+                                <Label Text="TMRADIO" Padding="5,0" FontSize="18" FontFamily="RobotoCondensed-Bold" TextColor="AntiqueWhite"/>
+                                <Label Text="v1.0 (13.05.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
+                                <Label Text="© 2014-2026, gmkuzmanoff" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
+                                <Label Text="gmkuzmanoff@gmail.com" Padding="5" FontSize="14" FontFamily="RobotoCondensed-Regular" TextColor="CornflowerBlue" TextDecorations="Underline"/>
+                                <Label Text="https://github.com/gmkuzmanoff/TM-RADIO-Application-Project" Padding="5" FontSize="14" FontFamily="RobotoCondensed-Regular" TextColor="CornflowerBlue" TextDecorations="Underline"/>
+                            </StackLayout>
                         </StackLayout>
                     </ScrollView>
                 </Frame>
