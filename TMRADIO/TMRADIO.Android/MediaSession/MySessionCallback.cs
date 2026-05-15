@@ -48,23 +48,23 @@ namespace TMRADIO.Droid.MediaSession
                             session.Play();
                         break;
                     case Keycode.MediaPause:
-                        if (mediaSource != TMRADIO_URL)
+                        if (mediaSource != TMRADIO_STREAM_URL)
                             session.Pause();
                         else
                             session.Stop();
                         break;
                     case Keycode.MediaStop:
-                        if (mediaSource != TMRADIO_URL)
+                        if (mediaSource != TMRADIO_STREAM_URL)
                             session.Pause();
                         else
                             session.Stop();
                         break;
                     case Keycode.MediaRewind:
-                        if (mediaSource != TMRADIO_URL)
+                        if (mediaSource != TMRADIO_STREAM_URL)
                             session.Rewind();
                         break;
                     case Keycode.MediaFastForward:
-                        if (mediaSource != TMRADIO_URL)
+                        if (mediaSource != TMRADIO_STREAM_URL)
                             session.FastForward();
                         break;
                     default:
@@ -89,7 +89,7 @@ namespace TMRADIO.Droid.MediaSession
                 {
                     Title = title,
                     Artist = artist,
-                    AlbumArt = mediaSource == TMRADIO_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt),
+                    AlbumArt = mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt),
                     Album = album,
                     Duration = session.GetMediaDuration()
                 };

@@ -998,7 +998,7 @@ namespace TMRADIO
             var isOk = await DisplayAlert("TMRADIO", "Open link?", "ok", "cancel");
             if (isOk)
             {
-                await Browser.OpenAsync("https://www.facebook.com/tmradiodotcom", BrowserLaunchMode.SystemPreferred);
+                await Browser.OpenAsync(TM_FACEBOOK, BrowserLaunchMode.SystemPreferred);
             }
         }
 
@@ -1007,7 +1007,7 @@ namespace TMRADIO
             var isOk = await DisplayAlert("TMRADIO", "Open link?", "ok", "cancel");
             if (isOk)
             {
-                await Browser.OpenAsync("https://twitter.com/_TMRadio", BrowserLaunchMode.SystemPreferred);
+                await Browser.OpenAsync(TM_TWITTER, BrowserLaunchMode.SystemPreferred);
             }
         }
 
@@ -1016,7 +1016,7 @@ namespace TMRADIO
             var isOk = await DisplayAlert("TMRADIO", "Open link?", "ok", "cancel");
             if (isOk)
             {
-                await Browser.OpenAsync("https://www.tm-radio.com/", BrowserLaunchMode.SystemPreferred);
+                await Browser.OpenAsync(TM_WEBSITE, BrowserLaunchMode.SystemPreferred);
             }
         }
 
@@ -1119,6 +1119,32 @@ namespace TMRADIO
                 cview_recently.SelectedItem = null;
             }
             
+        }
+
+        private async void GithubRepositoryClicked(object sender, EventArgs e)
+        {
+            var isOk = await DisplayAlert("TMRADIO", "Open github repository?", "ok", "cancel");
+            if (isOk)
+            {
+                await Browser.OpenAsync(GITHUB_REPOSITORY, BrowserLaunchMode.SystemPreferred);
+            }
+        }
+
+        private async void AuthorEmailClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var email = "gmkuzmanoff@gmail.com";
+                var subject = Uri.EscapeDataString("Support Request");
+                var body = Uri.EscapeDataString("Hello, I need help with...");
+                var mailtoUri = $"mailto:{email}?subject={subject}&body={body}";
+
+                await Xamarin.Essentials.Launcher.OpenAsync(mailtoUri);
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Unable to open email app: {ex.Message}", "OK");
+            }
         }
     }
 }
