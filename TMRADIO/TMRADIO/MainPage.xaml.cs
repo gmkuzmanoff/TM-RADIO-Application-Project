@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Xml;
 using System.Xml.Linq;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
@@ -402,7 +403,7 @@ namespace TMRADIO
         private void ShowMetadata()
         {
             //Set metadata
-            Device.StartTimer(TimeSpan.FromSeconds(5), () =>
+            Device.StartTimer(TimeSpan.FromSeconds(3), () =>
             {
                 session.SetPlaybackState();
                 session.SetMetadata(metadataViewModel);
@@ -1101,6 +1102,18 @@ namespace TMRADIO
                     session.Play();
 
                     ShowNotification();
+
+                    //Add episode to first place of the list and remove it from the old place
+                    var xdoc = XDocument.Load(XmlRecentlyPlayedFile);
+                    var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(episode)];
+                    targetedNode.Remove();
+                    xdoc.Root.AddFirst(targetedNode);
+                    xdoc.Save(XmlRecentlyPlayedFile);
+                    //Refresh view
+                    frame_recentlyPlayed.IsVisible = true;
+                    recentlyPlayedEpisodes.Clear();
+                    GetRecentlyPlayed();
+                    cview_recently.ItemsSource = recentlyPlayedEpisodes;
                 }
 
                 cview_recently.SelectedItem = null;
