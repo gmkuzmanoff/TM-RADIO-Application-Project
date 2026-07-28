@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
+using Java.Lang.Annotation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -49,6 +50,7 @@ namespace TMRADIO
         private readonly ObservableCollection<ShowViewModel> oldShowViewModels;
         private readonly ObservableCollection<PlaylistEntity> episodes;
         private readonly ObservableCollection<PlaylistEntity> recentlyPlayedEpisodes;
+        private readonly ObservableCollection<PlaylistEntity> favouriteEpisodes;
         private readonly ObservableCollection<GroupedCollection<string, ShowViewModel>> allShowsViewModels;
 
         public MainPage()
@@ -73,9 +75,23 @@ namespace TMRADIO
             oldShowViewModels = new ObservableCollection<ShowViewModel>();
             episodes = new ObservableCollection<PlaylistEntity>();
             recentlyPlayedEpisodes = new ObservableCollection<PlaylistEntity>();
+            favouriteEpisodes = new ObservableCollection<PlaylistEntity>();
             allShowsViewModels = new ObservableCollection<GroupedCollection<string, ShowViewModel>>();
 
             InitializeComponent();
+
+            #region 'Load Favourite episodes'
+            //Load and Show recently played episodes
+            if (!System.IO.File.Exists(XmlFavouritesFile))
+            {
+                XDocument xdoc = new XDocument();
+                XElement root = new XElement("Episodes");
+                xdoc.Add(root);
+                xdoc.Save(XmlFavouritesFile);
+            }
+            GetFavourites();
+            lv_favourites.ItemsSource = favouriteEpisodes;
+            #endregion
 
             #region 'Load and Show recently played episodes'
             //Load and Show recently played episodes
@@ -201,6 +217,11 @@ namespace TMRADIO
                 grid_playlist.Opacity = 0;
                 grid_playlist.IsVisible = false;
             }
+            else if (grid_favourites.IsVisible)
+            {
+                grid_favourites.Opacity = 0;
+                grid_favourites.IsVisible = false;
+            }
             else if (grid_nowPlaying.IsVisible)
             {
                 Device.BeginInvokeOnMainThread(async () =>
@@ -285,6 +306,14 @@ namespace TMRADIO
                 allShowsViewModels.Add(new GroupedCollection<string, ShowViewModel>("Connection error!", oldShowViewModels));
             }
 
+        }
+
+        private void GetFavourites()
+        {
+            foreach (var ep in radioService.Favourites())
+            {
+                favouriteEpisodes.Add(ep);
+            }
         }
 
         private void GetRecentlyPlayed()
@@ -403,7 +432,7 @@ namespace TMRADIO
         private void ShowMetadata()
         {
             //Set metadata
-            Device.StartTimer(TimeSpan.FromSeconds(3), () =>
+            Device.StartTimer(TimeSpan.FromSeconds(1), () =>
             {
                 session.SetPlaybackState();
                 session.SetMetadata(metadataViewModel);
@@ -621,6 +650,9 @@ namespace TMRADIO
                     CreateXmlRecentPlayed(nextEpisode);
                 }
             }
+
+            ShowNotification();
+            ShowMetadata();
         }
         #endregion
 
@@ -797,7 +829,7 @@ namespace TMRADIO
             show = (ShowViewModel)e.Item;
             lbl_playlistCount.Text = $"Sessions: 0";
 
-            bool isOk = await DisplayAlert($"TMRADIO", $"Load episodes from {show.Title} show?", "load", "cancel");
+            bool isOk = await DisplayAlert($"TMRADIO", $"Load episodes from {show.Title}?", "load", "cancel");
 
             if (isOk)
             {
@@ -941,7 +973,7 @@ namespace TMRADIO
             newEpisode.Add(
                 new XElement("Title", episode.Title),
                 new XElement("Image", episode.ImageArt),
-                new XElement("Show", selectedShow),
+                new XElement("Show", string.IsNullOrEmpty(selectedShow) ? episode.Show : selectedShow),
                 new XElement("Url", episode.Url),
                 new XElement("Description", episode.Description));
             xdoc.Element("Episodes").AddFirst(newEpisode);
@@ -1145,6 +1177,166 @@ namespace TMRADIO
             {
                 await DisplayAlert("Error", $"Unable to open email app: {ex.Message}", "OK");
             }
+        }
+
+        private async void FavouritesClicked(object  sender, EventArgs e)
+        {
+            grid_favourites.IsVisible = true;
+            await grid_favourites.FadeTo(0.9, 300);
+        }
+
+        private void FavouriteCloseClicked(object sender, EventArgs e)
+        {
+            grid_favourites.Opacity = 0;
+            grid_favourites.IsVisible = false;
+        }
+
+        private void AddToFavouritesClicked(object sender, EventArgs e)
+        {
+            var episode = episodes.Where(x => x.Url == nowPlayingTarget).FirstOrDefault() ?? recentlyPlayedEpisodes.Where(x => x.Url == nowPlayingTarget).FirstOrDefault();
+            
+            if (!isRadioSelected)
+            {
+                if (!favouriteEpisodes.Any(x => x.Url == episode.Url))
+                {
+                    launchActivity.AddedToFavourites(episode.Title);
+                    CreateXmlFavouriteEntity(episode);
+                }
+                else
+                {
+                    launchActivity.ExistInFavourites(episode.Title);
+                }
+            }
+        }
+
+        private async void FavouritesItemTapped(object sender, ItemTappedEventArgs e)
+        {
+            var episode = (PlaylistEntity)e.Item;
+
+            bool isOk = await DisplayAlert($"{episode.Show}", $"{episode.Title}", "play", "cancel");
+
+            if (isOk)
+            {
+                var image = episode.ImageArt.StartsWith("/") ? $"https://www.tm-radio.com{episode.ImageArt}" : episode.ImageArt;
+                episode.ImageArt = image;
+
+                await DownloadAndResizeFileAsync(image, $"{ExternalCacheDir}/Temp", episode.Title);
+
+                session.Stop();
+
+                grid_nowPlaying.IsVisible = true;
+                await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
+
+                isRadioSelected = false;
+                nowPlayingTarget = episode.Url;
+
+                session.LoadMedia(nowPlayingTarget);
+
+                session.MediaParse();
+
+                long episodeDuration = session.GetMediaDuration();
+
+                //Create notification data
+                notificationViewModel.Title = episode.Title;
+                notificationViewModel.Artist = episode.Description;
+                notificationViewModel.Album = episode.Show;
+                notificationViewModel.AlbumArt = episode.ImageSource;
+                notificationViewModel.Duration = episodeDuration;
+
+                //Create metadata
+                metadataViewModel.Title = episode.Title;
+                metadataViewModel.Artist = episode.Description;
+                metadataViewModel.Album = episode.Show;
+                metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
+                metadataViewModel.Duration = episodeDuration;
+
+                ShowMetadata();
+
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    lbl_title.Text = episode.Title;
+                    img_logo.Source = episode.ImageSource;
+                    lbl_album.Text = episode.Show;
+                    lbl_currListeners.Text = $"";
+                    lbl_bitrate.Text = $"";
+                    lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
+                });
+
+                session.Play();
+
+                ShowNotification();
+
+                if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
+                {
+                    var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
+                    //Add episode to first place of the list and remove it from the old place
+                    var xdoc = XDocument.Load(XmlRecentlyPlayedFile);
+                    var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
+                    targetedNode.Remove();
+                    xdoc.Root.AddFirst(targetedNode);
+                    xdoc.Save(XmlRecentlyPlayedFile);
+                    //Refresh view
+                    frame_recentlyPlayed.IsVisible = true;
+                    recentlyPlayedEpisodes.Clear();
+                    GetRecentlyPlayed();
+                    cview_recently.ItemsSource = recentlyPlayedEpisodes;
+                }
+                else
+                {
+                    CreateXmlRecentPlayed(episode);
+                }
+            }
+
+            cview_recently.SelectedItem = null;
+        }
+
+        private void FavouritesItemAppearing(object sender, ItemVisibilityEventArgs e)
+        {
+            lbl_favouriteEpisodesCount.Text = $"Favourite Sessions: {favouriteEpisodes.Count}";
+        }
+
+        private async void FavouriteEntityDeleteClicked(object sender, EventArgs e)
+        {
+            MenuItem url = (MenuItem)sender;
+            var episodeToRemove = favouriteEpisodes.First(x => x.Url == url.CommandParameter.ToString());
+
+            bool isOk = await DisplayAlert($"TMRADIO", $"Remove {episodeToRemove.Title} from Favourites?", "remove", "cancel");
+            if (isOk)
+            {
+                XDocument xdoc = XDocument.Load(XmlFavouritesFile);
+                var targetNode = xdoc.Descendants("Episode").ToList()[favouriteEpisodes.IndexOf(episodeToRemove)];
+                targetNode.Remove();
+                xdoc.Save(XmlFavouritesFile);
+                //Refresh view
+                favouriteEpisodes.Clear();
+                GetFavourites();
+                lv_favourites.ItemsSource = favouriteEpisodes;
+
+                if (!favouriteEpisodes.Any())
+                {
+                    lbl_favouriteEpisodesCount.Text = $"Favourite Sessions: 0";
+                }
+            }
+        }
+
+        private void CreateXmlFavouriteEntity(PlaylistEntity episode)
+        {
+            //Add episode to XML file (favourites)
+            XDocument xdoc = XDocument.Load(XmlFavouritesFile);
+            XElement newEpisode = new XElement("Episode");
+            newEpisode.Add(
+                new XElement("Title", episode.Title),
+                new XElement("Image", episode.ImageArt),
+                new XElement("Show", string.IsNullOrEmpty(selectedShow) ? episode.Show : selectedShow),
+                new XElement("Url", episode.Url),
+                new XElement("Description", episode.Description));
+            xdoc.Element("Episodes").AddFirst(newEpisode);
+            xdoc.Save(XmlFavouritesFile);
+            //Refresh view
+            //frame_recentlyPlayed.IsVisible = true;
+            favouriteEpisodes.Clear();
+            GetFavourites();
+            lv_favourites.ItemsSource = favouriteEpisodes;
         }
     }
 }

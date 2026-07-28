@@ -14,5 +14,6 @@ namespace TMRADIO.Interfaces
         byte[] ResizeImageAndroid(byte[] imageData);
         void CleanTempDir();
         ObservableCollection<PlaylistEntity> RecentlyPlayed();
+        ObservableCollection<PlaylistEntity> Favourites();
     }
 }

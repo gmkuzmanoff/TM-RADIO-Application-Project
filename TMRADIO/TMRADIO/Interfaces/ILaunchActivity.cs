@@ -8,6 +8,8 @@ namespace TMRADIO.Interfaces
     public interface ILaunchActivity
     {
         void StartNativeIntentOnBackButtonPressed();
-        void ShowSomeToast();
+        void AddedToFavourites(string title);
+        void RemovedFromFavourites(string title);
+        void ExistInFavourites(string title);
     }
 }

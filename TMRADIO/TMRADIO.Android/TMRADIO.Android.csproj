@@ -163,6 +163,10 @@
     <AndroidResource Include="Resources\drawable\facebook.png" />
     <AndroidResource Include="Resources\drawable\fastforward_not.png" />
     <AndroidResource Include="Resources\drawable\fast_forward.png" />
+    <AndroidResource Include="Resources\drawable\heart_plus.png" />
+    <AndroidResource Include="Resources\drawable\playlist_star.png" />
+    <AndroidResource Include="Resources\drawable\playlist_star2.png" />
+    <AndroidResource Include="Resources\drawable\delete_favourite.png" />
     <Content Include="Resources\drawable\icon.ico" />
     <AndroidResource Include="Resources\drawable\twitter.png" />
     <AndroidResource Include="Resources\drawable\web.png" />

@@ -12,6 +12,8 @@
         public static string TM_WEBSITE = "https://www.tm-radio.com/";
         public static string GITHUB_REPOSITORY = "https://github.com/gmkuzmanoff/TM-RADIO-Application-Project";
         public static string ExternalCacheDir = Android.App.Application.Context.ExternalCacheDir.AbsolutePath;
-        public static string XmlRecentlyPlayedFile = $"{ExternalCacheDir}/RecentlyPlayed.xml";
+        public static string ExternalFilesDir = Android.App.Application.Context.GetExternalFilesDir("").AbsolutePath;
+        public static string XmlRecentlyPlayedFile = $"{ExternalFilesDir}/RecentlyPlayed.xml";
+        public static string XmlFavouritesFile = $"{ExternalFilesDir}/Favourites.xml";
     }
 }

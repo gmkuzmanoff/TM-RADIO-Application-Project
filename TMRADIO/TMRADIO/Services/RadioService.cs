@@ -219,30 +219,28 @@ namespace TMRADIO.Services
 
             while (!string.IsNullOrEmpty(htmlDoc.ParsedText))
             {
-                var titles = htmlDoc.DocumentNode.SelectNodes("//div[@class='episode-file']");
-                
-                var urlsNodes = htmlDoc.DocumentNode.SelectNodes("//audio");
+                //var titles = htmlDoc.DocumentNode.SelectNodes("//div[@class='episode-file']");
 
-                if (titles == null)
+                var audioNodes = htmlDoc.DocumentNode.SelectNodes("//audio");
+
+                if (audioNodes == null)
                 {
-                    break;
+                    pageItems += 5;
+                    url = $"https://www.tm-radio.com/shows.php?id={id}&loadFrom={pageItems}";
+                    htmlDoc = web.Load(url);
+                    continue;
                 }
 
-                for (int i = 0; i < titles.Count; i++)
+                for (int i = 0; i < audioNodes.Count; i++)
                 {
                     string title = string.Empty;
                     string img;
                     string description = string.Empty;
                     string webAddress;
-                    
-                    if (urlsNodes == null)
-                    {
-                        continue;
-                    }
 
                     try
                     {
-                        webAddress = $"https://www.tm-radio.com{urlsNodes[i].GetAttributeValue("src", string.Empty)}";
+                        webAddress = $"https://www.tm-radio.com{audioNodes[i].GetAttributeValue("src", string.Empty)}";
                     }
                     catch
                     {
@@ -251,8 +249,8 @@ namespace TMRADIO.Services
 
                     try
                     {
-                        img = titles[i].ParentNode.PreviousSibling.ChildNodes[1].FirstChild.GetAttributeValue("src", string.Empty);
-                        
+                        img = audioNodes[i].ParentNode.ParentNode.ParentNode.ParentNode.ParentNode.FirstChild.FirstChild.NextSibling.FirstChild.GetAttributeValue("src", string.Empty);
+
                         if (img == "/pic/tm-radio-episode.png")
                         {
                             img = string.Empty;
@@ -262,20 +260,20 @@ namespace TMRADIO.Services
 
                     try
                     {
-                        description = titles[i].ParentNode.PreviousSibling.ChildNodes[3].InnerText;
+                        description = audioNodes[i].ParentNode.ParentNode.ParentNode.ParentNode.ParentNode.FirstChild.NextSibling.FirstChild.FirstChild.FirstChild.InnerHtml;
                     }
                     catch { }
 
                     try
                     {
-                        title = titles[i].FirstChild.InnerText.Replace(".mp3", "");
+                        title = audioNodes[i].ParentNode.ParentNode.ParentNode.FirstChild.InnerHtml.Replace(".mp3", "");
                     }
                     catch { }
 
                     list.Add(new PlaylistEntity()
                     {
                         ImageArt = img,
-                        Title = WebUtility.HtmlDecode(title),             
+                        Title = WebUtility.HtmlDecode(title),
                         Url = webAddress,
                         Description = description
                     });
@@ -284,11 +282,6 @@ namespace TMRADIO.Services
                 pageItems += 5;
                 url = $"https://www.tm-radio.com/shows.php?id={id}&loadFrom={pageItems}";
                 htmlDoc = web.Load(url);
-            }
-
-            if (!list.Any())
-            {
-                
             }
 
             return list;
@@ -345,6 +338,30 @@ namespace TMRADIO.Services
                 list.Add(playlistEntity);
             }
             
+            return list;
+        }
+
+        public ObservableCollection<PlaylistEntity> Favourites()
+        {
+            ObservableCollection<PlaylistEntity> list = new ObservableCollection<PlaylistEntity>();
+
+            var xdoc = new XmlDocument();
+            xdoc.Load(XmlFavouritesFile);
+            XmlNodeList epNodes = xdoc.GetElementsByTagName("Episode");
+            foreach (XmlNode epNode in epNodes)
+            {
+                var playlistEntity = new PlaylistEntity()
+                {
+                    Title = epNode.ChildNodes[0].InnerText,
+                    ImageArt = string.IsNullOrEmpty(epNode.ChildNodes[1].InnerText) ? $"{ExternalCacheDir}/tm_radio_episode.jpg" : epNode.ChildNodes[1].InnerText,
+                    Show = epNode.ChildNodes[2].InnerText,
+                    Url = epNode.ChildNodes[3].InnerText,
+                    Description = epNode.ChildNodes[4].InnerText
+                };
+
+                list.Add(playlistEntity);
+            }
+
             return list;
         }
     }
