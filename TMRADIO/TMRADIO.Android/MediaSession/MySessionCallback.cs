@@ -4,7 +4,6 @@ using Android.Support.V4.Media.Session;
 using Android.Views;
 using Android.Widget;
 using System;
-using System.Net.Http;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using Xamarin.Forms;
@@ -45,7 +44,7 @@ namespace TMRADIO.Droid.MediaSession
                             session.Play();
                         break;
                     case Keycode.MediaPlay:
-                            session.Play();
+                        session.Play();
                         break;
                     case Keycode.MediaPause:
                         if (mediaSource != TMRADIO_STREAM_URL)
@@ -61,50 +60,69 @@ namespace TMRADIO.Droid.MediaSession
                         break;
                     case Keycode.MediaRewind:
                         if (mediaSource != TMRADIO_STREAM_URL)
-                            session.Rewind();
+                            session.RewindPressed();
                         break;
                     case Keycode.MediaFastForward:
                         if (mediaSource != TMRADIO_STREAM_URL)
-                            session.FastForward();
+                            session.FastForwardPressed();
                         break;
                     default:
                         break;
                 }
+                Toast.MakeText(context, $"Callback: {keycode.KeyCode} pressed!", ToastLength.Long).Show();
 
-                //Create notification
-                NotificationViewModel notificationViewModel = new NotificationViewModel()
-                {
-                    Title = title,
-                    Artist = artist,
-                    AlbumArt = albumArt,
-                    Album = album,
-                    Duration = session.GetMediaDuration(),
-                    Position = session.GetCurrentPosition()
-                };
-                session.ShowMediaNotification(notificationViewModel);
-
-                //Create metadata
-                //byte[] image = new HttpClient().GetByteArrayAsync(albumArt).Result;
-                MetadataViewModel metadataViewModel = new MetadataViewModel()
-                {
-                    Title = title,
-                    Artist = artist,
-                    AlbumArt = mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt),
-                    Album = album,
-                    Duration = session.GetMediaDuration()
-                };
-                //Set metadata
-                Device.StartTimer(TimeSpan.FromSeconds(5), () =>
-                {
-                    session.SetPlaybackState();
-                    session.SetMetadata(metadataViewModel);
-                    session.InitializeSession();
-
-                    return false;
-                });
-                Toast.MakeText(context, $"Callback:  {keycode.KeyCode} pressed!", ToastLength.Long).Show();
-                //Log.Debug($"[{context.PackageName}]", $"Intent: {keycode}");
             }
+
+            if (keycode != null && keycode.Action == KeyEventActions.Up)
+            {
+                switch (keycode.KeyCode)
+                {
+                    case Keycode.MediaFastForward:
+                        session.FastForwardReleased();
+                        break;
+                    case Keycode.MediaRewind:
+                        session.RewindReleased();
+                        break;
+                    default:
+                        break;
+                }
+                Toast.MakeText(context, $"Callback: {keycode.KeyCode} released!", ToastLength.Short).Show();
+            }
+
+            //Create notification
+            NotificationViewModel notificationViewModel = new NotificationViewModel()
+            {
+                Title = title,
+                Artist = artist,
+                AlbumArt = albumArt,
+                Album = album,
+                Duration = session.GetMediaDuration(),
+                Position = session.GetCurrentPosition()
+            };
+            session.ShowMediaNotification(notificationViewModel);
+
+            //Create metadata
+            //byte[] image = new HttpClient().GetByteArrayAsync(albumArt).Result;
+            MetadataViewModel metadataViewModel = new MetadataViewModel()
+            {
+                Title = title,
+                Artist = artist,
+                AlbumArt = mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt),
+                Album = album,
+                Duration = session.GetMediaDuration()
+            };
+            //Set metadata
+            Device.StartTimer(TimeSpan.FromSeconds(1), () =>
+            {
+                session.SetPlaybackState();
+                session.SetMetadata(metadataViewModel);
+                session.InitializeSession();
+
+                return false;
+            });
+
+            //Log.Debug($"[{context.PackageName}]", $"Intent: {keycode}");
+        
 
             return base.OnMediaButtonEvent(mediaButtonEvent);
         }

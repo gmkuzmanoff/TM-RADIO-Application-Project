@@ -258,10 +258,10 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <ImageButton x:Name="btn_skipToPrev" Grid.Column="0" WidthRequest="30" VerticalOptions="Center" HorizontalOptions="Center" Source="skip_prev" BackgroundColor="Transparent" Clicked="SkipToPrevClicked"/>
-                        <ImageButton x:Name="btn_30bTmRadio" Grid.Column="1" WidthRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="rewind" BackgroundColor="Transparent" Clicked="RewindClicked"/>
+                        <ImageButton x:Name="btn_30bTmRadio" Grid.Column="1" WidthRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="rewind" BackgroundColor="Transparent" Pressed="RewindPressed" Released="RewindReleased" Clicked="RewindClicked"/>
                         <ImageButton x:Name="btn_pauseTmRadio" Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center" Source="pause" BackgroundColor="Transparent" Clicked="PauseClicked"/>
                         <ImageButton x:Name="btn_playTmRadio" Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center" Source="play" BackgroundColor="Transparent" Clicked="PlayClicked"/>
-                        <ImageButton x:Name="btn_30fTmRadio" Grid.Column="3" WidthRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="fast_forward" BackgroundColor="Transparent" Clicked="FastForwardClicked"/>
+                        <ImageButton x:Name="btn_30fTmRadio" Grid.Column="3" WidthRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="fast_forward" BackgroundColor="Transparent" Pressed="FastForwardPressed" Released="FastForwardReleased" Clicked="FastForwardClicked"/>
                         <ImageButton x:Name="btn_skipToNext" Grid.Column="4" WidthRequest="30" VerticalOptions="Center" HorizontalOptions="Center" Source="skip_next" BackgroundColor="Transparent" Clicked="SkipToNextClicked"/>
                     </Grid>
                 </Frame>

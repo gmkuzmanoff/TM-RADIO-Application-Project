@@ -1,6 +1,4 @@
-﻿using Android.App;
-using Android.Graphics;
-using LibVLCSharp.Shared;
+﻿using LibVLCSharp.Shared;
 using TMRADIO.Models;
 
 namespace TMRADIO.Interfaces
@@ -25,7 +23,11 @@ namespace TMRADIO.Interfaces
         void Pause();
         void Stop();
         void Rewind();
+        void RewindPressed();
+        void RewindReleased();
         void FastForward();
+        void FastForwardPressed();
+        void FastForwardReleased();
         void StopSession();
         bool IsActive();
         void SetPlaybackState();

@@ -276,6 +276,31 @@ namespace TMRADIO.Droid
             vlcPlayer.Skip30sec();
         }
 
+        public void FastForwardPressed()
+        {
+            vlcPlayer.FastForwardPressed();
+        }
+
+        public void FastForwardReleased()
+        {
+            vlcPlayer.FastForwardReleased();
+        }
+
+        public void Rewind()
+        {
+            vlcPlayer.Back30sec();
+        }
+
+        public void RewindPressed()
+        {
+            vlcPlayer.RewindPressed();
+        }
+
+        public void RewindReleased()
+        {
+            vlcPlayer.RewindReleased();
+        }
+
         public void Pause()
         {
             vlcPlayer.PauseMedia();
@@ -284,11 +309,6 @@ namespace TMRADIO.Droid
         public void Play()
         {
             vlcPlayer.PlayMedia();
-        }
-
-        public void Rewind()
-        {
-            vlcPlayer.Back30sec();
         }
 
         public void Stop()
@@ -349,6 +369,5 @@ namespace TMRADIO.Droid
         {
             return albumArt;
         }
-
     }
 }

@@ -482,20 +482,44 @@ namespace TMRADIO
 
         public void RewindClicked(object sender, EventArgs e)
         {
+            //if (!isRadioSelected)
+            //{
+            //    session.Rewind();
+            //    ShowMetadata();
+            //}
+        }
+
+        private void RewindPressed(object sender, EventArgs e)
+        {
             if (!isRadioSelected)
-            {
-                session.Rewind();
-                ShowMetadata();
-            }
+                session.RewindPressed();
+        }
+
+        private void RewindReleased(object sender, EventArgs e)
+        {
+            session.RewindReleased();
+            ShowMetadata();
         }
 
         public void FastForwardClicked(object sender, EventArgs e)
         {
-            if (!isRadioSelected)
-            {
-                session.FastForward();
-                ShowMetadata();
-            }
+            //if (!isRadioSelected)
+            //{
+            //    session.FastForward();
+            //    ShowMetadata();
+            //}
+        }
+        
+        private void FastForwardPressed(object sender, EventArgs e)
+        {
+            if(!isRadioSelected)
+            session.FastForwardPressed();
+        }
+        
+        private void FastForwardReleased(object sender, EventArgs e)
+        {
+            session.FastForwardReleased();
+            ShowMetadata();
         }
 
         private void SkipToNextClicked(object sender, EventArgs e)
@@ -1076,6 +1100,7 @@ namespace TMRADIO
         }
         #endregion
 
+        #region "Favourites"
         private async void RecentlyPlayedListItemTapped(object sender, SelectionChangedEventArgs e)
         {
             var episode = (PlaylistEntity)e.CurrentSelection.FirstOrDefault();
@@ -1151,32 +1176,6 @@ namespace TMRADIO
                 cview_recently.SelectedItem = null;
             }
             
-        }
-
-        private async void GithubRepositoryClicked(object sender, EventArgs e)
-        {
-            var isOk = await DisplayAlert("TMRADIO", "Open github repository?", "ok", "cancel");
-            if (isOk)
-            {
-                await Browser.OpenAsync(GITHUB_REPOSITORY, BrowserLaunchMode.SystemPreferred);
-            }
-        }
-
-        private async void AuthorEmailClicked(object sender, EventArgs e)
-        {
-            try
-            {
-                var email = "gmkuzmanoff@gmail.com";
-                var subject = Uri.EscapeDataString("Support Request");
-                var body = Uri.EscapeDataString("Hello, I need help with...");
-                var mailtoUri = $"mailto:{email}?subject={subject}&body={body}";
-
-                await Xamarin.Essentials.Launcher.OpenAsync(mailtoUri);
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", $"Unable to open email app: {ex.Message}", "OK");
-            }
         }
 
         private async void FavouritesClicked(object  sender, EventArgs e)
@@ -1338,5 +1337,35 @@ namespace TMRADIO
             GetFavourites();
             lv_favourites.ItemsSource = favouriteEpisodes;
         }
+        #endregion
+
+        #region "Author info"
+        private async void GithubRepositoryClicked(object sender, EventArgs e)
+        {
+            var isOk = await DisplayAlert("TMRADIO", "Open github repository?", "ok", "cancel");
+            if (isOk)
+            {
+                await Browser.OpenAsync(GITHUB_REPOSITORY, BrowserLaunchMode.SystemPreferred);
+            }
+        }
+
+        private async void AuthorEmailClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var email = "gmkuzmanoff@gmail.com";
+                var subject = Uri.EscapeDataString("Support Request");
+                var body = Uri.EscapeDataString("Hello, I need help with...");
+                var mailtoUri = $"mailto:{email}?subject={subject}&body={body}";
+
+                await Xamarin.Essentials.Launcher.OpenAsync(mailtoUri);
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Unable to open email app: {ex.Message}", "OK");
+            }
+        }
+
+        #endregion
     }
 }

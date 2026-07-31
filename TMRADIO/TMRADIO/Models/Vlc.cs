@@ -3,11 +3,15 @@ using LibVLCSharp.Shared;
 using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace TMRADIO.Models
 {
     public class Vlc
     {
+        private static Timer seekTimer;
+        private static bool isHolding = false;
+
         //VLC Lib
         public event PropertyChangedEventHandler PropertyChanged;
         private Media media;
@@ -192,6 +196,16 @@ namespace TMRADIO.Models
             catch { }
         }
 
+        public void FastForwardPressed()
+        {
+            StartSeekForwardTimer();
+        }
+
+        public void FastForwardReleased()
+        {
+            StopSeekTimer();
+        }
+
         public void Back30sec()
         {
             try
@@ -199,6 +213,16 @@ namespace TMRADIO.Models
                 Player.Time -= 30000;
             }
             catch { }
+        }
+        
+        public void RewindPressed()
+        {
+            StartSeekRewindTimer();
+        }
+
+        public void RewindReleased()
+        {
+            StopSeekTimer();
         }
 
         public bool IsPlayingMedia()
@@ -240,6 +264,56 @@ namespace TMRADIO.Models
             {
                 return 1f;
             }
+        }
+
+        private void StartSeekForwardTimer()
+        {
+            if (isHolding) return;
+            isHolding = true;
+
+            seekTimer = new Timer(300);//every 300ms
+            seekTimer.Elapsed += (s, e) =>
+            {
+                try
+                {
+                    if (Player.Time + 2000 < Media.Duration)
+                    {
+                        Player.Time += 2000;
+                    }
+                    else
+                    {
+                        Player.Time = Media.Duration;
+                        Player.Stop();
+                    }
+                }
+                catch { }
+            };
+            seekTimer.Start();
+        }
+
+        private void StartSeekRewindTimer()
+        {
+            if (isHolding) return;
+            isHolding = true;
+
+            seekTimer = new Timer(300);//every 300ms
+            seekTimer.Elapsed += (s, e) =>
+            {
+                try
+                {
+                    Player.Time -= 2000;
+                }
+                catch { }
+            };
+            seekTimer.Start();
+        }
+
+        private void StopSeekTimer()
+        {
+            isHolding = false;
+            seekTimer?.Stop();
+            seekTimer?.Dispose();
+            seekTimer = null;
         }
     }
 }
