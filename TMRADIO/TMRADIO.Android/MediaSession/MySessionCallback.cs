@@ -8,6 +8,7 @@ using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using Xamarin.Forms;
 using static TMRADIO.Constants.Links;
+using static TMRADIO.Constants.Digits;
 
 namespace TMRADIO.Droid.MediaSession
 {
@@ -112,7 +113,7 @@ namespace TMRADIO.Droid.MediaSession
                 Duration = session.GetMediaDuration()
             };
             //Set metadata
-            Device.StartTimer(TimeSpan.FromSeconds(1), () =>
+            Device.StartTimer(TimeSpan.FromSeconds(WAIT_FOR_METADATA), () =>
             {
                 session.SetPlaybackState();
                 session.SetMetadata(metadataViewModel);

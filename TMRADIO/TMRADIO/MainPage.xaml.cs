@@ -21,6 +21,7 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using static TMRADIO.Constants.Links;
 using static TMRADIO.Constants.Text;
+using static TMRADIO.Constants.Digits;
 
 namespace TMRADIO
 {
@@ -44,7 +45,7 @@ namespace TMRADIO
         private bool isStateEnded;
         private bool isStateError;
         private bool isStateOpening;
-        private readonly int maxCountOfRecentlyPlayedEpisodes = 15;
+        private const int maxCountOfRecentlyPlayedEpisodes = 15;
         private readonly ObservableCollection<Shedule> sheduleViewModels;
         private readonly ObservableCollection<ShowViewModel> mainShowViewModels;
         private readonly ObservableCollection<ShowViewModel> oldShowViewModels;
@@ -432,7 +433,7 @@ namespace TMRADIO
         private void ShowMetadata()
         {
             //Set metadata
-            Device.StartTimer(TimeSpan.FromSeconds(1), () =>
+            Device.StartTimer(TimeSpan.FromSeconds(WAIT_FOR_METADATA), () =>
             {
                 session.SetPlaybackState();
                 session.SetMetadata(metadataViewModel);
@@ -985,7 +986,26 @@ namespace TMRADIO
                 session.Play();
 
                 ShowNotification();
-                CreateXmlRecentPlayed(episode);
+
+                if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
+                {
+                    var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
+                    //Add episode to first place of the list and remove it from the old place
+                    var xdoc = XDocument.Load(XmlRecentlyPlayedFile);
+                    var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
+                    targetedNode.Remove();
+                    xdoc.Root.AddFirst(targetedNode);
+                    xdoc.Save(XmlRecentlyPlayedFile);
+                    //Refresh view
+                    frame_recentlyPlayed.IsVisible = true;
+                    recentlyPlayedEpisodes.Clear();
+                    GetRecentlyPlayed();
+                    cview_recently.ItemsSource = recentlyPlayedEpisodes;
+                }
+                else
+                {
+                    CreateXmlRecentPlayed(episode);
+                }
             }
         }
 
@@ -1291,7 +1311,7 @@ namespace TMRADIO
 
         private void FavouritesItemAppearing(object sender, ItemVisibilityEventArgs e)
         {
-            lbl_favouriteEpisodesCount.Text = $"Favourite Sessions: {favouriteEpisodes.Count}";
+            lbl_favouriteEpisodesCount.Text = $"Sessions: {favouriteEpisodes.Count}";
         }
 
         private async void FavouriteEntityDeleteClicked(object sender, EventArgs e)
@@ -1313,7 +1333,7 @@ namespace TMRADIO
 
                 if (!favouriteEpisodes.Any())
                 {
-                    lbl_favouriteEpisodesCount.Text = $"Favourite Sessions: 0";
+                    lbl_favouriteEpisodesCount.Text = $"Sessions: 0";
                 }
             }
         }

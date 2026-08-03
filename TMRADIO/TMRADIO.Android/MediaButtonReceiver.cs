@@ -9,6 +9,7 @@ using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using Xamarin.Forms;
 using static TMRADIO.Constants.Links;
+using static TMRADIO.Constants.Digits;
 
 namespace TMRADIO.Droid
 {
@@ -90,41 +91,41 @@ namespace TMRADIO.Droid
                     default:
                         break;
                 }
-
-                //Create notification
-                NotificationViewModel notificationViewModel = new NotificationViewModel()
-                {
-                    Title = title,
-                    Artist = artist,
-                    AlbumArt = albumArt,
-                    Album = album,
-                    Duration = session.GetMediaDuration(),
-                    Position = session.GetCurrentPosition()
-                };
-                session.ShowMediaNotification(notificationViewModel);
-
-                //Create metadata
-                //byte[] image = new HttpClient().GetByteArrayAsync(albumArt).Result;
-                MetadataViewModel metadataViewModel = new MetadataViewModel()
-                {
-                    Title = title,
-                    Artist = artist,
-                    AlbumArt = mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt),
-                    Album = album,
-                    Duration = session.GetMediaDuration()
-                };
-                //Set metadata
-                Device.StartTimer(TimeSpan.FromSeconds(5), () =>
-                {
-                    session.SetPlaybackState();
-                    session.SetMetadata(metadataViewModel);
-                    session.InitializeSession();
-
-                    return false;
-                });
-                
-                Toast.MakeText(context, $"Receiver: {keycode.KeyCode} pressed!", ToastLength.Long).Show();
             }
+
+            //Create notification
+            NotificationViewModel notificationViewModel = new NotificationViewModel()
+            {
+                Title = title,
+                Artist = artist,
+                AlbumArt = albumArt,
+                Album = album,
+                Duration = session.GetMediaDuration(),
+                Position = session.GetCurrentPosition()
+            };
+            session.ShowMediaNotification(notificationViewModel);
+
+            //Create metadata
+            //byte[] image = new HttpClient().GetByteArrayAsync(albumArt).Result;
+            MetadataViewModel metadataViewModel = new MetadataViewModel()
+            {
+                Title = title,
+                Artist = artist,
+                AlbumArt = mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt),
+                Album = album,
+                Duration = session.GetMediaDuration()
+            };
+            //Set metadata
+            Device.StartTimer(TimeSpan.FromSeconds(WAIT_FOR_METADATA), () =>
+            {
+                session.SetPlaybackState();
+                session.SetMetadata(metadataViewModel);
+                session.InitializeSession();
+
+                return false;
+            });
+
+            Toast.MakeText(context, $"Receiver: {keycode.KeyCode} pressed!", ToastLength.Long).Show();
         }
 
     }

@@ -187,8 +187,8 @@
                     <RowDefinition Height="60"/>
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
-                    <FlexLayout JustifyContent="SpaceBetween" AlignItems="End">
-                        <ImageButton x:Name="btn_playerBack" Padding="5" BackgroundColor="Transparent" Source="arrow_back" Clicked="PlayerBackArrowClicked"/>
+                    <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
+                        <ImageButton x:Name="btn_playerBack" Padding="5" BackgroundColor="Transparent" Source="arrow_back"/>
                         <Label Text="Now playing" TextColor="Wheat" FontSize="Title"/>
                         <Image Source="speaker" BackgroundColor="Transparent"/>
                     </FlexLayout>
@@ -200,8 +200,8 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Frame Grid.Column="0" WidthRequest="40" Margin="10,0" Padding="0" HorizontalOptions="StartAndExpand" BackgroundColor="Transparent">
-                        <FlexLayout Direction="Column" JustifyContent="End" AlignItems="Center" HorizontalOptions="Start" BackgroundColor="Transparent">
-                            <ImageButton x:Name="btn_playlist" CornerRadius="5" Margin="0,5" WidthRequest="40" HeightRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="playlist" Padding="3" Opacity="0.8" BackgroundColor="#1f1410" Clicked="PlaylistClicked"/>
+                        <FlexLayout Direction="Column" JustifyContent="Center" AlignItems="Center" HorizontalOptions="Start" BackgroundColor="Transparent">
+                            <ImageButton x:Name="btn_playlist" CornerRadius="5" Margin="0,5" Padding="5" WidthRequest="40" HeightRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="playlist" Opacity="0.8" BackgroundColor="#1f1410" Clicked="PlaylistClicked"/>
                         </FlexLayout>
                     </Frame>
                     <Frame Grid.Column="1" x:Name="frame_player_imageArt" Padding="0" HasShadow="True" CornerRadius="15" WidthRequest="200" HeightRequest="200" HorizontalOptions="Center" VerticalOptions="Center">
@@ -216,8 +216,8 @@
                         <Image x:Name="img_logo" Source="logo" Aspect="Fill"/>
                     </Frame>
                     <Frame Grid.Column="2" WidthRequest="40" Margin="10,0" HorizontalOptions="End" Padding="0" BackgroundColor="Transparent">
-                        <FlexLayout Direction="Column" JustifyContent="End" AlignItems="Center" HorizontalOptions="Start" BackgroundColor="Transparent">
-                            <ImageButton x:Name="btn_favourites" CornerRadius="5" Margin="0,5" WidthRequest="40" HeightRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="playlist_star" Padding="1" Opacity="0.8" BackgroundColor="#1f1410" Clicked="FavouritesClicked"/>
+                        <FlexLayout Direction="Column" JustifyContent="Center" AlignItems="Center" HorizontalOptions="Start" BackgroundColor="Transparent">
+                            <ImageButton x:Name="btn_favourites" CornerRadius="5" Margin="0,5" Padding="5" WidthRequest="40" HeightRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="playlist_star" Opacity="0.8" BackgroundColor="#1f1410" Clicked="FavouritesClicked"/>
                         </FlexLayout>
                     </Frame>
                 </Grid>
@@ -253,15 +253,15 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
-                            <ColumnDefinition Width="1.3*"/>
+                            <ColumnDefinition Width="1.2*"/>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <ImageButton x:Name="btn_skipToPrev" Grid.Column="0" WidthRequest="30" VerticalOptions="Center" HorizontalOptions="Center" Source="skip_prev" BackgroundColor="Transparent" Clicked="SkipToPrevClicked"/>
-                        <ImageButton x:Name="btn_30bTmRadio" Grid.Column="1" WidthRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="rewind" BackgroundColor="Transparent" Pressed="RewindPressed" Released="RewindReleased" Clicked="RewindClicked"/>
+                        <ImageButton x:Name="btn_30bTmRadio" Grid.Column="1" WidthRequest="30" VerticalOptions="Center" HorizontalOptions="Center" Source="rewind" BackgroundColor="Transparent" Pressed="RewindPressed" Released="RewindReleased" Clicked="RewindClicked"/>
                         <ImageButton x:Name="btn_pauseTmRadio" Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center" Source="pause" BackgroundColor="Transparent" Clicked="PauseClicked"/>
                         <ImageButton x:Name="btn_playTmRadio" Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center" Source="play" BackgroundColor="Transparent" Clicked="PlayClicked"/>
-                        <ImageButton x:Name="btn_30fTmRadio" Grid.Column="3" WidthRequest="40" VerticalOptions="Center" HorizontalOptions="Center" Source="fast_forward" BackgroundColor="Transparent" Pressed="FastForwardPressed" Released="FastForwardReleased" Clicked="FastForwardClicked"/>
+                        <ImageButton x:Name="btn_30fTmRadio" Grid.Column="3" WidthRequest="30" VerticalOptions="Center" HorizontalOptions="Center" Source="fast_forward" BackgroundColor="Transparent" Pressed="FastForwardPressed" Released="FastForwardReleased" Clicked="FastForwardClicked"/>
                         <ImageButton x:Name="btn_skipToNext" Grid.Column="4" WidthRequest="30" VerticalOptions="Center" HorizontalOptions="Center" Source="skip_next" BackgroundColor="Transparent" Clicked="SkipToNextClicked"/>
                     </Grid>
                 </Frame>
@@ -329,7 +329,7 @@
                     </FlexLayout>
                 </Frame>
                 <Frame Grid.Row="1" Padding="0" Margin="20,0" VerticalOptions="Center" BackgroundColor="Transparent">
-                    <Label x:Name="lbl_favouriteEpisodesCount" Text="Favourite Sessions: 0" TextColor="CornflowerBlue" FontSize="21"/>
+                    <Label x:Name="lbl_favouriteEpisodesCount" Text="Sessions: 0" TextColor="CornflowerBlue" FontSize="21"/>
                 </Frame>
                 <Frame Grid.Row="2" Grid.RowSpan="5" Padding="0" Margin="10" VerticalOptions="Center" CornerRadius="10" BackgroundColor="Transparent">
                     <ListView x:Name="lv_favourites" BackgroundColor="Transparent" CachingStrategy="RetainElement" HasUnevenRows="True" SeparatorVisibility="Default" SeparatorColor="Wheat" ItemAppearing="FavouritesItemAppearing" ItemTapped="FavouritesItemTapped">
