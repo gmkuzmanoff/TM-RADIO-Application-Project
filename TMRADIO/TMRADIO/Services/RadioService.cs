@@ -308,7 +308,7 @@ namespace TMRADIO.Services
 
         public void CleanTempDir()
         {
-            string directoryTemp = $"{ExternalCacheDir}/Temp";
+            string directoryTemp = $"{EXTERNAL_CACHE_DIR}/Temp";
             DirectoryInfo directory = new DirectoryInfo(directoryTemp);
 
             foreach (var file in directory.GetFiles())
@@ -322,14 +322,14 @@ namespace TMRADIO.Services
             ObservableCollection<PlaylistEntity> list = new ObservableCollection<PlaylistEntity>();
 
             var xdoc = new XmlDocument();
-            xdoc.Load(XmlRecentlyPlayedFile);
+            xdoc.Load(XML_RECENTLYPLAYED_FILE);
             XmlNodeList epNodes = xdoc.GetElementsByTagName("Episode");
             foreach (XmlNode epNode in epNodes)
             {
                 var playlistEntity = new PlaylistEntity()
                 {
                     Title = epNode.ChildNodes[0].InnerText,
-                    ImageArt = string.IsNullOrEmpty(epNode.ChildNodes[1].InnerText) ? $"{ExternalCacheDir}/tm_radio_episode.jpg" : epNode.ChildNodes[1].InnerText,
+                    ImageArt = string.IsNullOrEmpty(epNode.ChildNodes[1].InnerText) ? $"{EXTERNAL_CACHE_DIR}/tm_radio_episode.jpg" : epNode.ChildNodes[1].InnerText,
                     Show = epNode.ChildNodes[2].InnerText,
                     Url = epNode.ChildNodes[3].InnerText,
                     Description = epNode.ChildNodes[4].InnerText
@@ -346,14 +346,14 @@ namespace TMRADIO.Services
             ObservableCollection<PlaylistEntity> list = new ObservableCollection<PlaylistEntity>();
 
             var xdoc = new XmlDocument();
-            xdoc.Load(XmlFavouritesFile);
+            xdoc.Load(XML_FAVOURITES_FILE);
             XmlNodeList epNodes = xdoc.GetElementsByTagName("Episode");
             foreach (XmlNode epNode in epNodes)
             {
                 var playlistEntity = new PlaylistEntity()
                 {
                     Title = epNode.ChildNodes[0].InnerText,
-                    ImageArt = string.IsNullOrEmpty(epNode.ChildNodes[1].InnerText) ? $"{ExternalCacheDir}/tm_radio_episode.jpg" : epNode.ChildNodes[1].InnerText,
+                    ImageArt = string.IsNullOrEmpty(epNode.ChildNodes[1].InnerText) ? $"{EXTERNAL_CACHE_DIR}/tm_radio_episode.jpg" : epNode.ChildNodes[1].InnerText,
                     Show = epNode.ChildNodes[2].InnerText,
                     Url = epNode.ChildNodes[3].InnerText,
                     Description = epNode.ChildNodes[4].InnerText

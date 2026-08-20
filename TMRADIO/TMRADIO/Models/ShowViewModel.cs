@@ -16,7 +16,7 @@ namespace TMRADIO.Models
 
         public string GetImage()
         {
-            string file = $"{ExternalCacheDir}/{Title}.jpg";
+            string file = $"{EXTERNAL_CACHE_DIR}/{Title}.jpg";
 
             if (File.Exists(file))
             {

@@ -1,17 +1,12 @@
 ﻿using Android;
 using Android.App;
-using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
-using LibVLCSharp.Shared;
-using System.IO;
-using System.Runtime.Remoting.Contexts;
 using TMRADIO.Interfaces;
 using Xamarin.Forms;
-
 
 namespace TMRADIO.Droid
 {
@@ -38,7 +33,6 @@ namespace TMRADIO.Droid
                     ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.PostNotifications }, 21);
                 }
             }
-
             LoadApplication(new App());
         }
 

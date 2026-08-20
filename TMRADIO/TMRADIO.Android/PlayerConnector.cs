@@ -147,7 +147,7 @@ namespace TMRADIO.Droid
                 .SetContentText($"{artist} - {album}")
                 .SetContentIntent(PendingOpenApp())
                 .SetLargeIcon(mediaSource == "http://stream.tm-radio.com:8000/tribalmixes" ? BitmapFactory.DecodeResource(context.Resources ,Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt))
-                .SetSmallIcon(Resource.Drawable.logo)
+                .SetSmallIcon(Resource.Drawable.logo_transparent)
                 .SetVisibility((int)NotificationVisibility.Public)
                 .SetPriority((int)NotificationPriority.High)
                 .SetProgress(1, (int)notificationViewModel.Position, false)

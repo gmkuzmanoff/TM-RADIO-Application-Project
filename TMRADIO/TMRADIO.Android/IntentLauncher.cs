@@ -1,12 +1,8 @@
-﻿using Android;
-using Android.Content;
-using Android.Content.PM;
+﻿using Android.Content;
 using Android.Widget;
-using AndroidX.Core.App;
 using TMRADIO.Droid;
 using TMRADIO.Interfaces;
 using Xamarin.Forms;
-using Xamarin.Forms.Platform.Android;
 
 [assembly: Dependency(typeof(IntentLauncher))]
 namespace TMRADIO.Droid

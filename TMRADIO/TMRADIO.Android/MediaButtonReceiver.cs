@@ -1,15 +1,13 @@
 ﻿using Android.Content;
 using Android.Graphics;
 using Android.Views;
-using Android.Widget;
 using LibVLCSharp.Shared;
 using System;
-using System.Net.Http;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using Xamarin.Forms;
-using static TMRADIO.Constants.Links;
 using static TMRADIO.Constants.Digits;
+using static TMRADIO.Constants.Links;
 
 namespace TMRADIO.Droid
 {
@@ -125,7 +123,7 @@ namespace TMRADIO.Droid
                 return false;
             });
 
-            Toast.MakeText(context, $"Receiver: {keycode.KeyCode} pressed!", ToastLength.Long).Show();
+            //Toast.MakeText(context, $"Receiver: {keycode.KeyCode} pressed!", ToastLength.Long).Show();
         }
 
     }

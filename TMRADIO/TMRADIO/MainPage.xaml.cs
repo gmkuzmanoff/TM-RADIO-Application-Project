@@ -3,6 +3,10 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
+using Java.Net;
+using Sharpcaster;
+using Sharpcaster.Models;
+using Sharpcaster.Models.Media;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,9 +20,9 @@ using TMRADIO.Models;
 using TMRADIO.Services;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using static TMRADIO.Constants.Digits;
 using static TMRADIO.Constants.Links;
 using static TMRADIO.Constants.Text;
-using static TMRADIO.Constants.Digits;
 
 namespace TMRADIO
 {
@@ -46,10 +50,16 @@ namespace TMRADIO
         private readonly ObservableCollection<Shedule> sheduleViewModels;
         private readonly ObservableCollection<ShowViewModel> mainShowViewModels;
         private readonly ObservableCollection<ShowViewModel> oldShowViewModels;
-        private readonly ObservableCollection<PlaylistEntity> episodes;
+        private readonly ObservableCollection<PlaylistEntity> playlistEpisodes;
         private readonly ObservableCollection<PlaylistEntity> recentlyPlayedEpisodes;
         private readonly ObservableCollection<PlaylistEntity> favouriteEpisodes;
         private readonly ObservableCollection<GroupedCollection<string, ShowViewModel>> allShowsViewModels;
+        
+        //Chromecast requirements
+        private readonly ObservableCollection<ChromecastReceiver> listCastDevices = new ObservableCollection<ChromecastReceiver>();
+        private IEnumerable<ChromecastReceiver> chromecasts = new ObservableCollection<ChromecastReceiver>();
+        private ChromecastClient client;
+        private Media chromecastMedia;
 
         public MainPage()
         {
@@ -71,21 +81,28 @@ namespace TMRADIO
             sheduleViewModels = new ObservableCollection<Shedule>();
             mainShowViewModels = new ObservableCollection<ShowViewModel>();
             oldShowViewModels = new ObservableCollection<ShowViewModel>();
-            episodes = new ObservableCollection<PlaylistEntity>();
+            playlistEpisodes = new ObservableCollection<PlaylistEntity>();
             recentlyPlayedEpisodes = new ObservableCollection<PlaylistEntity>();
             favouriteEpisodes = new ObservableCollection<PlaylistEntity>();
             allShowsViewModels = new ObservableCollection<GroupedCollection<string, ShowViewModel>>();
 
             InitializeComponent();
 
+            //Command: Pull to refresh the list of chromecast devices 
+            lv_castDevices.RefreshCommand = new Command(async () =>
+            {
+                chromecasts = await DiscoverChromecastDevicesAsync(chromecasts);
+                lv_castDevices.IsRefreshing = false;
+            });
+
             #region 'Load Favourite episodes'
             //Load and Show recently played episodes
-            if (!System.IO.File.Exists(XmlFavouritesFile))
+            if (!System.IO.File.Exists(XML_FAVOURITES_FILE))
             {
                 XDocument xdoc = new XDocument();
                 XElement root = new XElement("Episodes");
                 xdoc.Add(root);
-                xdoc.Save(XmlFavouritesFile);
+                xdoc.Save(XML_FAVOURITES_FILE);
             }
             GetFavourites();
             lv_favourites.ItemsSource = favouriteEpisodes;
@@ -93,20 +110,20 @@ namespace TMRADIO
 
             #region 'Load and Show recently played episodes'
             //Load and Show recently played episodes
-            if (!System.IO.File.Exists(XmlRecentlyPlayedFile))
+            if (!System.IO.File.Exists(XML_RECENTLYPLAYED_FILE))
             {
                 XDocument xdoc = new XDocument();
                 XElement root = new XElement("Episodes");
                 xdoc.Add(root);
-                XElement newEpisode = new XElement("Episode");
-                newEpisode.Add(
-                    new XElement("Title", "Citric Waves 113 Ugly Cat"),
-                    new XElement("Image", "https://www.tm-radio.com/pic/djs/UglyCatMusic/WhatsApp_Image_2025-09-05_at_11.46.58_AM.jpeg"),
-                    new XElement("Show", "Citric Waves"),
-                    new XElement("Url", "https://www.tm-radio.com/access_mp3.php?mp3=qarh97"),
-                    new XElement("Description", "Citric Waves 113 Ugly Cat (from January 29th)"));
-                xdoc.Element("Episodes").AddFirst(newEpisode);
-                xdoc.Save(XmlRecentlyPlayedFile);
+                //XElement newEpisode = new XElement("Episode");
+                //newEpisode.Add(
+                //    new XElement("Title", "Citric Waves 113 Ugly Cat"),
+                //    new XElement("Image", "https://www.tm-radio.com/pic/djs/UglyCatMusic/WhatsApp_Image_2025-09-05_at_11.46.58_AM.jpeg"),
+                //    new XElement("Show", "Citric Waves"),
+                //    new XElement("Url", "https://www.tm-radio.com/access_mp3.php?mp3=qarh97"),
+                //    new XElement("Description", "Citric Waves 113 Ugly Cat (from January 29th)"));
+                //xdoc.Element("Episodes").AddFirst(newEpisode);
+                xdoc.Save(XML_RECENTLYPLAYED_FILE);
             }
             GetRecentlyPlayed();
             cview_recently.ItemsSource = recentlyPlayedEpisodes;
@@ -116,7 +133,7 @@ namespace TMRADIO
             {
                 GetRadioMetadataLoop(radioViewModel);
 
-                lbl_aboutText.Text = AboutTmRadio;
+                lbl_aboutText.Text = ABOUT_TMRADIO;
 
                 //Get Main Shows and insert models into list as source
                 GetMainShows();
@@ -134,7 +151,7 @@ namespace TMRADIO
                     {
                         radioService.CleanTempDir();
                         session.StopSession();
-                        Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
+                        Process.KillProcess(Process.MyPid());
                     }
                 });
             }
@@ -149,6 +166,7 @@ namespace TMRADIO
 
             timer.Start();
         }
+
 
         #region "Timer and Progress"
         private void Timer_Tick(object sender, ElapsedEventArgs e)
@@ -187,7 +205,7 @@ namespace TMRADIO
                     if (isStateEnded)
                     {
                         session.Stop();
-                        StartNextEpisode(episodes);
+                        StartNextEpisode(playlistEpisodes);
                     }
                     #endregion
 
@@ -219,6 +237,12 @@ namespace TMRADIO
             {
                 grid_favourites.Opacity = 0;
                 grid_favourites.IsVisible = false;
+            }
+            else if (grid_castDevices.IsVisible)
+            {
+                grid_castDevices.Opacity = 0;
+                grid_castDevices.IsVisible = false;
+                //lv_castDevices.IsRefreshing = false;
             }
             else if (grid_nowPlaying.IsVisible)
             {
@@ -328,7 +352,7 @@ namespace TMRADIO
             {
                 foreach (var item in radioService.GetMainShows())
                 {
-                    await DownloadAndResizeFileAsync(item.ImageUrl, ExternalCacheDir, item.Title);
+                    await DownloadAndResizeFileAsync(item.ImageUrl, EXTERNAL_CACHE_DIR, item.Title);
 
                     mainShowViewModels.Add(item);
                 }
@@ -336,7 +360,7 @@ namespace TMRADIO
                     .Add(new GroupedCollection<string, ShowViewModel>("MAIN SHOWS", mainShowViewModels));
 
                 //Copy empty episode image to cache folder of the app
-                await DownloadAndResizeFileAsync("https://www.tm-radio.com/pic/tm-radio-episode.png", ExternalCacheDir, "tm_radio_episode");
+                await DownloadAndResizeFileAsync("https://www.tm-radio.com/pic/tm-radio-episode.png", EXTERNAL_CACHE_DIR, "tm_radio_episode");
             }
             catch
             {
@@ -358,6 +382,23 @@ namespace TMRADIO
 
             session.MediaParse();
 
+            //Create Chromecast metadata
+            chromecastMedia = new Media
+            {
+                ContentUrl = nowPlayingTarget,
+                ContentType = "audio/mpeg",
+                Metadata = new MusicTrackMetadata
+                {
+                    Title = "TM-Radio live Stream",
+                    AlbumName = radioViewModel.Info,
+                    Artist = radioViewModel.StreamDescription,
+                    Images = new[]
+                        {
+                            new Sharpcaster.Models.Media.Image() { Url = "https://www.tm-radio.com/pic/logo/MasterLogo_h250w435_png24.png" }
+                        },
+                    MetadataType = MetadataType.Music
+                }
+            };
             //Create notification data
             notificationViewModel.Title = radioViewModel.Title;
             notificationViewModel.Artist = radioViewModel.StreamTitle;
@@ -379,8 +420,7 @@ namespace TMRADIO
             lbl_tmradiolive_title.Text = radioViewModel.Title.Replace(" - ", " | ");
             lbl_title.Text = lbl_tmradiolive_title.Text;
             lbl_album.Text = radioViewModel.Info;
-            lbl_currListeners.Text = $"👨‍💼 {radioViewModel.StreamCurrentListeners}";
-            lbl_bitrate.Text = $"{radioViewModel.StreamGenre} | {radioViewModel.StreamBitrate}";
+            lbl_currListeners.Text = $"[Listeners: {radioViewModel.StreamCurrentListeners}]";
             lbl_descriptiion.Text = radioViewModel.StreamDescription;
             lbl_duration.Text = "0:00:00";
 
@@ -394,7 +434,7 @@ namespace TMRADIO
                     {
                         lbl_tmradiolive_title.Text = radioViewModel.Title.Replace(" - ", " | ");
                         lbl_title.Text = lbl_tmradiolive_title.Text;
-                        lbl_currListeners.Text = $"👨‍💼 {radioViewModel.StreamCurrentListeners}";
+                        lbl_currListeners.Text = $"[Listeners: {radioViewModel.StreamCurrentListeners}]";
 
 
                         //Create notification data
@@ -407,6 +447,7 @@ namespace TMRADIO
                         metadataViewModel.Album = radioViewModel.Info;
 
                         ShowNotification();
+                        ShowMetadata();
                     }
                     else
                     {
@@ -522,33 +563,50 @@ namespace TMRADIO
 
         private void SkipToNextClicked(object sender, EventArgs e)
         {
-            var episode = episodes.Where(x => x.Url == nowPlayingTarget).FirstOrDefault();
+            var episode = playlistEpisodes.Where(x => x.Url == nowPlayingTarget).FirstOrDefault();
 
             if (episode != null)
             {
-                int indx = episodes.IndexOf(episode);
-                bool isLastEpisode = episode == episodes.Last();
+                int indx = playlistEpisodes.IndexOf(episode);
+                bool isLastEpisode = episode == playlistEpisodes.Last();
 
                 if (!isLastEpisode)
                 {
                     session.Stop();
 
-                    var nextEpisode = episodes[indx + 1];
+                    var nextEpisode = playlistEpisodes[indx + 1];
 
                     nowPlayingTarget = nextEpisode.Url;
                     session.LoadMedia(nowPlayingTarget);
                     session.MediaParse();
 
+                    //Create Chromecast metadata
+                    chromecastMedia = new Media
+                    {
+                        ContentUrl = nowPlayingTarget,
+                        ContentType = "audio/mpeg",
+                        Metadata = new MusicTrackMetadata
+                        {
+                            Title = nextEpisode.Title,
+                            AlbumName = selectedShow,
+                            Artist = nextEpisode.Description,
+                            Images = new[]
+                                {
+                            new Sharpcaster.Models.Media.Image() { Url = nextEpisode.ImageArt }
+                        },
+                            MetadataType = MetadataType.Music
+                        }
+                    };
                     //Create notification data
                     notificationViewModel.Title = nextEpisode.Title;
                     notificationViewModel.Artist = nextEpisode.Description;
-                    notificationViewModel.Album = nextEpisode.Show;
+                    notificationViewModel.Album = selectedShow;
                     notificationViewModel.AlbumArt = nextEpisode.ImageSource;
                     notificationViewModel.Duration = session.GetMediaDuration();
                     //Create metadata
                     metadataViewModel.Title = nextEpisode.Title;
                     metadataViewModel.Artist = nextEpisode.Description;
-                    metadataViewModel.Album = nextEpisode.Show;
+                    metadataViewModel.Album = selectedShow;
                     metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(nextEpisode.ImageSource);
                     metadataViewModel.Duration = session.GetMediaDuration();
 
@@ -574,33 +632,50 @@ namespace TMRADIO
 
         private void SkipToPrevClicked(object sender, EventArgs e)
         {
-            var episode = episodes.Where(x => x.Url == nowPlayingTarget).FirstOrDefault();
+            var episode = playlistEpisodes.Where(x => x.Url == nowPlayingTarget).FirstOrDefault();
 
             if (episode != null)
             {
-                int indx = episodes.IndexOf(episode);
-                bool isFirstEpisode = episode == episodes.First();
+                int indx = playlistEpisodes.IndexOf(episode);
+                bool isFirstEpisode = episode == playlistEpisodes.First();
 
                 if (!isFirstEpisode)
                 {
                     session.Stop();
 
-                    var prevEpisode = episodes[indx - 1];
+                    var prevEpisode = playlistEpisodes[indx - 1];
 
                     nowPlayingTarget = prevEpisode.Url;
                     session.LoadMedia(nowPlayingTarget);
                     session.MediaParse();
 
+                    //Create Chromecast metadata
+                    chromecastMedia = new Media
+                    {
+                        ContentUrl = nowPlayingTarget,
+                        ContentType = "audio/mpeg",
+                        Metadata = new MusicTrackMetadata
+                        {
+                            Title = prevEpisode.Title,
+                            AlbumName = selectedShow,
+                            Artist = prevEpisode.Description,
+                            Images = new[]
+                                {
+                            new Sharpcaster.Models.Media.Image() { Url = prevEpisode.ImageArt }
+                        },
+                            MetadataType = MetadataType.Music
+                        }
+                    };
                     //Create notification data
                     notificationViewModel.Title = prevEpisode.Title;
                     notificationViewModel.Artist = prevEpisode.Description;
-                    notificationViewModel.Album = prevEpisode.Show;
+                    notificationViewModel.Album = selectedShow;
                     notificationViewModel.AlbumArt = prevEpisode.ImageSource;
                     notificationViewModel.Duration = session.GetMediaDuration();
                     //Create metadata
                     metadataViewModel.Title = prevEpisode.Title;
                     metadataViewModel.Artist = prevEpisode.Description;
-                    metadataViewModel.Album = prevEpisode.Show;
+                    metadataViewModel.Album = selectedShow;
                     metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(prevEpisode.ImageSource);
                     metadataViewModel.Duration = session.GetMediaDuration();
 
@@ -641,16 +716,33 @@ namespace TMRADIO
                     session.LoadMedia(nowPlayingTarget);
                     session.MediaParse();
 
+                    //Create Chromecast metadata
+                    chromecastMedia = new Media
+                    {
+                        ContentUrl = nowPlayingTarget,
+                        ContentType = "audio/mpeg",
+                        Metadata = new MusicTrackMetadata
+                        {
+                            Title = nextEpisode.Title,
+                            AlbumName = selectedShow,
+                            Artist = nextEpisode.Description,
+                            Images = new[]
+                                {
+                            new Sharpcaster.Models.Media.Image() { Url = nextEpisode.ImageArt }
+                        },
+                            MetadataType = MetadataType.Music
+                        }
+                    };
                     //Create notification data
                     notificationViewModel.Title = nextEpisode.Title;
                     notificationViewModel.Artist = nextEpisode.Description;
-                    notificationViewModel.Album = nextEpisode.Show;
+                    notificationViewModel.Album = selectedShow;
                     notificationViewModel.AlbumArt = nextEpisode.ImageSource;
                     notificationViewModel.Duration = session.GetMediaDuration();
                     //Create metadata
                     metadataViewModel.Title = nextEpisode.Title;
                     metadataViewModel.Artist = nextEpisode.Description;
-                    metadataViewModel.Album = nextEpisode.Show;
+                    metadataViewModel.Album = selectedShow;
                     metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(nextEpisode.ImageSource);
                     metadataViewModel.Duration = session.GetMediaDuration();
 
@@ -846,6 +938,7 @@ namespace TMRADIO
             }
         }
 
+        #region "On Demand"
         private async void HistoryListItemTapped(object sender, ItemTappedEventArgs e)
         {
             show = (ShowViewModel)e.Item;
@@ -871,8 +964,8 @@ namespace TMRADIO
                 {
                     selectedShow = show.Title;
 
-                    episodes.Clear();
-                    lv_playlist.ItemsSource = episodes;
+                    playlistEpisodes.Clear();
+                    lv_playlist.ItemsSource = playlistEpisodes;
 
                     await Task.Run(() =>
                     {
@@ -888,6 +981,7 @@ namespace TMRADIO
                 }
             }
         }
+        #endregion
 
         #region "Search Box"
         IEnumerable<GroupedCollection<string, ShowViewModel>> SearchedShows(string searchText = null)
@@ -954,6 +1048,23 @@ namespace TMRADIO
 
                 long episodeDuration = session.GetMediaDuration();
 
+                //Create Chromecast metadata
+                chromecastMedia = new Media
+                {
+                    ContentUrl = nowPlayingTarget,
+                    ContentType = "audio/mpeg",
+                    Metadata = new MusicTrackMetadata
+                    {
+                        Title = episode.Title,
+                        AlbumName = selectedShow,
+                        Artist = episode.Description,
+                        Images = new[]
+                            {
+                            new Sharpcaster.Models.Media.Image() { Url = episode.ImageArt }
+                        },
+                        MetadataType = MetadataType.Music
+                    }
+                };
                 //Create notification data
                 notificationViewModel.Title = episode.Title;
                 notificationViewModel.Artist = episode.Description;
@@ -988,11 +1099,11 @@ namespace TMRADIO
                 {
                     var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
                     //Add episode to first place of the list and remove it from the old place
-                    var xdoc = XDocument.Load(XmlRecentlyPlayedFile);
+                    var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
                     var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
                     targetedNode.Remove();
                     xdoc.Root.AddFirst(targetedNode);
-                    xdoc.Save(XmlRecentlyPlayedFile);
+                    xdoc.Save(XML_RECENTLYPLAYED_FILE);
                     //Refresh view
                     frame_recentlyPlayed.IsVisible = true;
                     recentlyPlayedEpisodes.Clear();
@@ -1009,7 +1120,7 @@ namespace TMRADIO
         private void CreateXmlRecentPlayed(PlaylistEntity episode)
         {
             //Add episode to XML file (recently played)
-            XDocument xdoc = XDocument.Load(XmlRecentlyPlayedFile);
+            XDocument xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
             XElement newEpisode = new XElement("Episode");
             newEpisode.Add(
                 new XElement("Title", episode.Title),
@@ -1023,7 +1134,7 @@ namespace TMRADIO
             {
                 xdoc.Element("Episodes").LastNode.Remove();
             }
-            xdoc.Save(XmlRecentlyPlayedFile);
+            xdoc.Save(XML_RECENTLYPLAYED_FILE);
             //Refresh view
             frame_recentlyPlayed.IsVisible = true;
             recentlyPlayedEpisodes.Clear();
@@ -1033,7 +1144,7 @@ namespace TMRADIO
 
         private void PlaylistItemAppearing(object sender, ItemVisibilityEventArgs e)
         {
-            lbl_playlistCount.Text = $"Sessions: {episodes.Count}";
+            lbl_playlistCount.Text = $"Sessions: {playlistEpisodes.Count}";
         }
 
         private async void GetPlaylistEntities(ShowViewModel show)
@@ -1045,9 +1156,9 @@ namespace TMRADIO
                     var image = episode.ImageArt.StartsWith("/") ? $"https://www.tm-radio.com{episode.ImageArt}" : episode.ImageArt;
                     episode.ImageArt = image;
 
-                    await DownloadAndResizeFileAsync(image, $"{ExternalCacheDir}/Temp", episode.Title);
+                    await DownloadAndResizeFileAsync(image, $"{EXTERNAL_CACHE_DIR}/Temp", episode.Title);
 
-                    episodes.Add(episode);
+                    playlistEpisodes.Add(episode);
                 }
             }
             catch
@@ -1055,7 +1166,7 @@ namespace TMRADIO
 
             }
 
-            if (!episodes.Any())
+            if (!playlistEpisodes.Any())
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
@@ -1117,7 +1228,6 @@ namespace TMRADIO
         }
         #endregion
 
-        #region "Favourites"
         private async void RecentlyPlayedListItemTapped(object sender, SelectionChangedEventArgs e)
         {
             var episode = (PlaylistEntity)e.CurrentSelection.FirstOrDefault();
@@ -1131,7 +1241,7 @@ namespace TMRADIO
                     var image = episode.ImageArt.StartsWith("/") ? $"https://www.tm-radio.com{episode.ImageArt}" : episode.ImageArt;
                     episode.ImageArt = image;
 
-                    await DownloadAndResizeFileAsync(image, $"{ExternalCacheDir}/Temp", episode.Title);
+                    await DownloadAndResizeFileAsync(image, $"{EXTERNAL_CACHE_DIR}/Temp", episode.Title);
 
                     session.Stop();
 
@@ -1147,6 +1257,23 @@ namespace TMRADIO
 
                     long episodeDuration = session.GetMediaDuration();
 
+                    //Create Chromecast metadata
+                    chromecastMedia = new Media
+                    {
+                        ContentUrl = nowPlayingTarget,
+                        ContentType = "audio/mpeg",
+                        Metadata = new MusicTrackMetadata
+                        {
+                            Title = episode.Title,
+                            AlbumName = episode.Show,
+                            Artist = episode.Description,
+                            Images = new[]
+                                {
+                            new Sharpcaster.Models.Media.Image() { Url = image }
+                        },
+                            MetadataType = MetadataType.Music
+                        }
+                    };
                     //Create notification data
                     notificationViewModel.Title = episode.Title;
                     notificationViewModel.Artist = episode.Description;
@@ -1178,11 +1305,11 @@ namespace TMRADIO
                     ShowNotification();
 
                     //Add episode to first place of the list and remove it from the old place
-                    var xdoc = XDocument.Load(XmlRecentlyPlayedFile);
+                    var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
                     var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(episode)];
                     targetedNode.Remove();
                     xdoc.Root.AddFirst(targetedNode);
-                    xdoc.Save(XmlRecentlyPlayedFile);
+                    xdoc.Save(XML_RECENTLYPLAYED_FILE);
                     //Refresh view
                     frame_recentlyPlayed.IsVisible = true;
                     recentlyPlayedEpisodes.Clear();
@@ -1192,9 +1319,10 @@ namespace TMRADIO
 
                 cview_recently.SelectedItem = null;
             }
-            
+
         }
 
+        #region "Favourites"
         private async void FavouritesClicked(object  sender, EventArgs e)
         {
             grid_favourites.IsVisible = true;
@@ -1209,7 +1337,7 @@ namespace TMRADIO
 
         private void AddToFavouritesClicked(object sender, EventArgs e)
         {
-            var episode = episodes.Where(x => x.Url == nowPlayingTarget).FirstOrDefault() ?? recentlyPlayedEpisodes.Where(x => x.Url == nowPlayingTarget).FirstOrDefault();
+            var episode = playlistEpisodes.Where(x => x.Url == nowPlayingTarget).FirstOrDefault() ?? recentlyPlayedEpisodes.Where(x => x.Url == nowPlayingTarget).FirstOrDefault();
             
             if (!isRadioSelected)
             {
@@ -1236,7 +1364,7 @@ namespace TMRADIO
                 var image = episode.ImageArt.StartsWith("/") ? $"https://www.tm-radio.com{episode.ImageArt}" : episode.ImageArt;
                 episode.ImageArt = image;
 
-                await DownloadAndResizeFileAsync(image, $"{ExternalCacheDir}/Temp", episode.Title);
+                await DownloadAndResizeFileAsync(image, $"{EXTERNAL_CACHE_DIR}/Temp", episode.Title);
 
                 session.Stop();
 
@@ -1252,6 +1380,23 @@ namespace TMRADIO
 
                 long episodeDuration = session.GetMediaDuration();
 
+                //Create Chromecast metadata
+                chromecastMedia = new Media
+                {
+                    ContentUrl = nowPlayingTarget,
+                    ContentType = "audio/mpeg",
+                    Metadata = new MusicTrackMetadata
+                    {
+                        Title = episode.Title,
+                        AlbumName = episode.Show,
+                        Artist = episode.Description,
+                        Images = new[]
+                            {
+                            new Sharpcaster.Models.Media.Image() { Url = image }
+                        },
+                        MetadataType = MetadataType.Music
+                    }
+                };
                 //Create notification data
                 notificationViewModel.Title = episode.Title;
                 notificationViewModel.Artist = episode.Description;
@@ -1286,11 +1431,11 @@ namespace TMRADIO
                 {
                     var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
                     //Add episode to first place of the list and remove it from the old place
-                    var xdoc = XDocument.Load(XmlRecentlyPlayedFile);
+                    var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
                     var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
                     targetedNode.Remove();
                     xdoc.Root.AddFirst(targetedNode);
-                    xdoc.Save(XmlRecentlyPlayedFile);
+                    xdoc.Save(XML_RECENTLYPLAYED_FILE);
                     //Refresh view
                     frame_recentlyPlayed.IsVisible = true;
                     recentlyPlayedEpisodes.Clear();
@@ -1319,10 +1464,10 @@ namespace TMRADIO
             bool isOk = await DisplayAlert($"TMRADIO", $"Remove {episodeToRemove.Title} from Favourites?", "remove", "cancel");
             if (isOk)
             {
-                XDocument xdoc = XDocument.Load(XmlFavouritesFile);
+                XDocument xdoc = XDocument.Load(XML_FAVOURITES_FILE);
                 var targetNode = xdoc.Descendants("Episode").ToList()[favouriteEpisodes.IndexOf(episodeToRemove)];
                 targetNode.Remove();
-                xdoc.Save(XmlFavouritesFile);
+                xdoc.Save(XML_FAVOURITES_FILE);
                 //Refresh view
                 favouriteEpisodes.Clear();
                 GetFavourites();
@@ -1338,7 +1483,7 @@ namespace TMRADIO
         private void CreateXmlFavouriteEntity(PlaylistEntity episode)
         {
             //Add episode to XML file (favourites)
-            XDocument xdoc = XDocument.Load(XmlFavouritesFile);
+            XDocument xdoc = XDocument.Load(XML_FAVOURITES_FILE);
             XElement newEpisode = new XElement("Episode");
             newEpisode.Add(
                 new XElement("Title", episode.Title),
@@ -1347,7 +1492,7 @@ namespace TMRADIO
                 new XElement("Url", episode.Url),
                 new XElement("Description", episode.Description));
             xdoc.Element("Episodes").AddFirst(newEpisode);
-            xdoc.Save(XmlFavouritesFile);
+            xdoc.Save(XML_FAVOURITES_FILE);
             //Refresh view
             //frame_recentlyPlayed.IsVisible = true;
             favouriteEpisodes.Clear();
@@ -1384,5 +1529,154 @@ namespace TMRADIO
         }
 
         #endregion
+
+        #region "Chromecast"
+        private async void ChromecastDevicesDiscoveryClicked(object sender, EventArgs e)
+        {
+            //Open dialog
+            grid_castDevices.IsVisible = true;
+            await grid_castDevices.FadeTo(0.9, 300);
+
+            chromecasts = await DiscoverChromecastDevicesAsync(chromecasts);
+        }
+
+        private async Task<IEnumerable<ChromecastReceiver>> DiscoverChromecastDevicesAsync(IEnumerable<ChromecastReceiver> chromecasts)
+        {
+            listCastDevices.Clear();
+            lbl_castDevicesCount.Text = $"Chromecast Devices: 0";
+            lv_castDevices.ItemsSource = listCastDevices;
+
+            await Task.Run(async () =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    lv_castDevices.IsRefreshing = true;
+                });
+
+                // Discover Chromecast devices
+                var locator = new ChromecastLocator();
+                chromecasts = await locator.FindReceiversAsync(
+                    TimeSpan.FromSeconds(1),
+                    TimeSpan.FromSeconds(2),
+                    TimeSpan.FromSeconds(5));
+
+                if (chromecasts.Any())
+                {
+                    foreach (var device in chromecasts)
+                    {
+                        listCastDevices.Add(device);
+                    }
+                }
+            });
+
+            lv_castDevices.IsRefreshing = false;
+
+            if (!chromecasts.Any())
+            {
+                await DisplayAlert("Chromecast Not Found",
+                    "Your device couldn't find any Chromecast receivers.\n\n" +
+                    "• Ensure Chromecast is powered on\n" +
+                    "• Ensure Chromecast is on the same Wi-Fi network\n" +
+                    "• Disable AP/client isolation on your router\n" +
+                    "• Restart your router or Chromecast\n\n",
+                    "close");
+            }
+
+            return chromecasts;
+        }
+
+        private void ChromecastDevicesAppearing(object sender, ItemVisibilityEventArgs e)
+        {
+            lbl_castDevicesCount.Text = $"Chromecast Devices: {listCastDevices.Count}";
+        }
+
+        private async void ChromecastDeviceTapped(object sender, ItemTappedEventArgs e)
+        {
+            client = new ChromecastClient();
+
+            var targetReceiver = (ChromecastReceiver)e.Item;
+
+            bool isReadyToCast = await DisplayAlert($"Chromecast to", 
+                $"Device: {targetReceiver.Name}\n" +
+                $"Model: {targetReceiver.Model}\n" +
+                $"Address: {targetReceiver.DeviceUri.Host}:{targetReceiver.Port}", 
+                "cast", "cancel");
+
+            if (isReadyToCast)
+            {
+                try
+                {
+                    //Connect to chromecast device
+                    await client.ConnectChromecast(targetReceiver);
+                }
+                catch (Exception x)
+                {
+                    await DisplayAlert("TMRADIO - Cast dialog", $"{x.Message}", "close");
+                    return;
+                }
+
+                // Subscribe to events
+                client.MediaChannel.StatusChanged += OnMediaStatusChanged;
+                client.Disconnected += OnDisconnected;
+
+                // Launch the default media receiver app
+                await client.LaunchApplicationAsync(CHROMECAST_RECEIVER_ID); // Default Media Receiver
+
+                //Error Handling Best Practices
+                try
+                {
+                    await client.MediaChannel.LoadAsync(chromecastMedia);
+                }
+                catch (TimeoutException)
+                {
+                    await DisplayAlert("TMRADIO - Cast dialog", $"Request timed out - check network connection", "close");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    await DisplayAlert("TMRADIO - Cast dialog", $"Invalid operation: {ex.Message}", "close");
+                }
+                catch (Exception x)
+                {
+                    await DisplayAlert("TMRADIO - Cast dialog", $"Unexpected error: {x.Message}", "close");
+                }
+                
+            }
+        }
+
+        private async void OnDisconnected(object sender, EventArgs e)
+        {
+            await DisplayAlert("TMRADIO - Cast dialog", $"Disconnected from Chromecast", "close");
+        }
+
+        private void OnMediaStatusChanged(object sender, MediaStatus status)
+        {
+            
+        }
+
+        private void ChromecastDialogCloseClicked(object sender, EventArgs e)
+        {
+            grid_castDevices.Opacity = 0;
+            grid_castDevices.IsVisible = false;
+        }
+
+        private async void CastDeviceDisconnectClicked(object sender, EventArgs e)
+        {
+            //MenuItem menuItem = (MenuItem)sender;
+
+            //var deviceToDisconnect = listCastDevices.First(x => x.Name == menuItem.CommandParameter.ToString());
+
+            try
+            {
+                await client.DisconnectAsync();
+            }
+            catch (Exception x)
+            {
+                await DisplayAlert("TMRADIO - Cast dialog", $"{x.Message}", "close");
+            }
+
+        }
+        #endregion
+
+
     }
 }

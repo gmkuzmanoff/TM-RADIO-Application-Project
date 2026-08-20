@@ -16,7 +16,7 @@ namespace TMRADIO
         {
             base.OnStart();
 
-            Directory.CreateDirectory($"{ExternalCacheDir}/Temp");
+            Directory.CreateDirectory($"{EXTERNAL_CACHE_DIR}/Temp");
 
             CleanTempDir();
         }
@@ -33,7 +33,7 @@ namespace TMRADIO
 
         private void CleanTempDir()
         {
-            string directoryTemp = $"{ExternalCacheDir}/Temp";
+            string directoryTemp = $"{EXTERNAL_CACHE_DIR}/Temp";
             DirectoryInfo directory = new DirectoryInfo(directoryTemp);
 
             foreach (var file in directory.GetFiles())

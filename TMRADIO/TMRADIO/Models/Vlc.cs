@@ -1,8 +1,6 @@
-﻿using Java.Net;
-using LibVLCSharp.Shared;
+﻿using LibVLCSharp.Shared;
 using System;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace TMRADIO.Models
@@ -30,7 +28,7 @@ namespace TMRADIO.Models
         {
             Core.Initialize();
             LibVLC = new LibVLC(enableDebugLogs: true);
-            Player = new MediaPlayer(LibVLC);
+            Player = new MediaPlayer(LibVLC) { EnableHardwareDecoding = false };
         }
 
         public Media Media
@@ -90,6 +88,7 @@ namespace TMRADIO.Models
                 Media = new Media(LibVLC, url, FromType.FromLocation);
                 //Media.AddOption(":network-caching=5000");
                 Media.AddOption(":no-video");
+                //Media.AddOption(":avcodec-hw=dxva2");//Hardware accelleration - directX
                 //Media.AddOption("-vvv");
                 //Media.AddOption($":http-user-agent={userAgents[0]}");
                 //Media.AddOption(":http-forward-cookies=true");

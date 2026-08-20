@@ -70,7 +70,7 @@ namespace TMRADIO.Droid.MediaSession
                     default:
                         break;
                 }
-                Toast.MakeText(context, $"Callback: {keycode.KeyCode} pressed!", ToastLength.Long).Show();
+                //Toast.MakeText(context, $"Callback: {keycode.KeyCode} pressed!", ToastLength.Long).Show();
 
             }
 
@@ -87,7 +87,7 @@ namespace TMRADIO.Droid.MediaSession
                     default:
                         break;
                 }
-                Toast.MakeText(context, $"Callback: {keycode.KeyCode} released!", ToastLength.Short).Show();
+                //Toast.MakeText(context, $"Callback: {keycode.KeyCode} released!", ToastLength.Short).Show();
             }
 
             //Create notification
