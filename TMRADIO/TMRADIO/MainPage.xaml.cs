@@ -421,6 +421,7 @@ namespace TMRADIO
             lbl_title.Text = lbl_tmradiolive_title.Text;
             lbl_album.Text = radioViewModel.Info;
             lbl_currListeners.Text = $"[Listeners: {radioViewModel.StreamCurrentListeners}]";
+            lbl_bitrate.Text = "[Bitrate: 256kbps]";
             lbl_descriptiion.Text = radioViewModel.StreamDescription;
             lbl_duration.Text = "0:00:00";
 
@@ -452,6 +453,7 @@ namespace TMRADIO
                     else
                     {
                         lbl_tmradiolive_title.Text = radioViewModel.Title.Replace(" - ", " | ");
+                        lbl_currListeners.Text = $"[Listeners: {radioViewModel.StreamCurrentListeners}]";
                     }
                 });
 
@@ -616,8 +618,6 @@ namespace TMRADIO
                     {
                         lbl_title.Text = nextEpisode.Title;
                         img_logo.Source = nextEpisode.ImageSource;
-                        lbl_currListeners.Text = $"";
-                        lbl_bitrate.Text = $"";
                         lbl_duration.Text = TimeSpan.FromMilliseconds(session.GetMediaDuration()).ToString(@"h\:mm\:ss");
                     });
 
@@ -685,8 +685,6 @@ namespace TMRADIO
                     {
                         lbl_title.Text = prevEpisode.Title;
                         img_logo.Source = prevEpisode.ImageSource;
-                        lbl_currListeners.Text = $"";
-                        lbl_bitrate.Text = $"";
                         lbl_duration.Text = TimeSpan.FromMilliseconds(session.GetMediaDuration()).ToString(@"h\:mm\:ss");
                     });
 
@@ -752,8 +750,6 @@ namespace TMRADIO
                     {
                         lbl_title.Text = nextEpisode.Title;
                         img_logo.Source = nextEpisode.ImageSource;
-                        lbl_currListeners.Text = $"";
-                        lbl_bitrate.Text = $"";
                         lbl_duration.Text = TimeSpan.FromMilliseconds(session.GetMediaDuration()).ToString(@"h\:mm\:ss");
                     });
 
@@ -1086,8 +1082,6 @@ namespace TMRADIO
                     lbl_title.Text = episode.Title;
                     img_logo.Source = episode.ImageSource;
                     lbl_album.Text = selectedShow;
-                    lbl_currListeners.Text = $"";
-                    lbl_bitrate.Text = $"";
                     lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
                 });
 
@@ -1295,8 +1289,6 @@ namespace TMRADIO
                         lbl_title.Text = episode.Title;
                         img_logo.Source = episode.ImageSource;
                         lbl_album.Text = episode.Show;
-                        lbl_currListeners.Text = $"";
-                        lbl_bitrate.Text = $"";
                         lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
                     });
 
@@ -1418,8 +1410,6 @@ namespace TMRADIO
                     lbl_title.Text = episode.Title;
                     img_logo.Source = episode.ImageSource;
                     lbl_album.Text = episode.Show;
-                    lbl_currListeners.Text = $"";
-                    lbl_bitrate.Text = $"";
                     lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
                 });
 
