@@ -31,7 +31,7 @@
             <!--#region Grid Home-->
             <Grid x:Name="grid_home" Style="{DynamicResource MainGridStyle}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="70"/>
                     <RowDefinition Height="200"/>
                     <RowDefinition/>
                     <RowDefinition Height="160"/>
@@ -44,8 +44,8 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Label Grid.Column="1" Text="Home" TextColor="Wheat" FontSize="Title" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Image Grid.Column="2" Source="home" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Text="Home" FontFamily="AguafinaScript-Regular" CharacterSpacing="1.3" TextColor="Wheat" FontSize="33" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" WidthRequest="190" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Image Grid.Column="2" Source="home" BackgroundColor="Transparent" WidthRequest="34" HorizontalOptions="End" VerticalOptions="Center"/>
                     </Grid>
                 </Frame>
                 <!--#region Frame Main Shows Autoscroll list-->
@@ -83,7 +83,7 @@
                                     <DataTemplate>
                                         <StackLayout Margin="0" Padding="0" WidthRequest="100" HorizontalOptions="Center" VerticalOptions="Center" Spacing="0.5" BackgroundColor="Transparent">
                                             <Frame Padding="0" CornerRadius="15" HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="100" HeightRequest="100">
-                                                <Image Source="{Binding ImageArt}" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="500" HeightRequest="500"/>
+                                                <Image Source="{Binding ImageSourceForRecentlyPlayedEpisodes}" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="500" HeightRequest="500"/>
                                             </Frame>
                                             <Label Text="{Binding Title}" HorizontalTextAlignment="Center" TextColor="Wheat" FontSize="Micro" MaxLines="1" LineBreakMode="TailTruncation"/>
                                             <Label Text="{Binding Show}" HorizontalOptions="Center" TextColor="Gray" FontSize="Micro" MaxLines="1" LineBreakMode="TailTruncation"/>
@@ -163,7 +163,7 @@
                         </Frame>
                         <Frame Grid.Column="2" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
                             <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
-                                <ImageButton x:Name="btn_browse" WidthRequest="35" Margin="0" Padding="0" Source="history" BackgroundColor="Transparent" Clicked="HystoryMenuClicked"/>
+                                <ImageButton x:Name="btn_browse" WidthRequest="35" Margin="0" Padding="0" Source="history" BackgroundColor="Transparent" Clicked="OnDemandMenuClicked"/>
                                 <Label Text="on demand" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="9" TextColor="Wheat"/>
                             </StackLayout>
                         </Frame>
@@ -193,7 +193,7 @@
             <!--#region Grid Player-->
             <Grid x:Name="grid_nowPlaying" Style="{DynamicResource MainGridStyle}" TranslationY="800" IsVisible="false">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="70"/>
                     <RowDefinition Height="250"/>
                     <RowDefinition Height="1.1*"/>
                     <RowDefinition/>
@@ -202,21 +202,19 @@
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
                         <ImageButton x:Name="btn_playerBack" BackgroundColor="Transparent" Source="arrow_back" Clicked="PlayerBackArrowClicked"/>
-                        <Label Text="Now playing" TextColor="Wheat" FontSize="Title"/>
-                        <Image Source="speaker" BackgroundColor="Transparent"/>
+                        <Label Text="Now playing" FontFamily="AguafinaScript-Regular" CharacterSpacing="1.3" TextColor="Wheat" FontSize="33" WidthRequest="190" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
+                        <Image Source="speaker" WidthRequest="34" BackgroundColor="Transparent"/>
                     </FlexLayout>
                 </Frame>
                 <Grid Grid.Row="1" Margin="10,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Frame Grid.Column="0" WidthRequest="40" Margin="10,0" Padding="0" HorizontalOptions="StartAndExpand" BackgroundColor="Transparent">
+                    <!--<Frame Grid.Column="0" WidthRequest="40" Margin="10,0" Padding="0" HorizontalOptions="StartAndExpand" BackgroundColor="Transparent">
                         <FlexLayout Direction="Column" JustifyContent="Center" AlignItems="Center" HorizontalOptions="Start" BackgroundColor="Transparent">
                         </FlexLayout>
-                    </Frame>
-                    <Frame Grid.Column="1" x:Name="frame_player_imageArt" Padding="0" HasShadow="True" CornerRadius="5" WidthRequest="200" HeightRequest="200" HorizontalOptions="Center" VerticalOptions="Center">
+                    </Frame>-->
+                    <Frame Grid.Column="0" x:Name="frame_player_imageArt" Padding="0" HasShadow="True" CornerRadius="5" WidthRequest="220" HeightRequest="220" HorizontalOptions="Center" VerticalOptions="Center">
                         <Frame.Background>
                             <LinearGradientBrush EndPoint="0.5,0.5">
                                 <GradientStop Color="Wheat" Offset="0.2"/>
@@ -227,13 +225,9 @@
                         </Frame.Background>
                         <Image x:Name="img_logo" Margin="5" Source="logo" Aspect="Fill"/>
                     </Frame>
-                    <Frame Grid.Column="2" WidthRequest="40" Margin="10,0" HorizontalOptions="End" Padding="0" BackgroundColor="Transparent">
-                        <FlexLayout Direction="Column" JustifyContent="Center" AlignItems="Center" HorizontalOptions="Start" BackgroundColor="Transparent">
-                            <ImageButton x:Name="btn_cast" CornerRadius="5" Margin="0,5" Padding="6" WidthRequest="35" HeightRequest="35" VerticalOptions="Center" HorizontalOptions="Center" Source="cast" Opacity="0.8" BackgroundColor="#1f1410" Clicked="ChromecastDevicesDiscoveryClicked"/>
-                            <ImageButton x:Name="btn_favourites" CornerRadius="5" Margin="0,5" Padding="6" WidthRequest="35" HeightRequest="35" VerticalOptions="Center" HorizontalOptions="Center" Source="playlist_star" Opacity="0.8" BackgroundColor="#1f1410" Clicked="FavouritesClicked"/>
-                            <ImageButton x:Name="btn_playlist" CornerRadius="5" Margin="0,5" Padding="6" WidthRequest="35" HeightRequest="35" VerticalOptions="Center" HorizontalOptions="Center" Source="playlist" Opacity="0.8" BackgroundColor="#1f1410" Clicked="PlaylistClicked"/>
-                        </FlexLayout>
-                    </Frame>
+                    <!--<Frame Grid.Column="2" WidthRequest="40" Margin="10,0" HorizontalOptions="End" Padding="0" BackgroundColor="Transparent">
+                        
+                    </Frame>-->
                 </Grid>
                 
                 <Frame Grid.Row="2" Padding="0" VerticalOptions="Center" HorizontalOptions="Center" BackgroundColor="Transparent" IsClippedToBounds="True">
@@ -276,25 +270,27 @@
                         <ImageButton x:Name="btn_skipToNext" Grid.Column="4" WidthRequest="30" VerticalOptions="Center" HorizontalOptions="Center" Source="skip_next" BackgroundColor="Transparent" Clicked="SkipToNextClicked"/>
                     </Grid>
                 </Frame>
-                <Frame Grid.Row="4" Padding="0,1,0,0" Margin="0,0" BackgroundColor="Firebrick">
-                    <StackLayout VerticalOptions="Fill" HorizontalOptions="FillAndExpand" BackgroundColor="Black">
-                        <Label x:Name="lbl_descriptiion" TextColor="#222f5b" FontSize="16" Padding="5" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" VerticalOptions="Center" HorizontalOptions="CenterAndExpand"/>
-                    </StackLayout>
+                <Frame Grid.Row="4" Padding="0,1,0,0" Margin="0,0" BackgroundColor="DarkMagenta">
+                    <FlexLayout Direction="Row" JustifyContent="SpaceAround" AlignItems="Center" HorizontalOptions="Start" BackgroundColor="#170d17">
+                        <ImageButton x:Name="btn_cast" CornerRadius="5" Margin="0,5" Padding="6" WidthRequest="35" HeightRequest="35" VerticalOptions="Center" HorizontalOptions="Center" Source="cast" Opacity="0.8" BackgroundColor="#1f1410" Clicked="ChromecastDevicesDiscoveryClicked"/>
+                        <ImageButton x:Name="btn_favourites" CornerRadius="5" Margin="0,5" Padding="6" WidthRequest="35" HeightRequest="35" VerticalOptions="Center" HorizontalOptions="Center" Source="playlist_star" Opacity="0.8" BackgroundColor="#1f1410" Clicked="FavouritesClicked"/>
+                        <ImageButton x:Name="btn_playlist" CornerRadius="5" Margin="0,5" Padding="6" WidthRequest="35" HeightRequest="35" VerticalOptions="Center" HorizontalOptions="Center" Source="playlist" Opacity="0.8" BackgroundColor="#1f1410" Clicked="PlaylistClicked"/>
+                    </FlexLayout>
                 </Frame>
             </Grid>
             <!--#endregion-->
             <!--#region Grid Playlist-->
             <Grid x:Name="grid_playlist" Style="{DynamicResource MainGridStyle}" IsVisible="false" Opacity="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="70"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
                         <ImageButton x:Name="btn_playlistClose" Padding="5" BackgroundColor="Transparent" Source="close" Clicked="PlaylistCloseClicked"/>
-                        <Label Text="Playlist" TextColor="Wheat" FontSize="Title"/>
-                        <Image Source="playlist2" BackgroundColor="Transparent"/>
+                        <Label Text="Playlist" FontFamily="AguafinaScript-Regular" CharacterSpacing="1.3" TextColor="Wheat" FontSize="33" WidthRequest="190" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
+                        <Image Source="playlist2" WidthRequest="34" BackgroundColor="Transparent"/>
                     </FlexLayout>
                 </Frame>
                 <Frame Grid.Row="1" Padding="0" Margin="20,0" VerticalOptions="Center" BackgroundColor="Transparent">
@@ -311,7 +307,7 @@
                                             <ColumnDefinition Width="3*"/>
                                         </Grid.ColumnDefinitions>
                                         <Frame Grid.Column="0" Padding="5" BackgroundColor="#170d17">
-                                            <Image Source="{Binding ImageSource}"/>
+                                            <Image Source="{Binding ImageSourceForPlaylist}"/>
                                         </Frame>
                                         <StackLayout Grid.Column="1" VerticalOptions="Center">
                                             <Label Text="{Binding Title}" FontSize="13" TextColor="Wheat"/>
@@ -328,15 +324,15 @@
             <!--#region Grid Favourites-->
             <Grid x:Name="grid_favourites" Style="{DynamicResource MainGridStyle}" IsVisible="false" Opacity="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="70"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
                         <ImageButton x:Name="btn_favouriteClose" Padding="5" BackgroundColor="Transparent" Source="close" Clicked="FavouriteCloseClicked"/>
-                        <Label Text="Favourites" TextColor="Wheat" FontSize="Title"/>
-                        <Image Source="playlist_star2" BackgroundColor="Transparent"/>
+                        <Label Text="Favourites" FontFamily="AguafinaScript-Regular" CharacterSpacing="1.3" TextColor="Wheat" FontSize="33" WidthRequest="190" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
+                        <Image Source="playlist_star2" WidthRequest="34" BackgroundColor="Transparent"/>
                     </FlexLayout>
                 </Frame>
                 <Frame Grid.Row="1" Padding="0" Margin="20,0" VerticalOptions="Center" BackgroundColor="Transparent">
@@ -356,7 +352,7 @@
                                             <ColumnDefinition Width="3*"/>
                                         </Grid.ColumnDefinitions>
                                         <Frame Grid.Column="0" Padding="5" BackgroundColor="#170d17">
-                                            <Image Source="{Binding ImageArt}"/>
+                                            <Image Source="{Binding ImageSourceForFavouriteEpisodes}"/>
                                         </Frame>
                                         <StackLayout Grid.Column="1" VerticalOptions="Center">
                                             <Label Text="{Binding Title}" FontSize="13" TextColor="Wheat"/>
@@ -373,24 +369,18 @@
             <!--#region Grid Shedule-->
             <Grid x:Name="grid_shedule" Style="{DynamicResource MainGridStyle}" TranslationY="800" IsVisible="false">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="70"/>
+                    <RowDefinition/>
                     <RowDefinition Height="60"/>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="0.7*"/>
-                    <RowDefinition Height="0.5*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="0.5*"/>
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
                         <ImageButton x:Name="btn_sheduleBack" BackgroundColor="Transparent" Source="arrow_back" Clicked="SheduleBackArrowClicked"/>
-                        <Label Text="Shedule" TextColor="Wheat" FontSize="Title"/>
-                        <Image Source="calendar" BackgroundColor="Transparent"/>
+                        <Label Text="Shedule" FontFamily="AguafinaScript-Regular" CharacterSpacing="1.3" TextColor="Wheat" FontSize="33" WidthRequest="190" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
+                        <Image Source="calendar" WidthRequest="34" BackgroundColor="Transparent"/>
                     </FlexLayout>
                 </Frame>
-                <Frame Grid.Row="1" Padding="0" Margin="20,0" BackgroundColor="Transparent">
-                    <Label x:Name="lbl_UTCtime" HorizontalTextAlignment="Start" TextColor="Lime" FontSize="12"/>
-                </Frame>
-                <Frame Grid.Row="2" Grid.RowSpan="4" BackgroundColor="Transparent">
+                <Frame Grid.Row="1" BackgroundColor="Transparent">
                     <StackLayout>
                         <ListView x:Name="list_shedule" ItemsSource="{Binding sheduleViewModels}" HasUnevenRows="True">
                             <ListView.ItemTemplate>
@@ -419,12 +409,24 @@
                         </ListView>
                     </StackLayout>
                 </Frame>
+                <Frame Grid.Row="2" Padding="0,1,0,0" Margin="0,0" BackgroundColor="Yellow" CornerRadius="0">
+                    <Grid BackgroundColor="#170d17">
+                        <Label x:Name="lbl_UTCtime" VerticalOptions="Center" HorizontalTextAlignment="Center" FontSize="Subtitle" >
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="UTC : " CharacterSpacing="1.3" TextColor="Wheat"/>
+                                    <Span x:Name="span_utcnow" Text="-" FontSize="Subtitle" FontFamily="RobotoCondensed-Regular" CharacterSpacing="1.3" TextColor="Gold"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Grid>
+                </Frame>
             </Grid>
             <!--#endregion-->
-            <!--#region Grid Browser-->
+            <!--#region Grid On Demand-->
             <Grid x:Name="grid_browser" Style="{DynamicResource MainGridStyle}" TranslationY="800" IsVisible="false">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="70"/>
                     <RowDefinition Height="20"/>
                     <RowDefinition Height="0.7*"/>
                     <RowDefinition Height="0.5*"/>
@@ -434,8 +436,8 @@
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
                         <ImageButton x:Name="btn_browserBack" BackgroundColor="Transparent" Source="arrow_back" Clicked="HistoryBackArrowClicked"/>
-                        <Label Text="On Demand" TextColor="Wheat" FontSize="Title"/>
-                        <Image Source="history" BackgroundColor="Transparent"/>
+                        <Label Text="On Demand" FontFamily="AguafinaScript-Regular" CharacterSpacing="1.3" TextColor="Wheat" FontSize="33" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" WidthRequest="190"/>
+                        <Image Source="history" WidthRequest="34" BackgroundColor="Transparent"/>
                     </FlexLayout>
                 </Frame>
                 <Frame Grid.Row="1" Padding="0" Margin="10,0" BackgroundColor="Transparent">
@@ -446,7 +448,7 @@
                         <SearchBar x:Name="Search_bar" BackgroundColor="Bisque" TextColor="Black" Placeholder="... Search" PlaceholderColor="Gray" TextChanged="SearchbarTextChanged"/>
                     </Frame>
                     <Frame Padding="0" Margin="10,0" BackgroundColor="Transparent">
-                        <ListView x:Name="list_browser" SeparatorVisibility="Default" SeparatorColor="Wheat" HasUnevenRows="True" CachingStrategy="RetainElement" BackgroundColor="Transparent" GroupDisplayBinding="{Binding Key}" IsGroupingEnabled="True" ItemTapped="HistoryListItemTapped">
+                        <ListView x:Name="list_browser" SeparatorVisibility="Default" SeparatorColor="Wheat" HasUnevenRows="True" CachingStrategy="RetainElement" BackgroundColor="Transparent" GroupDisplayBinding="{Binding Key}" IsGroupingEnabled="True" ItemTapped="OnDemandListItemTapped">
                             <ListView.GroupHeaderTemplate>
                                 <DataTemplate>
                                     <ViewCell Height="60">
@@ -481,14 +483,14 @@
             <!--#region Grid About-->
             <Grid x:Name="grid_about" Style="{DynamicResource MainGridStyle}" TranslationY="800" IsVisible="false">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="70"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
                         <ImageButton x:Name="btn_aboutBack" BackgroundColor="Transparent" Source="arrow_back" Clicked="AboutBackArrowClicked"/>
-                        <Label Text="About TM-Radio" TextColor="Wheat" FontSize="Title"/>
-                        <Image Source="about" BackgroundColor="Transparent"/>
+                        <Label Text="About" FontFamily="AguafinaScript-Regular" CharacterSpacing="1.3" TextColor="Wheat" FontSize="33" WidthRequest="190" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                        <Image Source="about" WidthRequest="34" BackgroundColor="Transparent"/>
                     </FlexLayout>
                 </Frame>
                 <Frame Grid.Row="1" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
@@ -526,14 +528,14 @@
             <!--#region Grid Cast devices-->
             <Grid x:Name="grid_castDevices" IsVisible="false" Opacity="0" BackgroundColor="Black">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="70"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
                         <ImageButton x:Name="btn_castDevicesClose" Padding="5" BackgroundColor="Transparent" Source="close" Clicked="ChromecastDialogCloseClicked"/>
-                        <Label Text="Cast" TextColor="Wheat" FontSize="Title"/>
+                        <Label Text="Cast" FontFamily="AguafinaScript-Regular" CharacterSpacing="1.3" TextColor="Wheat" FontSize="33" WidthRequest="190" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                         <Image Source="cast" WidthRequest="30" BackgroundColor="Transparent"/>
                     </FlexLayout>
                 </Frame>
@@ -550,9 +552,9 @@
                                     </ViewCell.ContextActions>-->
                                     <Grid Margin="10">
                                         <StackLayout VerticalOptions="Center">
-                                            <Label Text="{Binding Name}" FontSize="Title" TextColor="Wheat"/>
-                                            <Label Text="{Binding Model}" FontSize="Subtitle" TextColor="LightGray"/>
-                                            <Label Text="{Binding Status}" FontSize="Caption" TextColor="Gray"/>
+                                            <Label Text="{Binding Name}" FontSize="Title" TextColor="Wheat" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding Model}" FontSize="Subtitle" TextColor="LightGray" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding Status}" FontSize="Caption" TextColor="Yellow" MaxLines="1" LineBreakMode="TailTruncation"/>
                                         </StackLayout>
                                     </Grid>
                                 </ViewCell>

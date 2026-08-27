@@ -1,4 +1,3 @@
-using Java.Interop;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -6,4 +5,5 @@ using Xamarin.Forms.Xaml;
     ExportFont("RobotoCondensed-Regular.ttf"),
     ExportFont("RobotoCondensed-Bold.ttf"),
     ExportFont("RobotoCondensed-Italic.ttf"),
-    ExportFont("Ubuntu-Regular.ttf")]
+    ExportFont("Ubuntu-Regular.ttf"),
+    ExportFont("AguafinaScript-Regular.ttf")]

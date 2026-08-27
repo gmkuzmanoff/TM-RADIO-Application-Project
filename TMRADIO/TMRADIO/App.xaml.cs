@@ -17,6 +17,8 @@ namespace TMRADIO
             base.OnStart();
 
             Directory.CreateDirectory($"{EXTERNAL_CACHE_DIR}/Temp");
+            Directory.CreateDirectory(RECENT_EPISODES_TUMBNAILS_DIR);
+            Directory.CreateDirectory(FAVOURITE_EPISODES_TUMBNAILS_DIR);
 
             CleanTempDir();
         }

@@ -1,5 +1,7 @@
 ﻿using Android.Content;
 using Android.Graphics;
+using Android.Media.Session;
+using Android.OS;
 using Android.Support.V4.Media.Session;
 using Android.Views;
 using Android.Widget;
@@ -7,8 +9,8 @@ using System;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using Xamarin.Forms;
-using static TMRADIO.Constants.Links;
 using static TMRADIO.Constants.Digits;
+using static TMRADIO.Constants.Links;
 
 namespace TMRADIO.Droid.MediaSession
 {
@@ -16,7 +18,13 @@ namespace TMRADIO.Droid.MediaSession
     {
         private readonly Android.Content.Context context = Android.App.Application.Context;
         private readonly IPlayerConnector session;
-        
+
+        private string mediaSource = string.Empty;
+        private string title = string.Empty;
+        private string artist = string.Empty;
+        private string album = string.Empty;
+        private string albumArt = string.Empty;
+
         public MySessionCallback()
         {
             DependencyService.Register<IPlayerConnector>();
@@ -26,11 +34,11 @@ namespace TMRADIO.Droid.MediaSession
         [System.Obsolete]
         public override bool OnMediaButtonEvent(Intent mediaButtonEvent)
         {
-            var mediaSource = session.MediaSource();
-            var title = session.GetTitle();
-            var artist = session.GetArtist();
-            var album = session.GetAlbum();
-            var albumArt = session.GetAlbumArt();
+            mediaSource = session.MediaSource();
+            title = session.GetTitle();
+            artist = session.GetArtist();
+            album = session.GetAlbum();
+            albumArt = session.GetAlbumArt();
             
             var keycode = (KeyEvent)mediaButtonEvent.Extras.GetParcelable(Intent.ExtraKeyEvent);
 
@@ -127,5 +135,32 @@ namespace TMRADIO.Droid.MediaSession
 
             return base.OnMediaButtonEvent(mediaButtonEvent);
         }
+
+        public override void OnPlayFromMediaId(string mediaId, Bundle extras)
+        {
+            base.OnPlayFromMediaId(mediaId, extras);
+        }
+
+        public override void OnPlayFromSearch(string query, Bundle extras)
+        {
+            base.OnPlayFromSearch(query, extras);
+        }
+
+        public override void OnPlay()
+        {
+            base.OnPlay();
+        }
+
+        public override void OnPause()
+        {
+            base.OnPause();
+        }
+
+        public override void OnStop()
+        {
+            base.OnStop();
+        }
+
+        
     }
 }

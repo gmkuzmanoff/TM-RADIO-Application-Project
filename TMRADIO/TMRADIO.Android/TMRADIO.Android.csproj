@@ -85,17 +85,22 @@
     <PackageReference Include="VideoLAN.LibVLC.Android">
       <Version>3.6.5</Version>
     </PackageReference>
+    <PackageReference Include="Xamarin.AndroidX.Media">
+      <Version>1.7.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2662" />
     <PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntentLauncher.cs" />
+    <Compile Include="Interfaces\IAndroidAutoRadioService.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="MediaButtonReceiver.cs" />
     <Compile Include="MediaSession\MySessionCallback.cs" />
     <Compile Include="PlayerConnector.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AndroidAutoRadioService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -174,6 +179,7 @@
     <AndroidResource Include="Resources\drawable\playlist_star2.png" />
     <AndroidResource Include="Resources\drawable\delete_favourite.png" />
     <AndroidResource Include="Resources\drawable\cast.png" />
+    <AndroidResource Include="Resources\xml\automotive_app_desc.xml" />
     <Content Include="Resources\drawable\icon.ico" />
     <AndroidResource Include="Resources\drawable\twitter.png" />
     <AndroidResource Include="Resources\drawable\web.png" />
