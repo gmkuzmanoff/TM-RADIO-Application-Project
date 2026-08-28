@@ -83,7 +83,7 @@
                                     <DataTemplate>
                                         <StackLayout Margin="0" Padding="0" WidthRequest="100" HorizontalOptions="Center" VerticalOptions="Center" Spacing="0.5" BackgroundColor="Transparent">
                                             <Frame Padding="0" CornerRadius="15" HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="100" HeightRequest="100">
-                                                <Image Source="{Binding ImageSourceForRecentlyPlayedEpisodes}" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="500" HeightRequest="500"/>
+                                                <Image Source="{Binding ImageSource}" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="500" HeightRequest="500"/>
                                             </Frame>
                                             <Label Text="{Binding Title}" HorizontalTextAlignment="Center" TextColor="Wheat" FontSize="Micro" MaxLines="1" LineBreakMode="TailTruncation"/>
                                             <Label Text="{Binding Show}" HorizontalOptions="Center" TextColor="Gray" FontSize="Micro" MaxLines="1" LineBreakMode="TailTruncation"/>
@@ -307,7 +307,7 @@
                                             <ColumnDefinition Width="3*"/>
                                         </Grid.ColumnDefinitions>
                                         <Frame Grid.Column="0" Padding="5" BackgroundColor="#170d17">
-                                            <Image Source="{Binding ImageSourceForPlaylist}"/>
+                                            <Image Source="{Binding ImageSource}"/>
                                         </Frame>
                                         <StackLayout Grid.Column="1" VerticalOptions="Center">
                                             <Label Text="{Binding Title}" FontSize="13" TextColor="Wheat"/>
@@ -352,7 +352,7 @@
                                             <ColumnDefinition Width="3*"/>
                                         </Grid.ColumnDefinitions>
                                         <Frame Grid.Column="0" Padding="5" BackgroundColor="#170d17">
-                                            <Image Source="{Binding ImageSourceForFavouriteEpisodes}"/>
+                                            <Image Source="{Binding ImageSource}"/>
                                         </Frame>
                                         <StackLayout Grid.Column="1" VerticalOptions="Center">
                                             <Label Text="{Binding Title}" FontSize="13" TextColor="Wheat"/>
@@ -507,7 +507,7 @@
                             <BoxView HeightRequest="1" Margin="5" BackgroundColor="LightGray" HorizontalOptions="FillAndExpand" />
                             <StackLayout Padding="5" HorizontalOptions="Fill" VerticalOptions="FillAndExpand" BackgroundColor="#140720">
                                 <Label Text="TMRADIO" Padding="5,0" FontSize="18" FontFamily="RobotoCondensed-Bold" TextColor="AntiqueWhite"/>
-                                <Label Text="v1.1 (21.07.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
+                                <Label Text="v1.1 (28.08.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="© 2026, gmkuzmanoff" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="Send Feedback" Padding="5" FontSize="14" FontFamily="RobotoCondensed-Regular" TextColor="CornflowerBlue" TextDecorations="Underline">
                                     <Label.GestureRecognizers>

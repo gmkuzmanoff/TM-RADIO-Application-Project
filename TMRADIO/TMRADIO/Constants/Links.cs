@@ -15,8 +15,7 @@
         public static string GITHUB_REPOSITORY = "https://github.com/gmkuzmanoff/TM-RADIO-Application-Project";
         public static string EXTERNAL_CACHE_DIR = Android.App.Application.Context.ExternalCacheDir.AbsolutePath;
         public static string EXTERNAL_FILES_DIR = Android.App.Application.Context.GetExternalFilesDir("").AbsolutePath;
-        public static string RECENT_EPISODES_TUMBNAILS_DIR = $"{EXTERNAL_FILES_DIR}/recentThumbs";
-        public static string FAVOURITE_EPISODES_TUMBNAILS_DIR = $"{EXTERNAL_FILES_DIR}/favsThumbs";
+        public static string THUMBNAILS_DIR = $"{EXTERNAL_FILES_DIR}/thumbnails";
         public static string XML_RECENTLYPLAYED_FILE = $"{EXTERNAL_FILES_DIR}/RecentlyPlayed.xml";
         public static string XML_FAVOURITES_FILE = $"{EXTERNAL_FILES_DIR}/Favourites.xml";
     }

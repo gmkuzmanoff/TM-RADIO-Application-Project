@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using static TMRADIO.Constants.Links;
 
 namespace TMRADIO.Models
@@ -8,46 +9,17 @@ namespace TMRADIO.Models
         private string title = string.Empty;
         private string show = string.Empty;
 
+        public string ShowId { get; set; }
         public string Title { get => title; set => title = value; }
         public string Show { get => show; set => show = value; }
         public string ImageArt { get; set; } = string.Empty;
-        public string ImageSourceForPlaylist { get => GetImageForPlaylist(); }
-        public string ImageSourceForRecentlyPlayedEpisodes {  get => GetImageForRecentlyPlayedEpisodes(); }
-        public string ImageSourceForFavouriteEpisodes { get => GetImageForFavouriteEpisodes(); }
+        public string ImageSource { get => GetImageSource(); }
         public string Url { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
 
-        private string GetImageForPlaylist()
+        private string GetImageSource()
         {
-            string file = $"{EXTERNAL_CACHE_DIR}/Temp/{Title}.jpg";
-
-            if (File.Exists(file))
-            {
-                return file;
-            }
-            else
-            {
-                return $"{EXTERNAL_CACHE_DIR}/tm_radio_episode.jpg";
-            }
-        }
-
-        private string GetImageForRecentlyPlayedEpisodes()
-        {
-            string file = $"{RECENT_EPISODES_TUMBNAILS_DIR}/{Title}.jpg";
-
-            if (File.Exists(file))
-            {
-                return file;
-            }
-            else
-            {
-                return "tm_radio_episode";
-            }
-        }
-
-        private string GetImageForFavouriteEpisodes()
-        {
-            string file = $"{FAVOURITE_EPISODES_TUMBNAILS_DIR}/{Title}.jpg";
+            string file = $"{THUMBNAILS_DIR}/{ShowId}/{Title}.jpg";
 
             if (File.Exists(file))
             {

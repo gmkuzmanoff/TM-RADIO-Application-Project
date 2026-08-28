@@ -16,32 +16,16 @@ namespace TMRADIO
         {
             base.OnStart();
 
-            Directory.CreateDirectory($"{EXTERNAL_CACHE_DIR}/Temp");
-            Directory.CreateDirectory(RECENT_EPISODES_TUMBNAILS_DIR);
-            Directory.CreateDirectory(FAVOURITE_EPISODES_TUMBNAILS_DIR);
-
-            CleanTempDir();
+            Directory.CreateDirectory(THUMBNAILS_DIR);
         }
 
 
         protected override void OnSleep()
         {
-            
         }
 
         protected override void OnResume()
         {
-        }
-
-        private void CleanTempDir()
-        {
-            string directoryTemp = $"{EXTERNAL_CACHE_DIR}/Temp";
-            DirectoryInfo directory = new DirectoryInfo(directoryTemp);
-
-            foreach (var file in directory.GetFiles())
-            {
-                file.Delete();
-            }
         }
     }
 }

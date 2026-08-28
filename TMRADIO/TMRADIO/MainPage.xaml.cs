@@ -3,18 +3,17 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
-using Java.Net;
 using Sharpcaster;
 using Sharpcaster.Models;
 using Sharpcaster.Models.Media;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Xml;
 using System.Xml.Linq;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
@@ -150,7 +149,6 @@ namespace TMRADIO
                     bool isOK = await DisplayAlert("TMRADIO", "This application REQUIRE network connection!", "", "exit", FlowDirection.LeftToRight);
                     if (!isOK)
                     {
-                        radioService.CleanTempDir();
                         session.StopSession();
                         Process.KillProcess(Process.MyPid());
                     }
@@ -331,28 +329,18 @@ namespace TMRADIO
 
         }
 
-        private async void GetFavourites()
+        private void GetFavourites()
         {
             foreach (var ep in radioService.Favourites())
             {
-                if (!System.IO.File.Exists($"{FAVOURITE_EPISODES_TUMBNAILS_DIR}/{ep.Title}.jpg"))
-                {
-                    await DownloadAndResizeFileAsync(ep.ImageArt, FAVOURITE_EPISODES_TUMBNAILS_DIR, ep.Title);
-                }
-
                 favouriteEpisodes.Add(ep);
             }
         }
 
-        private async void GetRecentlyPlayed()
+        private void GetRecentlyPlayed()
         {
             foreach (var ep in radioService.RecentlyPlayed())
             {
-                if (!System.IO.File.Exists($"{RECENT_EPISODES_TUMBNAILS_DIR}/{ep.Title}.jpg"))
-                {
-                    await DownloadAndResizeFileAsync(ep.ImageArt, RECENT_EPISODES_TUMBNAILS_DIR, ep.Title);
-                }
-                
                 recentlyPlayedEpisodes.Add(ep);
             }
         }
@@ -615,13 +603,13 @@ namespace TMRADIO
                     notificationViewModel.Title = nextEpisode.Title;
                     notificationViewModel.Artist = nextEpisode.Description;
                     notificationViewModel.Album = selectedShow;
-                    notificationViewModel.AlbumArt = nextEpisode.ImageSourceForPlaylist;
+                    notificationViewModel.AlbumArt = nextEpisode.ImageSource;
                     notificationViewModel.Duration = session.GetMediaDuration();
                     //Create metadata
                     metadataViewModel.Title = nextEpisode.Title;
                     metadataViewModel.Artist = nextEpisode.Description;
                     metadataViewModel.Album = selectedShow;
-                    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(nextEpisode.ImageSourceForPlaylist);
+                    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(nextEpisode.ImageSource);
                     metadataViewModel.Duration = session.GetMediaDuration();
 
                     ShowMetadata();
@@ -629,7 +617,7 @@ namespace TMRADIO
                     Device.BeginInvokeOnMainThread(() =>
                     {
                         lbl_title.Text = nextEpisode.Title;
-                        img_logo.Source = nextEpisode.ImageSourceForPlaylist;
+                        img_logo.Source = nextEpisode.ImageSource;
                         lbl_duration.Text = TimeSpan.FromMilliseconds(session.GetMediaDuration()).ToString(@"h\:mm\:ss");
                     });
 
@@ -684,13 +672,13 @@ namespace TMRADIO
                     notificationViewModel.Title = prevEpisode.Title;
                     notificationViewModel.Artist = prevEpisode.Description;
                     notificationViewModel.Album = selectedShow;
-                    notificationViewModel.AlbumArt = prevEpisode.ImageSourceForPlaylist;
+                    notificationViewModel.AlbumArt = prevEpisode.ImageSource;
                     notificationViewModel.Duration = session.GetMediaDuration();
                     //Create metadata
                     metadataViewModel.Title = prevEpisode.Title;
                     metadataViewModel.Artist = prevEpisode.Description;
                     metadataViewModel.Album = selectedShow;
-                    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(prevEpisode.ImageSourceForPlaylist);
+                    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(prevEpisode.ImageSource);
                     metadataViewModel.Duration = session.GetMediaDuration();
 
                     ShowMetadata();
@@ -698,7 +686,7 @@ namespace TMRADIO
                     Device.BeginInvokeOnMainThread(() =>
                     {
                         lbl_title.Text = prevEpisode.Title;
-                        img_logo.Source = prevEpisode.ImageSourceForPlaylist;
+                        img_logo.Source = prevEpisode.ImageSource;
                         lbl_duration.Text = TimeSpan.FromMilliseconds(session.GetMediaDuration()).ToString(@"h\:mm\:ss");
                     });
 
@@ -751,13 +739,13 @@ namespace TMRADIO
                     notificationViewModel.Title = nextEpisode.Title;
                     notificationViewModel.Artist = nextEpisode.Description;
                     notificationViewModel.Album = selectedShow;
-                    notificationViewModel.AlbumArt = nextEpisode.ImageSourceForPlaylist;
+                    notificationViewModel.AlbumArt = nextEpisode.ImageSource;
                     notificationViewModel.Duration = session.GetMediaDuration();
                     //Create metadata
                     metadataViewModel.Title = nextEpisode.Title;
                     metadataViewModel.Artist = nextEpisode.Description;
                     metadataViewModel.Album = selectedShow;
-                    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(nextEpisode.ImageSourceForPlaylist);
+                    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(nextEpisode.ImageSource);
                     metadataViewModel.Duration = session.GetMediaDuration();
 
                     ShowMetadata();
@@ -765,7 +753,7 @@ namespace TMRADIO
                     Device.BeginInvokeOnMainThread(() =>
                     {
                         lbl_title.Text = nextEpisode.Title;
-                        img_logo.Source = nextEpisode.ImageSourceForPlaylist;
+                        img_logo.Source = nextEpisode.ImageSource;
                         lbl_duration.Text = TimeSpan.FromMilliseconds(session.GetMediaDuration()).ToString(@"h\:mm\:ss");
                     });
 
@@ -867,7 +855,6 @@ namespace TMRADIO
 
             if (isOkToTurnOff)
             {
-                radioService.CleanTempDir();
                 session.StopSession();
                 Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
             }
@@ -1084,14 +1071,14 @@ namespace TMRADIO
                 notificationViewModel.Title = episode.Title;
                 notificationViewModel.Artist = episode.Description;
                 notificationViewModel.Album = selectedShow;
-                notificationViewModel.AlbumArt = episode.ImageSourceForPlaylist;
+                notificationViewModel.AlbumArt = episode.ImageSource;
                 notificationViewModel.Duration = episodeDuration;
 
                 //Create metadata
                 metadataViewModel.Title = episode.Title;
                 metadataViewModel.Artist = episode.Description;
                 metadataViewModel.Album = selectedShow;
-                metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSourceForPlaylist);
+                metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
                 metadataViewModel.Duration = episodeDuration;
 
                 ShowMetadata();
@@ -1099,7 +1086,7 @@ namespace TMRADIO
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     lbl_title.Text = episode.Title;
-                    img_logo.Source = episode.ImageSourceForPlaylist;
+                    img_logo.Source = episode.ImageSource;
                     lbl_album.Text = selectedShow;
                     lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
                 });
@@ -1136,6 +1123,7 @@ namespace TMRADIO
             XDocument xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
             XElement newEpisode = new XElement("Episode");
             newEpisode.Add(
+                new XElement("ShowId", episode.ShowId),
                 new XElement("Title", episode.Title),
                 new XElement("Image", episode.ImageArt),
                 new XElement("Show", string.IsNullOrEmpty(selectedShow) ? episode.Show : selectedShow),
@@ -1146,13 +1134,6 @@ namespace TMRADIO
             //Delete the last episode from the file if all episodes > 16
             if (recentlyPlayedEpisodes.Count > maxCountOfRecentlyPlayedEpisodes)
             {
-                var imageFile = xdoc.Descendants("Title").Last().Value;
-
-                if (System.IO.File.Exists($"{RECENT_EPISODES_TUMBNAILS_DIR}/{imageFile}.jpg"))
-                {
-                    System.IO.File.Delete($"{RECENT_EPISODES_TUMBNAILS_DIR}/{imageFile}.jpg");
-                }
-
                 xdoc.Element("Episodes").LastNode.Remove();
             }
             //Save changes to XML file
@@ -1175,11 +1156,12 @@ namespace TMRADIO
             {
                 foreach (var episode in radioService.GetPlaylistEntities(show.Id))
                 {
-                    var image = episode.ImageArt.StartsWith("/") ? $"https://www.tm-radio.com{episode.ImageArt}" : episode.ImageArt;
-                    episode.ImageArt = image;
-
-                    await DownloadAndResizeFileAsync(image, $"{EXTERNAL_CACHE_DIR}/Temp", episode.Title);
-
+                    if (!System.IO.File.Exists($"{$"{THUMBNAILS_DIR}/{show.Id}/{episode.Title}.jpg"}"))
+                    {
+                        Directory.CreateDirectory($"{THUMBNAILS_DIR}/{ show.Id}");
+                        await DownloadAndResizeFileAsync(episode.ImageArt, $"{THUMBNAILS_DIR}/{show.Id}", episode.Title);
+                    }
+                    
                     playlistEpisodes.Add(episode);
                 }
             }
@@ -1194,6 +1176,26 @@ namespace TMRADIO
                 {
                     lbl_playlistCount.Text = "Sessions: 0 (Nothing found!)";
                 });
+            }
+            //Make M3U file
+            else
+            {
+                CreateM3uFile(show);
+            }
+        }
+
+        private void CreateM3uFile(ShowViewModel show)
+        {
+            using (StreamWriter writer = new StreamWriter($"{THUMBNAILS_DIR}/{show.Id}/{show.Id}.m3u"))
+            {
+                writer.WriteLine("#EXTM3U");
+                foreach (var episode in playlistEpisodes)
+                {
+                    var image = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
+
+                    writer.WriteLine($"#EXTINF:-1 group-title=\"{selectedShow}\" tvg-logo=\"{image}\", {episode.Title.Replace(",", "-")}");
+                    writer.WriteLine(episode.Url);
+                }
             }
         }
         #endregion
@@ -1260,8 +1262,6 @@ namespace TMRADIO
 
                 if (isOk)
                 {
-                    await DownloadAndResizeFileAsync(episode.ImageArt, $"{EXTERNAL_CACHE_DIR}/Temp", episode.Title);
-
                     session.Stop();
 
                     grid_nowPlaying.IsVisible = true;
@@ -1276,8 +1276,6 @@ namespace TMRADIO
 
                     long episodeDuration = session.GetMediaDuration();
 
-                    var imageUrl = episode.ImageArt.Contains(EXTERNAL_CACHE_DIR) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
-
                     //Create Chromecast metadata
                     chromecastMedia = new Media
                     {
@@ -1290,7 +1288,7 @@ namespace TMRADIO
                             Artist = episode.Description,
                             Images = new[]
                                 {
-                            new Sharpcaster.Models.Media.Image() { Url = imageUrl }
+                            new Sharpcaster.Models.Media.Image() { Url = episode.ImageArt }
                         },
                             MetadataType = MetadataType.Music
                         }
@@ -1299,14 +1297,14 @@ namespace TMRADIO
                     notificationViewModel.Title = episode.Title;
                     notificationViewModel.Artist = episode.Description;
                     notificationViewModel.Album = episode.Show;
-                    notificationViewModel.AlbumArt = episode.ImageSourceForPlaylist;
+                    notificationViewModel.AlbumArt = episode.ImageSource;
                     notificationViewModel.Duration = episodeDuration;
 
                     //Create metadata
                     metadataViewModel.Title = episode.Title;
                     metadataViewModel.Artist = episode.Description;
                     metadataViewModel.Album = episode.Show;
-                    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSourceForPlaylist);
+                    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
                     metadataViewModel.Duration = episodeDuration;
 
                     ShowMetadata();
@@ -1314,7 +1312,7 @@ namespace TMRADIO
                     Device.BeginInvokeOnMainThread(() =>
                     {
                         lbl_title.Text = episode.Title;
-                        img_logo.Source = episode.ImageSourceForPlaylist;
+                        img_logo.Source = episode.ImageSource;
                         lbl_album.Text = episode.Show;
                         lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
                     });
@@ -1380,8 +1378,6 @@ namespace TMRADIO
 
             if (isOk)
             {
-                await DownloadAndResizeFileAsync(episode.ImageArt, $"{EXTERNAL_CACHE_DIR}/Temp", episode.Title);
-
                 session.Stop();
 
                 grid_nowPlaying.IsVisible = true;
@@ -1396,8 +1392,6 @@ namespace TMRADIO
 
                 long episodeDuration = session.GetMediaDuration();
 
-                var imageUrl = episode.ImageArt.Contains(EXTERNAL_CACHE_DIR) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
-
                 //Create Chromecast metadata
                 chromecastMedia = new Media
                 {
@@ -1410,7 +1404,7 @@ namespace TMRADIO
                         Artist = episode.Description,
                         Images = new[]
                             {
-                            new Sharpcaster.Models.Media.Image() { Url = imageUrl }
+                            new Sharpcaster.Models.Media.Image() { Url = episode.ImageArt }
                         },
                         MetadataType = MetadataType.Music
                     }
@@ -1419,14 +1413,14 @@ namespace TMRADIO
                 notificationViewModel.Title = episode.Title;
                 notificationViewModel.Artist = episode.Description;
                 notificationViewModel.Album = episode.Show;
-                notificationViewModel.AlbumArt = episode.ImageSourceForFavouriteEpisodes;
+                notificationViewModel.AlbumArt = episode.ImageSource;
                 notificationViewModel.Duration = episodeDuration;
 
                 //Create metadata
                 metadataViewModel.Title = episode.Title;
                 metadataViewModel.Artist = episode.Description;
                 metadataViewModel.Album = episode.Show;
-                metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSourceForFavouriteEpisodes);
+                metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
                 metadataViewModel.Duration = episodeDuration;
 
                 ShowMetadata();
@@ -1434,7 +1428,7 @@ namespace TMRADIO
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     lbl_title.Text = episode.Title;
-                    img_logo.Source = episode.ImageSourceForFavouriteEpisodes;
+                    img_logo.Source = episode.ImageSource;
                     lbl_album.Text = episode.Show;
                     lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
                 });
@@ -1483,12 +1477,6 @@ namespace TMRADIO
                 //Remove node from XML file
                 XDocument xdoc = XDocument.Load(XML_FAVOURITES_FILE);
                 var targetNode = xdoc.Descendants("Episode").ToList()[favouriteEpisodes.IndexOf(episodeToRemove)];
-
-                if (System.IO.File.Exists($"{FAVOURITE_EPISODES_TUMBNAILS_DIR}/{episodeToRemove.Title}.jpg"))
-                {
-                    System.IO.File.Delete($"{FAVOURITE_EPISODES_TUMBNAILS_DIR}/{episodeToRemove.Title}.jpg");
-                }
-
                 targetNode.Remove();
                 xdoc.Save(XML_FAVOURITES_FILE);
                 //Refresh view
@@ -1509,6 +1497,7 @@ namespace TMRADIO
             XDocument xdoc = XDocument.Load(XML_FAVOURITES_FILE);
             XElement newEpisode = new XElement("Episode");
             newEpisode.Add(
+                new XElement("ShowId", episode.ShowId),
                 new XElement("Title", episode.Title),
                 new XElement("Image", episode.ImageArt),
                 new XElement("Show", string.IsNullOrEmpty(selectedShow) ? episode.Show : selectedShow),

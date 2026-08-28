@@ -271,6 +271,7 @@ namespace TMRADIO.Services
 
                     list.Add(new PlaylistEntity()
                     {
+                        ShowId = id,
                         ImageArt = img,
                         Title = WebUtility.HtmlDecode(title),
                         Url = webAddress,
@@ -327,11 +328,12 @@ namespace TMRADIO.Services
             {
                 var playlistEntity = new PlaylistEntity()
                 {
-                    Title = epNode.ChildNodes[0].InnerText,
-                    ImageArt = string.IsNullOrEmpty(epNode.ChildNodes[1].InnerText) ? $"{EXTERNAL_CACHE_DIR}/tm_radio_episode.jpg" : epNode.ChildNodes[1].InnerText,
-                    Show = epNode.ChildNodes[2].InnerText,
-                    Url = epNode.ChildNodes[3].InnerText,
-                    Description = epNode.ChildNodes[4].InnerText
+                    ShowId = epNode.ChildNodes[0].InnerText,
+                    Title = epNode.ChildNodes[1].InnerText,
+                    ImageArt = epNode.ChildNodes[2].InnerText,
+                    Show = epNode.ChildNodes[3].InnerText,
+                    Url = epNode.ChildNodes[4].InnerText,
+                    Description = epNode.ChildNodes[5].InnerText
                 };
 
                 list.Add(playlistEntity);
@@ -351,11 +353,12 @@ namespace TMRADIO.Services
             {
                 var playlistEntity = new PlaylistEntity()
                 {
-                    Title = epNode.ChildNodes[0].InnerText,
-                    ImageArt = string.IsNullOrEmpty(epNode.ChildNodes[1].InnerText) ? $"{EXTERNAL_CACHE_DIR}/tm_radio_episode.jpg" : epNode.ChildNodes[1].InnerText,
-                    Show = epNode.ChildNodes[2].InnerText,
-                    Url = epNode.ChildNodes[3].InnerText,
-                    Description = epNode.ChildNodes[4].InnerText
+                    ShowId = epNode.ChildNodes[0].InnerText,
+                    Title = epNode.ChildNodes[1].InnerText,
+                    ImageArt = epNode.ChildNodes[2].InnerText,
+                    Show = epNode.ChildNodes[3].InnerText,
+                    Url = epNode.ChildNodes[4].InnerText,
+                    Description = epNode.ChildNodes[5].InnerText
                 };
 
                 list.Add(playlistEntity);

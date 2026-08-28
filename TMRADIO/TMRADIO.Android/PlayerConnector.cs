@@ -31,7 +31,7 @@ namespace TMRADIO.Droid
     public class PlayerConnector : MediaBrowserServiceCompat, IPlayerConnector
     {
         private readonly IAndroidAutoRadioService androidAutoRadioService;
-
+        
         private readonly PlaybackStateCompat.Builder playbackState;
         private readonly MediaMetadataCompat.Builder mediaMetadata;
         private NotificationManager notificationManager;
