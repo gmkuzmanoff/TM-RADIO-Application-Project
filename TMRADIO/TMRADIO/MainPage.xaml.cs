@@ -1276,6 +1276,8 @@ namespace TMRADIO
 
                     long episodeDuration = session.GetMediaDuration();
 
+                    var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
+
                     //Create Chromecast metadata
                     chromecastMedia = new Media
                     {
@@ -1288,7 +1290,7 @@ namespace TMRADIO
                             Artist = episode.Description,
                             Images = new[]
                                 {
-                            new Sharpcaster.Models.Media.Image() { Url = episode.ImageArt }
+                            new Sharpcaster.Models.Media.Image() { Url = imageUrl }
                         },
                             MetadataType = MetadataType.Music
                         }
@@ -1391,6 +1393,8 @@ namespace TMRADIO
                 session.MediaParse();
 
                 long episodeDuration = session.GetMediaDuration();
+
+                var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
 
                 //Create Chromecast metadata
                 chromecastMedia = new Media
