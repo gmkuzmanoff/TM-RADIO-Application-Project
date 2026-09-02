@@ -14,7 +14,7 @@ The project focuses on simplicity, stability, and a smooth listening experience 
 - 🔊 **Background Playback** – Music continues even when minimized and corresponding with bluetooth media devices.
 - 📴 **Lock‑Screen Controls** – Play/Pause/Rewind/FastForward directly from notifications.
 - ⚙️ **Lightweight & Fast** – Optimized for performance and low battery usage.
-
+- 📺 **Chromecast compatible** – Discover Chromecast device and cast audio stream.
 ---
 
 ## 🛠️ Tech Stack
