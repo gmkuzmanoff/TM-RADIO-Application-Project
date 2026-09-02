@@ -54,6 +54,7 @@ namespace TMRADIO
         private readonly ObservableCollection<PlaylistEntity> recentlyPlayedEpisodes;
         private readonly ObservableCollection<PlaylistEntity> favouriteEpisodes;
         private readonly ObservableCollection<GroupedCollection<string, ShowViewModel>> allShowsViewModels;
+        private PlaylistEntity selectedEpisode, episodeToRemove;
         
         //Chromecast requirements
         private readonly ObservableCollection<ChromecastReceiver> listCastDevices = new ObservableCollection<ChromecastReceiver>();
@@ -166,7 +167,6 @@ namespace TMRADIO
             timer.Start();
         }
 
-
         #region "Timer and Progress"
         private void Timer_Tick(object sender, ElapsedEventArgs e)
         {
@@ -227,7 +227,27 @@ namespace TMRADIO
 
         protected override bool OnBackButtonPressed()
         {
-            if (grid_playlist.IsVisible)
+            if (frame_popupMessage_appExit.IsVisible)
+            {
+                ClosePopupForAppExit();
+            }
+            else if (frame_popupMessage_removeFavourite.IsVisible)
+            {
+                ClosePopupForRemoveFavourite();
+            }
+            else if (frame_popupMessage_show.IsVisible)
+            {
+                ClosePopupForShow();
+            }
+            else if (frame_popupMessage_episode.IsVisible)
+            {
+                ClosePopupForEpisode();
+            }
+            else if (frame_popupMessage_liveStream.IsVisible)
+            {
+                ClosePopupForLiveStream();
+            }
+            else if (grid_playlist.IsVisible)
             {
                 grid_playlist.Opacity = 0;
                 grid_playlist.IsVisible = false;
@@ -851,13 +871,15 @@ namespace TMRADIO
 
         private async void PowerOffMenuClicked(object sender, EventArgs e)
         {
-            bool isOkToTurnOff = await DisplayAlert("TMRADIO", "You are about to leave the application. Are you sure?", "Leave", "Not now");
+            await OpenPopupForAppExit();
 
-            if (isOkToTurnOff)
-            {
-                session.StopSession();
-                Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
-            }
+            //bool isOkToTurnOff = await DisplayAlert("TMRADIO", "You are about to leave the application. Are you sure?", "Leave", "Not now");
+
+            //if (isOkToTurnOff)
+            //{
+            //    session.StopSession();
+            //    Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
+            //}
         }
         #endregion
 
@@ -920,21 +942,23 @@ namespace TMRADIO
 
         private async void ListenNowClicked(object sender, EventArgs e)
         {
-            bool isOk = await DisplayAlert($"TMRADIO", $"Play live stream now?", "play", "cancel");
+            await OpenPopupForLiveStream();
 
-            if (isOk)
-            {
-                session.Stop();
+            //bool isOk = await DisplayAlert($"TMRADIO", $"Play live stream now?", "play", "cancel");
 
-                GetRadioMetadataLoop(radioViewModel);
+            //if (isOk)
+            //{
+            //    session.Stop();
 
-                grid_nowPlaying.IsVisible = true;
-                await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
+            //    GetRadioMetadataLoop(radioViewModel);
 
-                session.Play();
+            //    grid_nowPlaying.IsVisible = true;
+            //    await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
 
-                ShowNotification();
-            }
+            //    session.Play();
+
+            //    ShowNotification();
+            //}
         }
 
         #region "On Demand"
@@ -943,42 +967,48 @@ namespace TMRADIO
             show = (ShowViewModel)e.Item;
             lbl_playlistCount.Text = $"Sessions: 0";
 
-            bool isOk = await DisplayAlert($"TMRADIO", $"Load episodes from {show.Title}?", "load", "cancel");
+            #region "Custom popup"
+            await OpenPopupForShow();
+            popup_show_imageSource.Source = show.ImageSource;
+            popup_show_title.Text = show.Title;
+            #endregion
 
-            if (isOk)
-            {
-                grid_playlist.IsVisible = true;
-                await grid_playlist.FadeTo(0.9, 300);
+            //bool isOk = await DisplayAlert($"TMRADIO", $"Load episodes from {show.Title}?", "load", "cancel");
 
-                Device.BeginInvokeOnMainThread(async () =>
-                {
-                    await grid_browser.TranslateTo(0, 800, 500, Easing.SpringIn);
-                    grid_browser.IsVisible = false;
-                });
+            //if (isOk)
+            //{
+            //    grid_playlist.IsVisible = true;
+            //    await grid_playlist.FadeTo(0.9, 300);
 
-                grid_nowPlaying.IsVisible = true;
-                await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
+            //    Device.BeginInvokeOnMainThread(async () =>
+            //    {
+            //        await grid_browser.TranslateTo(0, 800, 500, Easing.SpringIn);
+            //        grid_browser.IsVisible = false;
+            //    });
 
-                if (selectedShow != show.Title)
-                {
-                    selectedShow = show.Title;
+            //    grid_nowPlaying.IsVisible = true;
+            //    await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
 
-                    playlistEpisodes.Clear();
-                    lv_playlist.ItemsSource = playlistEpisodes;
+            //    if (selectedShow != show.Title)
+            //    {
+            //        selectedShow = show.Title;
 
-                    await Task.Run(() =>
-                    {
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-                            lv_playlist.IsRefreshing = true;
-                        });
+            //        playlistEpisodes.Clear();
+            //        lv_playlist.ItemsSource = playlistEpisodes;
 
-                        GetPlaylistEntities(show);
-                    });
+            //        await Task.Run(() =>
+            //        {
+            //            Device.BeginInvokeOnMainThread(() =>
+            //            {
+            //                lv_playlist.IsRefreshing = true;
+            //            });
 
-                    lv_playlist.IsRefreshing = false;
-                }
-            }
+            //            GetPlaylistEntities(show);
+            //        });
+
+            //        lv_playlist.IsRefreshing = false;
+            //    }
+            //}
         }
         #endregion
 
@@ -1031,90 +1061,97 @@ namespace TMRADIO
         private async void PlaylistItemTapped(object sender, ItemTappedEventArgs e)
         {
             var episode = (PlaylistEntity)e.Item;
+            selectedEpisode = episode;
 
-            bool isOk = await DisplayAlert($"{selectedShow}", $"{episode.Title}", "play", "cancel");
+            #region "Custom popup"
+            await OpenPopupForEpisode();
+            popup_episode_imageSource.Source = episode.ImageSource;
+            popup_episode_title.Text = episode.Title;
+            #endregion
 
-            if (isOk)
-            {
-                session.Stop();
+            //bool isOk = await DisplayAlert($"{selectedShow}", $"{episode.Title}", "play", "cancel");
 
-                isRadioSelected = false;
-                nowPlayingTarget = episode.Url;
+            //if (isOk)
+            //{
+            //    session.Stop();
 
-                session.LoadMedia(nowPlayingTarget);
+            //    isRadioSelected = false;
+            //    nowPlayingTarget = episode.Url;
 
-                session.MediaParse();
+            //    session.LoadMedia(nowPlayingTarget);
 
-                long episodeDuration = session.GetMediaDuration();
+            //    session.MediaParse();
 
-                var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
+            //    long episodeDuration = session.GetMediaDuration();
 
-                //Create Chromecast metadata
-                chromecastMedia = new Media
-                {
-                    ContentUrl = nowPlayingTarget,
-                    ContentType = "audio/mpeg",
-                    Metadata = new MusicTrackMetadata
-                    {
-                        Title = episode.Title,
-                        AlbumName = selectedShow,
-                        Artist = episode.Description,
-                        Images = new[]
-                            {
-                            new Sharpcaster.Models.Media.Image() { Url = imageUrl }
-                        },
-                        MetadataType = MetadataType.Music
-                    }
-                };
+            //    var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
 
-                //Create notification data
-                notificationViewModel.Title = episode.Title;
-                notificationViewModel.Artist = episode.Description;
-                notificationViewModel.Album = selectedShow;
-                notificationViewModel.AlbumArt = episode.ImageSource;
-                notificationViewModel.Duration = episodeDuration;
+            //    //Create Chromecast metadata
+            //    chromecastMedia = new Media
+            //    {
+            //        ContentUrl = nowPlayingTarget,
+            //        ContentType = "audio/mpeg",
+            //        Metadata = new MusicTrackMetadata
+            //        {
+            //            Title = episode.Title,
+            //            AlbumName = selectedShow,
+            //            Artist = episode.Description,
+            //            Images = new[]
+            //                {
+            //                new Sharpcaster.Models.Media.Image() { Url = imageUrl }
+            //            },
+            //            MetadataType = MetadataType.Music
+            //        }
+            //    };
 
-                //Create metadata
-                metadataViewModel.Title = episode.Title;
-                metadataViewModel.Artist = episode.Description;
-                metadataViewModel.Album = selectedShow;
-                metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
-                metadataViewModel.Duration = episodeDuration;
+            //    //Create notification data
+            //    notificationViewModel.Title = episode.Title;
+            //    notificationViewModel.Artist = episode.Description;
+            //    notificationViewModel.Album = selectedShow;
+            //    notificationViewModel.AlbumArt = episode.ImageSource;
+            //    notificationViewModel.Duration = episodeDuration;
 
-                ShowMetadata();
+            //    //Create metadata
+            //    metadataViewModel.Title = episode.Title;
+            //    metadataViewModel.Artist = episode.Description;
+            //    metadataViewModel.Album = selectedShow;
+            //    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
+            //    metadataViewModel.Duration = episodeDuration;
 
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    lbl_title.Text = episode.Title;
-                    img_logo.Source = episode.ImageSource;
-                    lbl_album.Text = selectedShow;
-                    lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
-                });
+            //    ShowMetadata();
 
-                session.Play();
+            //    Device.BeginInvokeOnMainThread(() =>
+            //    {
+            //        lbl_title.Text = episode.Title;
+            //        img_logo.Source = episode.ImageSource;
+            //        lbl_album.Text = selectedShow;
+            //        lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
+            //    });
 
-                ShowNotification();
+            //    session.Play();
 
-                if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
-                {
-                    var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
-                    //Add episode to first place of the list and remove it from the old place
-                    var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
-                    var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
-                    targetedNode.Remove();
-                    xdoc.Root.AddFirst(targetedNode);
-                    xdoc.Save(XML_RECENTLYPLAYED_FILE);
-                    //Refresh view
-                    frame_recentlyPlayed.IsVisible = true;
-                    recentlyPlayedEpisodes.Clear();
-                    GetRecentlyPlayed();
-                    cview_recently.ItemsSource = recentlyPlayedEpisodes;
-                }
-                else
-                {
-                    CreateXmlRecentPlayed(episode);
-                }
-            }
+            //    ShowNotification();
+
+            //    if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
+            //    {
+            //        var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
+            //        //Add episode to first place of the list and remove it from the old place
+            //        var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
+            //        var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
+            //        targetedNode.Remove();
+            //        xdoc.Root.AddFirst(targetedNode);
+            //        xdoc.Save(XML_RECENTLYPLAYED_FILE);
+            //        //Refresh view
+            //        frame_recentlyPlayed.IsVisible = true;
+            //        recentlyPlayedEpisodes.Clear();
+            //        GetRecentlyPlayed();
+            //        cview_recently.ItemsSource = recentlyPlayedEpisodes;
+            //    }
+            //    else
+            //    {
+            //        CreateXmlRecentPlayed(episode);
+            //    }
+            //}
         }
 
         private void CreateXmlRecentPlayed(PlaylistEntity episode)
@@ -1256,88 +1293,109 @@ namespace TMRADIO
         {
             var episode = (PlaylistEntity)e.CurrentSelection.FirstOrDefault();
 
-            if (episode != null)
+            if (episode == null)
             {
-                bool isOk = await DisplayAlert($"{episode.Show}", $"{episode.Title}", "play", "cancel");
-
-                if (isOk)
-                {
-                    session.Stop();
-
-                    grid_nowPlaying.IsVisible = true;
-                    await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
-
-                    isRadioSelected = false;
-                    nowPlayingTarget = episode.Url;
-
-                    session.LoadMedia(nowPlayingTarget);
-
-                    session.MediaParse();
-
-                    long episodeDuration = session.GetMediaDuration();
-
-                    var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
-
-                    //Create Chromecast metadata
-                    chromecastMedia = new Media
-                    {
-                        ContentUrl = nowPlayingTarget,
-                        ContentType = "audio/mpeg",
-                        Metadata = new MusicTrackMetadata
-                        {
-                            Title = episode.Title,
-                            AlbumName = episode.Show,
-                            Artist = episode.Description,
-                            Images = new[]
-                                {
-                            new Sharpcaster.Models.Media.Image() { Url = imageUrl }
-                        },
-                            MetadataType = MetadataType.Music
-                        }
-                    };
-                    //Create notification data
-                    notificationViewModel.Title = episode.Title;
-                    notificationViewModel.Artist = episode.Description;
-                    notificationViewModel.Album = episode.Show;
-                    notificationViewModel.AlbumArt = episode.ImageSource;
-                    notificationViewModel.Duration = episodeDuration;
-
-                    //Create metadata
-                    metadataViewModel.Title = episode.Title;
-                    metadataViewModel.Artist = episode.Description;
-                    metadataViewModel.Album = episode.Show;
-                    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
-                    metadataViewModel.Duration = episodeDuration;
-
-                    ShowMetadata();
-
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        lbl_title.Text = episode.Title;
-                        img_logo.Source = episode.ImageSource;
-                        lbl_album.Text = episode.Show;
-                        lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
-                    });
-
-                    session.Play();
-
-                    ShowNotification();
-
-                    //Add episode to first place of the list and remove it from the old place
-                    var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
-                    var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(episode)];
-                    targetedNode.Remove();
-                    xdoc.Root.AddFirst(targetedNode);
-                    xdoc.Save(XML_RECENTLYPLAYED_FILE);
-                    //Refresh view
-                    frame_recentlyPlayed.IsVisible = true;
-                    recentlyPlayedEpisodes.Clear();
-                    GetRecentlyPlayed();
-                    cview_recently.ItemsSource = recentlyPlayedEpisodes;
-                }
-
+                #region "Custom popup"
+                await OpenPopupForEpisode();
+                popup_episode_imageSource.Source = selectedEpisode.ImageSource;
+                popup_episode_title.Text = selectedEpisode.Title;
+                #endregion
+            }
+            else
+            {
+                #region "Custom popup"
+                await OpenPopupForEpisode();
+                popup_episode_imageSource.Source = episode.ImageSource;
+                popup_episode_title.Text = episode.Title;
+                #endregion
+                selectedEpisode = episode;
                 cview_recently.SelectedItem = null;
             }
+                
+
+
+            //if (episode != null)
+            //{
+            //    bool isOk = await DisplayAlert($"{episode.Show}", $"{episode.Title}", "play", "cancel");
+
+            //    if (isOk)
+            //    {
+            //        session.Stop();
+
+            //        grid_nowPlaying.IsVisible = true;
+            //        await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
+
+            //        isRadioSelected = false;
+            //        nowPlayingTarget = episode.Url;
+
+            //        session.LoadMedia(nowPlayingTarget);
+
+            //        session.MediaParse();
+
+            //        long episodeDuration = session.GetMediaDuration();
+
+            //        var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
+
+            //        //Create Chromecast metadata
+            //        chromecastMedia = new Media
+            //        {
+            //            ContentUrl = nowPlayingTarget,
+            //            ContentType = "audio/mpeg",
+            //            Metadata = new MusicTrackMetadata
+            //            {
+            //                Title = episode.Title,
+            //                AlbumName = episode.Show,
+            //                Artist = episode.Description,
+            //                Images = new[]
+            //                    {
+            //                new Sharpcaster.Models.Media.Image() { Url = imageUrl }
+            //            },
+            //                MetadataType = MetadataType.Music
+            //            }
+            //        };
+            //        //Create notification data
+            //        notificationViewModel.Title = episode.Title;
+            //        notificationViewModel.Artist = episode.Description;
+            //        notificationViewModel.Album = episode.Show;
+            //        notificationViewModel.AlbumArt = episode.ImageSource;
+            //        notificationViewModel.Duration = episodeDuration;
+
+            //        //Create metadata
+            //        metadataViewModel.Title = episode.Title;
+            //        metadataViewModel.Artist = episode.Description;
+            //        metadataViewModel.Album = episode.Show;
+            //        metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
+            //        metadataViewModel.Duration = episodeDuration;
+
+            //        ShowMetadata();
+
+            //        Device.BeginInvokeOnMainThread(() =>
+            //        {
+            //            lbl_title.Text = episode.Title;
+            //            img_logo.Source = episode.ImageSource;
+            //            lbl_album.Text = episode.Show;
+            //            lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
+            //        });
+
+            //        session.Play();
+
+            //        ShowNotification();
+
+            //        //Add episode to first place of the list and remove it from the old place
+            //        var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
+            //        var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(episode)];
+            //        targetedNode.Remove();
+            //        xdoc.Root.AddFirst(targetedNode);
+            //        xdoc.Save(XML_RECENTLYPLAYED_FILE);
+            //        //Refresh view
+            //        frame_recentlyPlayed.IsVisible = true;
+            //        recentlyPlayedEpisodes.Clear();
+            //        GetRecentlyPlayed();
+            //        cview_recently.ItemsSource = recentlyPlayedEpisodes;
+            //    }
+
+            //    cview_recently.SelectedItem = null;
+            //}
 
         }
 
@@ -1375,94 +1433,101 @@ namespace TMRADIO
         private async void FavouritesItemTapped(object sender, ItemTappedEventArgs e)
         {
             var episode = (PlaylistEntity)e.Item;
+            selectedEpisode = episode;
 
-            bool isOk = await DisplayAlert($"{episode.Show}", $"{episode.Title}", "play", "cancel");
+            #region "Custom popup"
+            await OpenPopupForEpisode();
+            popup_episode_imageSource.Source = episode.ImageSource;
+            popup_episode_title.Text = episode.Title;
+            #endregion
 
-            if (isOk)
-            {
-                session.Stop();
+            //bool isOk = await DisplayAlert($"{episode.Show}", $"{episode.Title}", "play", "cancel");
 
-                grid_nowPlaying.IsVisible = true;
-                await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
+            //if (isOk)
+            //{
+            //    session.Stop();
 
-                isRadioSelected = false;
-                nowPlayingTarget = episode.Url;
+            //    grid_nowPlaying.IsVisible = true;
+            //    await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
 
-                session.LoadMedia(nowPlayingTarget);
+            //    isRadioSelected = false;
+            //    nowPlayingTarget = episode.Url;
 
-                session.MediaParse();
+            //    session.LoadMedia(nowPlayingTarget);
 
-                long episodeDuration = session.GetMediaDuration();
+            //    session.MediaParse();
 
-                var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
+            //    long episodeDuration = session.GetMediaDuration();
 
-                //Create Chromecast metadata
-                chromecastMedia = new Media
-                {
-                    ContentUrl = nowPlayingTarget,
-                    ContentType = "audio/mpeg",
-                    Metadata = new MusicTrackMetadata
-                    {
-                        Title = episode.Title,
-                        AlbumName = episode.Show,
-                        Artist = episode.Description,
-                        Images = new[]
-                            {
-                            new Sharpcaster.Models.Media.Image() { Url = episode.ImageArt }
-                        },
-                        MetadataType = MetadataType.Music
-                    }
-                };
-                //Create notification data
-                notificationViewModel.Title = episode.Title;
-                notificationViewModel.Artist = episode.Description;
-                notificationViewModel.Album = episode.Show;
-                notificationViewModel.AlbumArt = episode.ImageSource;
-                notificationViewModel.Duration = episodeDuration;
+            //    var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
 
-                //Create metadata
-                metadataViewModel.Title = episode.Title;
-                metadataViewModel.Artist = episode.Description;
-                metadataViewModel.Album = episode.Show;
-                metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
-                metadataViewModel.Duration = episodeDuration;
+            //    //Create Chromecast metadata
+            //    chromecastMedia = new Media
+            //    {
+            //        ContentUrl = nowPlayingTarget,
+            //        ContentType = "audio/mpeg",
+            //        Metadata = new MusicTrackMetadata
+            //        {
+            //            Title = episode.Title,
+            //            AlbumName = episode.Show,
+            //            Artist = episode.Description,
+            //            Images = new[]
+            //                {
+            //                new Sharpcaster.Models.Media.Image() { Url = episode.ImageArt }
+            //            },
+            //            MetadataType = MetadataType.Music
+            //        }
+            //    };
+            //    //Create notification data
+            //    notificationViewModel.Title = episode.Title;
+            //    notificationViewModel.Artist = episode.Description;
+            //    notificationViewModel.Album = episode.Show;
+            //    notificationViewModel.AlbumArt = episode.ImageSource;
+            //    notificationViewModel.Duration = episodeDuration;
 
-                ShowMetadata();
+            //    //Create metadata
+            //    metadataViewModel.Title = episode.Title;
+            //    metadataViewModel.Artist = episode.Description;
+            //    metadataViewModel.Album = episode.Show;
+            //    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
+            //    metadataViewModel.Duration = episodeDuration;
 
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    lbl_title.Text = episode.Title;
-                    img_logo.Source = episode.ImageSource;
-                    lbl_album.Text = episode.Show;
-                    lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
-                });
+            //    ShowMetadata();
 
-                session.Play();
+            //    Device.BeginInvokeOnMainThread(() =>
+            //    {
+            //        lbl_title.Text = episode.Title;
+            //        img_logo.Source = episode.ImageSource;
+            //        lbl_album.Text = episode.Show;
+            //        lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
+            //    });
 
-                ShowNotification();
+            //    session.Play();
 
-                if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
-                {
-                    var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
-                    //Add episode to first place of the list and remove it from the old place
-                    var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
-                    var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
-                    targetedNode.Remove();
-                    xdoc.Root.AddFirst(targetedNode);
-                    xdoc.Save(XML_RECENTLYPLAYED_FILE);
-                    //Refresh view
-                    frame_recentlyPlayed.IsVisible = true;
-                    recentlyPlayedEpisodes.Clear();
-                    GetRecentlyPlayed();
-                    cview_recently.ItemsSource = recentlyPlayedEpisodes;
-                }
-                else
-                {
-                    CreateXmlRecentPlayed(episode);
-                }
-            }
+            //    ShowNotification();
 
-            cview_recently.SelectedItem = null;
+            //    if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
+            //    {
+            //        var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
+            //        //Add episode to first place of the list and remove it from the old place
+            //        var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
+            //        var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
+            //        targetedNode.Remove();
+            //        xdoc.Root.AddFirst(targetedNode);
+            //        xdoc.Save(XML_RECENTLYPLAYED_FILE);
+            //        //Refresh view
+            //        frame_recentlyPlayed.IsVisible = true;
+            //        recentlyPlayedEpisodes.Clear();
+            //        GetRecentlyPlayed();
+            //        cview_recently.ItemsSource = recentlyPlayedEpisodes;
+            //    }
+            //    else
+            //    {
+            //        CreateXmlRecentPlayed(episode);
+            //    }
+            //}
+
+            //cview_recently.SelectedItem = null;
         }
 
         private void FavouritesItemAppearing(object sender, ItemVisibilityEventArgs e)
@@ -1473,26 +1538,30 @@ namespace TMRADIO
         private async void FavouriteEntityDeleteClicked(object sender, EventArgs e)
         {
             MenuItem url = (MenuItem)sender;
-            var episodeToRemove = favouriteEpisodes.First(x => x.Url == url.CommandParameter.ToString());
+            episodeToRemove = favouriteEpisodes.First(x => x.Url == url.CommandParameter.ToString());
 
-            bool isOk = await DisplayAlert($"TMRADIO", $"Remove {episodeToRemove.Title} from Favourites?", "remove", "cancel");
-            if (isOk)
-            {
-                //Remove node from XML file
-                XDocument xdoc = XDocument.Load(XML_FAVOURITES_FILE);
-                var targetNode = xdoc.Descendants("Episode").ToList()[favouriteEpisodes.IndexOf(episodeToRemove)];
-                targetNode.Remove();
-                xdoc.Save(XML_FAVOURITES_FILE);
-                //Refresh view
-                favouriteEpisodes.Clear();
-                GetFavourites();
-                lv_favourites.ItemsSource = favouriteEpisodes;
+            await OpenPopupForRemoveFavourite();
 
-                if (!favouriteEpisodes.Any())
-                {
-                    lbl_favouriteEpisodesCount.Text = $"Sessions: 0";
-                }
-            }
+            lbl_popup_removeFavourite.Text = $"Remove {episodeToRemove.Title} from Favourites?";
+
+            //bool isOk = await DisplayAlert($"TMRADIO", $"Remove {episodeToRemove.Title} from Favourites?", "remove", "cancel");
+            //if (isOk)
+            //{
+            //    //Remove node from XML file
+            //    XDocument xdoc = XDocument.Load(XML_FAVOURITES_FILE);
+            //    var targetNode = xdoc.Descendants("Episode").ToList()[favouriteEpisodes.IndexOf(episodeToRemove)];
+            //    targetNode.Remove();
+            //    xdoc.Save(XML_FAVOURITES_FILE);
+            //    //Refresh view
+            //    favouriteEpisodes.Clear();
+            //    GetFavourites();
+            //    lv_favourites.ItemsSource = favouriteEpisodes;
+
+            //    if (!favouriteEpisodes.Any())
+            //    {
+            //        lbl_favouriteEpisodesCount.Text = $"Sessions: 0";
+            //    }
+            //}
         }
 
         private void CreateXmlFavouriteEntity(PlaylistEntity episode)
@@ -1709,8 +1778,317 @@ namespace TMRADIO
             }
 
         }
+
         #endregion
 
+        private void PopupBackgroundTapped(object sender, EventArgs e)
+        {
+            if (frame_popupMessage_appExit.IsVisible)
+            {
+                ClosePopupForAppExit();
+            }
+            else if (frame_popupMessage_removeFavourite.IsVisible)
+            {
+                ClosePopupForRemoveFavourite();
+            }
+            else if (frame_popupMessage_show.IsVisible)
+            {
+                ClosePopupForShow();
+            }
+            else if (frame_popupMessage_episode.IsVisible)
+            {
+                ClosePopupForEpisode();
+            }
+            else if (frame_popupMessage_liveStream.IsVisible)
+            {
+                ClosePopupForLiveStream();
+            }
+        }
+
+        #region "Custom Popup for selected show"
+
+        private async void PopupShowOkClicked(object sender, EventArgs e)
+        {
+            ClosePopupForShow();
+
+            grid_playlist.IsVisible = true;
+            await grid_playlist.FadeTo(0.9, 300);
+
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                await grid_browser.TranslateTo(0, 800, 500, Easing.SpringIn);
+                grid_browser.IsVisible = false;
+            });
+
+            grid_nowPlaying.IsVisible = true;
+            await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
+
+            if (selectedShow != show.Title)
+            {
+                selectedShow = show.Title;
+
+                playlistEpisodes.Clear();
+                lv_playlist.ItemsSource = playlistEpisodes;
+
+                await Task.Run(() =>
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        lv_playlist.IsRefreshing = true;
+                    });
+
+                    GetPlaylistEntities(show);
+                });
+
+                lv_playlist.IsRefreshing = false;
+            }
+        }
+
+        private void PopupShowCancelClicked(object sender, EventArgs e)
+        {
+            ClosePopupForShow();
+        }
+
+        private async Task OpenPopupForShow()
+        {
+            grid_popupMessage.IsVisible = true;
+            await grid_popupMessage.FadeTo(0.6, 300);
+            frame_popupMessage_show.IsVisible = true;
+        }
+
+        private void ClosePopupForShow()
+        {
+            grid_popupMessage.FadeTo(0, 300);
+            grid_popupMessage.IsVisible = false;
+            frame_popupMessage_show.IsVisible = false;
+        }
+        #endregion
+
+        #region "Custom Popup for selected episode"
+
+        private async void PopupEpisodeOkClicked(object sender, EventArgs e)
+        {
+            var episode = selectedEpisode;
+
+            if (episode != null)
+            {
+                ClosePopupForEpisode();
+
+                session.Stop();
+
+                grid_nowPlaying.IsVisible = true;
+                await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
+
+                isRadioSelected = false;
+                nowPlayingTarget = episode.Url;
+
+                session.LoadMedia(nowPlayingTarget);
+
+                session.MediaParse();
+
+                long episodeDuration = session.GetMediaDuration();
+
+                var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
+
+                selectedShow = string.IsNullOrEmpty(episode.Show) ? selectedShow : episode.Show;
+
+                //Create Chromecast metadata
+                chromecastMedia = new Media
+                {
+                    ContentUrl = nowPlayingTarget,
+                    ContentType = "audio/mpeg",
+                    Metadata = new MusicTrackMetadata
+                    {
+                        Title = episode.Title,
+                        AlbumName = selectedShow,
+                        Artist = episode.Description,
+                        Images = new[]
+                            {
+                            new Sharpcaster.Models.Media.Image() { Url = imageUrl }
+                        },
+                        MetadataType = MetadataType.Music
+                    }
+                };
+
+                //Create notification data
+                notificationViewModel.Title = episode.Title;
+                notificationViewModel.Artist = episode.Description;
+                notificationViewModel.Album = selectedShow;
+                notificationViewModel.AlbumArt = episode.ImageSource;
+                notificationViewModel.Duration = episodeDuration;
+
+                //Create metadata
+                metadataViewModel.Title = episode.Title;
+                metadataViewModel.Artist = episode.Description;
+                metadataViewModel.Album = selectedShow;
+                metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
+                metadataViewModel.Duration = episodeDuration;
+
+                ShowMetadata();
+
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    lbl_title.Text = episode.Title;
+                    img_logo.Source = episode.ImageSource;
+                    lbl_album.Text = selectedShow;
+                    lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
+                });
+
+                session.Play();
+
+                ShowNotification();
+
+                if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
+                {
+                    var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
+                    //Add episode to first place of the list and remove it from the old place
+                    var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
+                    var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
+                    targetedNode.Remove();
+                    xdoc.Root.AddFirst(targetedNode);
+                    xdoc.Save(XML_RECENTLYPLAYED_FILE);
+                    //Refresh view
+                    frame_recentlyPlayed.IsVisible = true;
+                    recentlyPlayedEpisodes.Clear();
+                    GetRecentlyPlayed();
+                    cview_recently.ItemsSource = recentlyPlayedEpisodes;
+                }
+                else
+                {
+                    CreateXmlRecentPlayed(episode);
+                }
+            }
+        }
+
+        private void PopupEpisodeCancelClicked(object sender, EventArgs e)
+        {
+            ClosePopupForEpisode();
+        }
+
+        private async Task OpenPopupForEpisode()
+        {
+            grid_popupMessage.IsVisible = true;
+            await grid_popupMessage.FadeTo(0.6, 300);
+            frame_popupMessage_episode.IsVisible = true;
+        }
+
+        private void ClosePopupForEpisode()
+        {
+            grid_popupMessage.FadeTo(0, 300);
+            grid_popupMessage.IsVisible = false;
+            frame_popupMessage_episode.IsVisible = false;
+        }
+        #endregion
+
+        #region "Custom Popup for Live Stream"
+
+        private async void PopupLiveStreamOkClicked(object sender, EventArgs e)
+        {
+            ClosePopupForLiveStream();
+
+            session.Stop();
+
+            GetRadioMetadataLoop(radioViewModel);
+
+            grid_nowPlaying.IsVisible = true;
+            await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
+
+            session.Play();
+
+            ShowNotification();
+        }
+
+        private void PopupLiveStreamCancelClicked(object sender, EventArgs e)
+        {
+            ClosePopupForLiveStream();
+        }
+
+        private async Task OpenPopupForLiveStream()
+        {
+            grid_popupMessage.IsVisible = true;
+            await grid_popupMessage.FadeTo(0.6, 300);
+            frame_popupMessage_liveStream.IsVisible = true;
+        }
+
+        private void ClosePopupForLiveStream()
+        {
+            grid_popupMessage.FadeTo(0, 300);
+            grid_popupMessage.IsVisible = false;
+            frame_popupMessage_liveStream.IsVisible = false;
+        }
+        #endregion
+
+        #region "Custom Popup for application exit"
+
+        private void PopupAppExitOkClicked(object sender, EventArgs e)
+        {
+            session.StopSession();
+            Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
+        }
+
+        private void PopupAppExitCancelClicked(object sender, EventArgs e)
+        {
+            ClosePopupForAppExit();
+        }
+
+        private async Task OpenPopupForAppExit()
+        {
+            grid_popupMessage.IsVisible = true;
+            await grid_popupMessage.FadeTo(0.6, 300);
+            frame_popupMessage_appExit.IsVisible = true;
+        }
+
+        private void ClosePopupForAppExit()
+        {
+            grid_popupMessage.FadeTo(0, 300);
+            grid_popupMessage.IsVisible = false;
+            frame_popupMessage_appExit.IsVisible = false;
+        }
+
+        #endregion
+
+        #region "Custom Popup for remove favourite episode from list"
+
+        private void PopupRemoveFavouriteOkClicked(object sender, EventArgs e)
+        {
+            //Remove node from XML file
+            XDocument xdoc = XDocument.Load(XML_FAVOURITES_FILE);
+            var targetNode = xdoc.Descendants("Episode").ToList()[favouriteEpisodes.IndexOf(episodeToRemove)];
+            targetNode.Remove();
+            xdoc.Save(XML_FAVOURITES_FILE);
+            //Refresh view
+            favouriteEpisodes.Clear();
+            GetFavourites();
+            lv_favourites.ItemsSource = favouriteEpisodes;
+
+            if (!favouriteEpisodes.Any())
+            {
+                lbl_favouriteEpisodesCount.Text = $"Sessions: 0";
+            }
+
+            ClosePopupForRemoveFavourite();
+        }
+
+        private void PopupRemoveFavouriteCancelClicked(object sender, EventArgs e)
+        {
+            ClosePopupForRemoveFavourite();
+        }
+
+        private async Task OpenPopupForRemoveFavourite()
+        {
+            grid_popupMessage.IsVisible = true;
+            await grid_popupMessage.FadeTo(0.6, 300);
+            frame_popupMessage_removeFavourite.IsVisible = true;
+        }
+
+        private void ClosePopupForRemoveFavourite()
+        {
+            grid_popupMessage.FadeTo(0, 300);
+            grid_popupMessage.IsVisible = false;
+            frame_popupMessage_removeFavourite.IsVisible = false;
+        }
+
+        #endregion
 
     }
 }

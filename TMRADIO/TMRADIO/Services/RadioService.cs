@@ -193,7 +193,6 @@ namespace TMRADIO.Services
                     {
                         Title = WebUtility.HtmlDecode(show.InnerText).Replace("• ", ""),
                         Id = show.GetAttributeValue("href", string.Empty).Replace("/shows.php?id=", ""),
-                        ImageUrl = "compact_disc",
                         GroupType = GroupType.Old
                     };
 

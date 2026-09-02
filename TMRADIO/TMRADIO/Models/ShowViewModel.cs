@@ -24,7 +24,7 @@ namespace TMRADIO.Models
             }
             else
             {
-                return "compact_disc";
+                return "tm_radio_show";
             }
         }
     }
