@@ -297,10 +297,12 @@ namespace TMRADIO.Services
             //height = (int)(originalImage.Height * scale);
 
             Bitmap resizedImage = Bitmap.CreateScaledBitmap(originalImage, 500, 500, false);
+            originalImage.Dispose();
             
             using (MemoryStream ms = new MemoryStream())
             {
                 resizedImage.Compress(Bitmap.CompressFormat.Jpeg, 100, ms);
+                resizedImage.Dispose();
                 return ms.ToArray();
             }
         }

@@ -275,9 +275,9 @@ namespace TMRADIO.Models
             {
                 try
                 {
-                    if (Player.Time + 3000 < Media.Duration)
+                    if (Player.Time + 8000 < Media.Duration)
                     {
-                        Player.Time += 3000;
+                        Player.Time += 8000;
                     }
                     else
                     {
@@ -300,10 +300,11 @@ namespace TMRADIO.Models
             {
                 try
                 {
-                    Player.Time -= 3000;
+                    Player.Time -= 8000;
                 }
                 catch { }
             };
+
             seekTimer.Start();
         }
 

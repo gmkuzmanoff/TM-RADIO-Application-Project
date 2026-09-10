@@ -2,7 +2,9 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
+using Android.Media;
 using Android.OS;
+using Java.Nio;
 using Sharpcaster;
 using Sharpcaster.Models;
 using Sharpcaster.Models.Media;
@@ -12,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml.Linq;
@@ -61,6 +64,8 @@ namespace TMRADIO
         private IEnumerable<ChromecastReceiver> chromecasts = new ObservableCollection<ChromecastReceiver>();
         private ChromecastClient client;
         private Media chromecastMedia;
+        private static Timer seekTimer;
+        private static bool isHolding = false;
 
         public MainPage()
         {
@@ -137,8 +142,10 @@ namespace TMRADIO
                 lbl_aboutText.Text = ABOUT_TMRADIO;
 
                 //Get Main Shows and insert models into list as source
-                GetMainShows();
+                
                 lv_mainShows.ItemsSource = mainShowViewModels;
+
+                GetMainShows();
 
                 //Main Shows Scroll Animation
                 AutoScroll(mainShowViewModels);
@@ -308,17 +315,18 @@ namespace TMRADIO
             string file = $"{downloadedFilePath}/{name}.jpg";
             try
             {
-                var client = new HttpClient();
-
-                var downloadStream = await client.GetStreamAsync(fileUrl);
-
-                using (var fileStream = System.IO.File.Create(file))
+                using (var client = new HttpClient())
                 {
-                    await downloadStream.CopyToAsync(fileStream);
-                }
+                    var downloadStream = await client.GetStreamAsync(fileUrl);
 
-                byte[] newImage = radioService.ResizeImageAndroid(System.IO.File.ReadAllBytes(file));
-                System.IO.File.WriteAllBytes(file, newImage);
+                    using (var fileStream = System.IO.File.Create(file))
+                    {
+                        await downloadStream.CopyToAsync(fileStream);
+                    }
+
+                    byte[] newImage = radioService.ResizeImageAndroid(System.IO.File.ReadAllBytes(file));
+                    System.IO.File.WriteAllBytes(file, newImage);
+                }
             }
             catch { }
         }
@@ -377,9 +385,6 @@ namespace TMRADIO
                 }
                 allShowsViewModels
                     .Add(new GroupedCollection<string, ShowViewModel>("MAIN SHOWS", mainShowViewModels));
-
-                //Copy empty episode image to cache folder of the app
-                await DownloadAndResizeFileAsync("https://www.tm-radio.com/pic/tm-radio-episode.png", EXTERNAL_CACHE_DIR, "tm_radio_episode");
             }
             catch
             {
@@ -1616,6 +1621,7 @@ namespace TMRADIO
         #endregion
 
         #region "Chromecast"
+
         private async void ChromecastDevicesDiscoveryClicked(object sender, EventArgs e)
         {
             //Open dialog
@@ -1693,6 +1699,8 @@ namespace TMRADIO
 
                 session.Stop();
 
+                ShowNotification();
+
                 try
                 {
                     //Connect to chromecast device
@@ -1728,7 +1736,8 @@ namespace TMRADIO
                 {
                     await DisplayAlert("TMRADIO - Cast dialog", $"Unexpected error: {x.Message}", "close");
                 }
-                
+
+                chromecasts = await DiscoverChromecastDevicesAsync(chromecasts);
             }
         }
 
@@ -1762,23 +1771,147 @@ namespace TMRADIO
             grid_castDevices.IsVisible = false;
         }
 
-        private async void CastDeviceDisconnectClicked(object sender, EventArgs e)
+        private async void ChromecastPlayClicked(object sender, EventArgs e)
         {
-            //MenuItem menuItem = (MenuItem)sender;
+            try
+            {
+                await client.MediaChannel?.PlayAsync();
+            }
+            catch (Exception)
+            {
+                //await DisplayAlert("TMRADIO - Cast dialog", $"{x.Message}", "close");
+            }
+            
+        }
 
-            //var deviceToDisconnect = listCastDevices.First(x => x.Name == menuItem.CommandParameter.ToString());
+        private async void ChromecastPauseClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                await client.MediaChannel?.PauseAsync();
+            }
+            catch (Exception)
+            {
+                //await DisplayAlert("TMRADIO - Cast dialog", $"{x.Message}", "close");
+            }
+        }
 
+        private async void ChromecastStopClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                await client.MediaChannel?.StopAsync();
+            }
+            catch (Exception)
+            {
+                //await DisplayAlert("TMRADIO - Cast dialog", $"{x.Message}", "close");
+            }
+
+            chromecasts = await DiscoverChromecastDevicesAsync(chromecasts);
+        }
+
+        private void ChromecastRewindPressed(object sender, EventArgs e)
+        {
+            StartSeekRewindTimer();
+        }
+
+        private void ChromecastRewindReleased(object sender, EventArgs e)
+        {
+            StopSeekTimer();
+        }
+
+        private void ChromecastFasForwardPressed(object sender, EventArgs e)
+        {
+            StartSeekForwardTimer();
+        }
+
+        private void ChromecastFasForwardReleased(object sender, EventArgs e)
+        {
+            StopSeekTimer();
+        }
+
+        private void StartSeekForwardTimer()
+        {
+            if (isHolding) return;
+            isHolding = true;
+
+            seekTimer = new Timer(300);//every 300ms
+            seekTimer.Elapsed += async (s, e) =>
+            {
+                try
+                {
+                    await client.MediaChannel?.SeekAsync(client.MediaStatus.CurrentTime += 30);
+                }
+                catch { }
+            };
+
+            seekTimer.Start();
+        }
+
+        private void StartSeekRewindTimer()
+        {
+            if (isHolding) return;
+            isHolding = true;
+
+            seekTimer = new Timer(300);//every 300ms
+            seekTimer.Elapsed += async (s, e) =>
+            {
+                try
+                {
+                    await client.MediaChannel?.SeekAsync(client.MediaStatus.CurrentTime -= 30);
+                }
+                catch { }
+            };
+
+            seekTimer.Start();
+        }
+
+        private void StopSeekTimer()
+        {
+            isHolding = false;
+            seekTimer?.Stop();
+            seekTimer?.Dispose();
+            seekTimer = null;
+        }
+
+        private async void ChromecastCastOffClicked(object sender, EventArgs e)
+        {
             try
             {
                 await client.DisconnectAsync();
+                await client.Dispose();
             }
             catch (Exception x)
             {
                 await DisplayAlert("TMRADIO - Cast dialog", $"{x.Message}", "close");
             }
 
+            
         }
 
+        private async void ChromecastVolumePlusClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                await client.MediaChannel.SetVolumeAsync((double)(client.MediaStatus.Volume.Level += 0.1));
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+        private async void ChromecastVolumeMinusClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                await client.MediaChannel.SetVolumeAsync((double)(client.MediaStatus.Volume.Level -= 0.1));
+            }
+            catch (Exception)
+            {
+
+            }
+        }
         #endregion
 
         private void PopupBackgroundTapped(object sender, EventArgs e)

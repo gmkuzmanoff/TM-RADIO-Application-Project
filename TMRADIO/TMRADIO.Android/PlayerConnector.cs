@@ -12,7 +12,7 @@ using Android.Views;
 using AndroidX.Core.App;
 using AndroidX.Media;
 using LibVLCSharp.Shared;
-using System.Collections.Generic;
+using System.Linq;
 using TMRADIO.Droid;
 using TMRADIO.Droid.Interfaces;
 using TMRADIO.Droid.MediaSession;
@@ -20,13 +20,12 @@ using TMRADIO.Droid.Services;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using Xamarin.Forms;
-
 using static TMRADIO.Constants.Links;
 
 [assembly: Dependency(typeof(PlayerConnector))]
 namespace TMRADIO.Droid
 {
-    [Service(Exported = true, Enabled = true, ForegroundServiceType = ForegroundService.TypeMediaPlayback)]
+    [Service(Exported = false, Enabled = true, ForegroundServiceType = ForegroundService.TypeMediaPlayback)]
     [IntentFilter(new[] { "android.media.browse.MediaBrowserService", "android.intent.action.MEDIA_BUTTON", "android.media.AUDIO_BECOMING_NOISY" })]
     public class PlayerConnector : MediaBrowserServiceCompat, IPlayerConnector
     {
@@ -47,6 +46,11 @@ namespace TMRADIO.Droid
         private string mediaSource;
         private string title, artist, album, albumArt;
 
+        //Android Auto Requirements
+        MediaDescriptionCompat mediaDescription;
+        private readonly JavaList<MediaBrowserCompat.MediaItem> mediaItems;
+        MediaBrowserCompat.MediaItem mediaItem;
+
         public PlayerConnector()
         {
             androidAutoRadioService = new AndroidAutoRadioService();
@@ -62,10 +66,11 @@ namespace TMRADIO.Droid
             // Initialize MediaSession
             mediaSession.SetFlags((int)MediaSessionFlags.HandlesMediaButtons | (int)MediaSessionFlags.HandlesTransportControls);
             mediaSession.SetCallback(new MySessionCallback());
-            
             SetButtonReceiver();
+           
             // Set the session active
             mediaSession.Active = true;
+
         }
 
         public void SetButtonReceiver()
@@ -158,7 +163,7 @@ namespace TMRADIO.Droid
                 .SetContentTitle(title)
                 .SetContentText($"{artist} - {album}")
                 .SetContentIntent(PendingOpenApp())
-                .SetLargeIcon(mediaSource == "http://stream.tm-radio.com:8000/tribalmixes" ? BitmapFactory.DecodeResource(context.Resources ,Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt))
+                .SetLargeIcon(mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources ,Resource.Drawable.logo) : (albumArt.Equals("tm_radio_episode") ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.tm_radio_episode) : BitmapFactory.DecodeFile(albumArt)) )
                 .SetSmallIcon(Resource.Drawable.logo_transparent)
                 .SetVisibility((int)NotificationVisibility.Public)
                 .SetPriority((int)NotificationPriority.High)
@@ -338,6 +343,7 @@ namespace TMRADIO.Droid
                     mediaSession.Active = false;
                     mediaSession.Dispose();
                     vlcPlayer.PlayerDispose();
+                    context.StopService(new Intent(this, typeof(PlayerConnector)));
                 }
             }
             catch
@@ -377,21 +383,45 @@ namespace TMRADIO.Droid
             return albumArt;
         }
 
+
+        // Media Framework Content Style constants
+        private static string CONTENT_STYLE_SUPPORTED =
+            "android.media.browse.CONTENT_STYLE_SUPPORTED";
+    public static string CONTENT_STYLE_PLAYABLE_HINT =
+            "android.media.browse.CONTENT_STYLE_PLAYABLE_HINT";
+    public static string CONTENT_STYLE_BROWSABLE_HINT =
+            "android.media.browse.CONTENT_STYLE_BROWSABLE_HINT";
+    public static int CONTENT_STYLE_LIST_ITEM_HINT_VALUE = 1;
+        public static int CONTENT_STYLE_GRID_ITEM_HINT_VALUE = 2;
+
+        private Bundle GetDefaultStyle()
+        {
+            Bundle style = new Bundle();
+            style.PutBoolean(CONTENT_STYLE_SUPPORTED, true);
+            style.PutInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_GRID_ITEM_HINT_VALUE);
+            style.PutInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE);
+            return style;
+        }
+
         public override BrowserRoot OnGetRoot(string clientPackageName, int clientUid, Bundle rootHints)
         {
-            return new BrowserRoot("SHOWS", null);
+            Bundle style = GetDefaultStyle();
+
+            return new BrowserRoot("SHOWS", style);
+            
         }
 
         public override void OnLoadChildren(string parentId, Result result)
         {
-            MediaDescriptionCompat mediaDescription;
-            JavaList<MediaBrowserCompat.MediaItem> mediaItems;
-            MediaBrowserCompat.MediaItem mediaItem;
-
+            //Browsing not allowed
+            if (string.Equals("MY_EMPTY_MEDIA_ROOT_ID", parentId))
+            {
+                result.SendResult(null);
+                return;
+            }
+            
             if (parentId.Equals("SHOWS"))
             {
-                mediaItems = new JavaList<MediaBrowserCompat.MediaItem>();
-
                 foreach (var show in androidAutoRadioService.GetRadioShows())
                 {
                     mediaDescription = new MediaDescriptionCompat.Builder()
@@ -406,21 +436,26 @@ namespace TMRADIO.Droid
                     mediaItems.Add(mediaItem);
                 }
 
-                result.SendResult(mediaItems);
+                if (mediaItems.Any())
+                {
+                    result.SendResult(mediaItems);
+                }
+                else { result.Detach(); }
             }
             else
             {
-                mediaDescription = new MediaDescriptionCompat.Builder()
-                        .SetMediaId("")
-                        .SetTitle("TM-RADIO Live Stream")
-                        .SetSubtitle("www.tm-radio.com")
-                        //.SetIconUri(Android.Net.Uri.Parse(TMRADIO_LOGO))
-                        .SetDescription("")
-                        .Build();
+                //mediaDescription = new MediaDescriptionCompat.Builder()
+                //        .SetMediaId("")
+                //        .SetTitle("TM-RADIO Live Stream")
+                //        .SetSubtitle("www.tm-radio.com")
+                //        .SetIconUri(Android.Net.Uri.Parse(TMRADIO_LOGO))
+                //        .SetDescription("")
+                //        .Build();
 
-                mediaItem = new MediaBrowserCompat.MediaItem(mediaDescription, (int)Android.Media.Browse.MediaItemFlags.Playable);
+                //mediaItem = new MediaBrowserCompat.MediaItem(mediaDescription, (int)Android.Media.Browse.MediaItemFlags.Playable);
 
-                result.SendResult(mediaItem);
+                //result.SendResult(mediaItem);
+                result.Detach();
             }
             
 
