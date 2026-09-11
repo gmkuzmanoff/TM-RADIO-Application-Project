@@ -350,6 +350,7 @@ namespace TMRADIO
                 allShowsViewModels.Add(new GroupedCollection<string, ShowViewModel>("Connection error!", oldShowViewModels));
             }
 
+            
         }
 
         private void GetFavourites()
@@ -860,6 +861,8 @@ namespace TMRADIO
                 
                 isShowsCalled = true;
             }
+
+            list_browser.ItemsSource = allShowsViewModels.OrderBy(x => x.Key);
         }
 
         private async void AboutMenuClicked(object sender, EventArgs e)
