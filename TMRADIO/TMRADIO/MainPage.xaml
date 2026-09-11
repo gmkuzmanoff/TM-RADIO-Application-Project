@@ -573,11 +573,11 @@
                             <ImageButton Margin="5" Source="rewind_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Pressed="ChromecastRewindPressed" Released="ChromecastRewindReleased"/>
                             <ImageButton Margin="5" Source="play_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Clicked="ChromecastPlayClicked"/>
                             <ImageButton Margin="5" Source="pause_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Clicked="ChromecastPauseClicked"/>
-                            <ImageButton Margin="5" Source="stop_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Clicked="ChromecastStopClicked"/>
+                            <!--<ImageButton Margin="5" Source="stop_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Clicked="ChromecastStopClicked"/>-->
                             <ImageButton Margin="5" Source="fastforward_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Pressed="ChromecastFasForwardPressed" Released="ChromecastFasForwardReleased"/>
-                            <ImageButton Margin="5" Source="volume_plus" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Clicked="ChromecastVolumePlusClicked"/>
-                            <ImageButton Margin="5" Source="volume_minus" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Clicked="ChromecastVolumeMinusClicked"/>
-                            <ImageButton Margin="5" Source="cast_off" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent" Clicked="ChromecastCastOffClicked"/>
+                            <ImageButton Margin="5" Source="volume_plus" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Pressed="ChromecastVolumePlusPressed" Released="ChromecastVolumePlusReleased"/>
+                            <ImageButton Margin="5" Source="volume_minus" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Pressed="ChromecastVolumeMinusPressed" Released="ChromecastVolumeMinusReleased"/>
+                            <ImageButton Margin="5" Source="cast_off" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent" Clicked="ChromecastStopClicked"/>
                         </FlexLayout>
                     </StackLayout>
                 </Frame>

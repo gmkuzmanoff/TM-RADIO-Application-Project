@@ -1873,44 +1873,70 @@ namespace TMRADIO
             seekTimer = null;
         }
 
-        private async void ChromecastCastOffClicked(object sender, EventArgs e)
+        private void StartIncreaseVolumeTimer()
         {
-            try
-            {
-                await client.DisconnectAsync();
-                await client.Dispose();
-            }
-            catch (Exception x)
-            {
-                await DisplayAlert("TMRADIO - Cast dialog", $"{x.Message}", "close");
-            }
+            if (isHolding) return;
+            isHolding = true;
 
-            
+            seekTimer = new Timer(300);//every 300ms
+            seekTimer.Elapsed += async (s, e) =>
+            {
+                try
+                {
+                    await client.MediaChannel?.SetVolumeAsync((double)(client.MediaStatus.Volume.Level += 0.2));
+                }
+                catch { }
+            };
+
+            seekTimer.Start();
         }
 
-        private async void ChromecastVolumePlusClicked(object sender, EventArgs e)
+        private void StartDecreaseVolumeTimer()
         {
-            try
-            {
-                await client.MediaChannel.SetVolumeAsync((double)(client.MediaStatus.Volume.Level += 0.1));
-            }
-            catch (Exception)
-            {
+            if (isHolding) return;
+            isHolding = true;
 
-            }
+            seekTimer = new Timer(300);//every 300ms
+            seekTimer.Elapsed += async (s, e) =>
+            {
+                try
+                {
+                    await client.MediaChannel?.SetVolumeAsync((double)(client.MediaStatus.Volume.Level -= 0.2));
+                }
+                catch { }
+            };
+
+            seekTimer.Start();
         }
 
-        private async void ChromecastVolumeMinusClicked(object sender, EventArgs e)
+        private void StopVolumeTimer()
         {
-            try
-            {
-                await client.MediaChannel.SetVolumeAsync((double)(client.MediaStatus.Volume.Level -= 0.1));
-            }
-            catch (Exception)
-            {
-
-            }
+            isHolding = false;
+            seekTimer?.Stop();
+            seekTimer?.Dispose();
+            seekTimer = null;
         }
+
+        private void ChromecastVolumePlusPressed(object sender, EventArgs e)
+        {
+            StartIncreaseVolumeTimer();
+        }
+
+        private void ChromecastVolumePlusReleased(object sender, EventArgs e)
+        {
+            StopVolumeTimer();
+        }
+
+        private void ChromecastVolumeMinusPressed(object sender, EventArgs e)
+        {
+            StartDecreaseVolumeTimer();
+        }
+
+        private void ChromecastVolumeMinusReleased(object sender, EventArgs e)
+        {
+            StopVolumeTimer();
+        }
+
         #endregion
 
         private void PopupBackgroundTapped(object sender, EventArgs e)
