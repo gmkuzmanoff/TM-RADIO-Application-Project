@@ -385,7 +385,7 @@ namespace TMRADIO.Droid
 
 
         // Media Framework Content Style constants
-        private static string CONTENT_STYLE_SUPPORTED =
+        private static readonly string CONTENT_STYLE_SUPPORTED =
             "android.media.browse.CONTENT_STYLE_SUPPORTED";
     public static string CONTENT_STYLE_PLAYABLE_HINT =
             "android.media.browse.CONTENT_STYLE_PLAYABLE_HINT";

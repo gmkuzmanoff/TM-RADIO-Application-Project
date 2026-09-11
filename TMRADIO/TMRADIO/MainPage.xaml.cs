@@ -2,9 +2,7 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
-using Android.Media;
 using Android.OS;
-using Java.Nio;
 using Sharpcaster;
 using Sharpcaster.Models;
 using Sharpcaster.Models.Media;
@@ -14,7 +12,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml.Linq;
@@ -142,11 +139,9 @@ namespace TMRADIO
                 lbl_aboutText.Text = ABOUT_TMRADIO;
 
                 //Get Main Shows and insert models into list as source
-                
                 lv_mainShows.ItemsSource = mainShowViewModels;
-
                 GetMainShows();
-
+                
                 //Main Shows Scroll Animation
                 AutoScroll(mainShowViewModels);
             }
@@ -377,20 +372,30 @@ namespace TMRADIO
         {
             try
             {
-                foreach (var item in radioService.GetMainShows())
+                await Task.Run(async () =>
                 {
-                    await DownloadAndResizeFileAsync(item.ImageUrl, EXTERNAL_CACHE_DIR, item.Title);
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        list_browser.IsRefreshing = true;
+                    });
 
-                    mainShowViewModels.Add(item);
-                }
-                allShowsViewModels
-                    .Add(new GroupedCollection<string, ShowViewModel>("MAIN SHOWS", mainShowViewModels));
+                    foreach (var item in radioService.GetMainShows())
+                    {
+                        await DownloadAndResizeFileAsync(item.ImageUrl, EXTERNAL_CACHE_DIR, item.Title);
+
+                        mainShowViewModels.Add(item);
+                    }
+                    allShowsViewModels
+                        .Add(new GroupedCollection<string, ShowViewModel>("MAIN SHOWS", mainShowViewModels));
+                });
             }
             catch
             {
                 allShowsViewModels.Add(new GroupedCollection<string, ShowViewModel>("Connection error!", mainShowViewModels));
             }
 
+            list_browser.IsRefreshing = false;
+            list_browser.ItemsSource = allShowsViewModels.OrderBy(x => x.Key);
         }
 
         private void GetRadioMetadataLoop(XspfViewModel radioViewModel)
@@ -851,19 +856,8 @@ namespace TMRADIO
 
             if (!isShowsCalled)
             {
-                list_browser.ItemsSource = allShowsViewModels;
-
-                await Task.Run(() =>
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        list_browser.IsRefreshing = true;
-                    });
-
-                    GetOldShows();
-                });
-
-                list_browser.IsRefreshing = false;
+                GetOldShows();
+                
                 isShowsCalled = true;
             }
         }
@@ -967,6 +961,11 @@ namespace TMRADIO
         }
 
         #region "On Demand"
+        private void OnDemandItemAppearing(object sender, ItemVisibilityEventArgs e)
+        {
+            
+        }
+
         private async void OnDemandListItemTapped(object sender, ItemTappedEventArgs e)
         {
             show = (ShowViewModel)e.Item;
@@ -1037,11 +1036,11 @@ namespace TMRADIO
 
             if (string.IsNullOrEmpty(searchText))
             {
-                return allShowsViewModels;
+                return allShowsViewModels.OrderBy(x => x.Key);
             }
             else
             {
-                return collection;
+                return collection.OrderBy(x => x.Key);
             }
         }
         private void SearchbarTextChanged(object sender, TextChangedEventArgs e)
