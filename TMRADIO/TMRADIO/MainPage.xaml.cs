@@ -419,7 +419,7 @@ namespace TMRADIO
                 ContentType = "audio/mpeg",
                 Metadata = new MusicTrackMetadata
                 {
-                    Title = "TM-Radio live Stream",
+                    Title = "TM-Radio Live Stream",
                     AlbumName = radioViewModel.Info,
                     Artist = radioViewModel.StreamDescription,
                     Images = new[]
