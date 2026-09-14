@@ -30,4 +30,4 @@ The project focuses on simplicity, stability, and a smooth listening experience 
 
 ## 📷 Screenshot
 
-![alt text](tmradio/screenshots/screenshot.jpg)
+![alt text](TMRADIO/TMRADIO/screenshots/screenshot.jpg)
