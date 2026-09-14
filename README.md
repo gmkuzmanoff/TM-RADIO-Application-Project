@@ -30,4 +30,4 @@ The project focuses on simplicity, stability, and a smooth listening experience 
 
 ## 📷 Screenshot
 
-![alt text](TMRADIO/TMRADIO/screenshots/screenshot.jpg)
+![alt text](https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/blob/master/TMRADIO/TMRADIO/Screenshots/screenshot.jpg)
