@@ -31,3 +31,7 @@ The project focuses on simplicity, stability, and a smooth listening experience 
 ## 📷 Screenshot
 
 <img src="https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/blob/master/TMRADIO/TMRADIO/Screenshots/screenshot.jpg" alt="Screenshot" width="300"/>
+
+## 📷 Video
+<a href='https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/raw/refs/heads/master/TMRADIO/TMRADIO/Screenshots/tm-radio_app_2026-09-13.mp4' type="video/mp4" download>Video Demo</a>
+
