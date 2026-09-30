@@ -41,7 +41,6 @@ namespace TMRADIO
         private string nowPlayingTarget;
         private string selectedShow;
         private bool isRadioSelected;
-        private bool isShowsCalled;
         private bool isSheduleCalled;
         private bool isStateEnded;
         private bool isStateError;
@@ -74,7 +73,6 @@ namespace TMRADIO
             context = Android.App.Application.Context;
             time = new TimeSpan(0, 0, 0);
             isRadioSelected = false;
-            isShowsCalled = false;
             isSheduleCalled = false;
             selectedShow = string.Empty;
             radioService = new RadioService();
@@ -130,6 +128,7 @@ namespace TMRADIO
             }
             GetRecentlyPlayed();
             cview_recently.ItemsSource = recentlyPlayedEpisodes;
+            session.SetPlaylist(recentlyPlayedEpisodes, "Recently played");
             #endregion
 
             try
@@ -334,25 +333,6 @@ namespace TMRADIO
             }
         }
 
-        private void GetOldShows()
-        {
-            try
-            {
-                foreach (var item in radioService.GetOldShows())
-                {
-                    oldShowViewModels.Add(item);
-                }
-                allShowsViewModels
-                    .Add(new GroupedCollection<string, ShowViewModel>("Other shows on this radio...", oldShowViewModels));
-            }
-            catch
-            {
-                allShowsViewModels.Add(new GroupedCollection<string, ShowViewModel>("Connection error!", oldShowViewModels));
-            }
-
-            
-        }
-
         private void GetFavourites()
         {
             foreach (var ep in radioService.Favourites())
@@ -382,12 +362,21 @@ namespace TMRADIO
 
                     foreach (var item in radioService.GetMainShows())
                     {
-                        await DownloadAndResizeFileAsync(item.ImageUrl, EXTERNAL_CACHE_DIR, item.Title);
+                        if (item.GroupType == GroupType.Main)
+                        {
+                            await DownloadAndResizeFileAsync(item.ImageUrl, EXTERNAL_CACHE_DIR, item.Title);
 
-                        mainShowViewModels.Add(item);
+                            mainShowViewModels.Add(item);
+                        }
+                        else
+                        {
+                            oldShowViewModels.Add(item);
+                        }
                     }
                     allShowsViewModels
                         .Add(new GroupedCollection<string, ShowViewModel>("MAIN SHOWS", mainShowViewModels));
+                    allShowsViewModels
+                    .Add(new GroupedCollection<string, ShowViewModel>("Other shows on this radio...", oldShowViewModels));
                 });
             }
             catch
@@ -412,6 +401,8 @@ namespace TMRADIO
 
             session.MediaParse();
 
+            session.Stop();
+
             //Create Chromecast metadata
             chromecastMedia = new Media
             {
@@ -419,9 +410,9 @@ namespace TMRADIO
                 ContentType = "audio/mpeg",
                 Metadata = new MusicTrackMetadata
                 {
+                    Artist = "www.tm-radio.com",
                     Title = "TM-Radio Live Stream",
-                    AlbumName = radioViewModel.Info,
-                    Artist = radioViewModel.StreamDescription,
+                    AlbumName = radioViewModel.StreamDescription,
                     Images = new[]
                         {
                             new Sharpcaster.Models.Media.Image() { Url = "https://www.tm-radio.com/pic/logo/MasterLogo_h250w435_png24.png" }
@@ -434,7 +425,6 @@ namespace TMRADIO
             notificationViewModel.Artist = radioViewModel.StreamTitle;
             notificationViewModel.Album = radioViewModel.Info;
             notificationViewModel.Duration = 1000;
-            notificationViewModel.Position = session.GetCurrentPosition();
             //Create metadata
             byte[] tmlogo = new HttpClient().GetByteArrayAsync(TMRADIO_LOGO).Result;
             metadataViewModel.Title = radioViewModel.Title;
@@ -854,15 +844,6 @@ namespace TMRADIO
         {
             grid_browser.IsVisible = true;
             await grid_browser.TranslateTo(0, 0, 500, Easing.SpringOut);
-
-            if (!isShowsCalled)
-            {
-                GetOldShows();
-                
-                isShowsCalled = true;
-            }
-
-            list_browser.ItemsSource = allShowsViewModels.OrderBy(x => x.Key);
         }
 
         private async void AboutMenuClicked(object sender, EventArgs e)
@@ -1225,6 +1206,7 @@ namespace TMRADIO
             else
             {
                 CreateM3uFile(show);
+                session.SetPlaylist(playlistEpisodes, selectedShow);
             }
         }
 
@@ -1697,8 +1679,6 @@ namespace TMRADIO
 
             if (isReadyToCast)
             {
-                var position = session.GetCurrentPosition();
-
                 session.Stop();
 
                 ShowNotification();
@@ -1720,7 +1700,7 @@ namespace TMRADIO
 
                 // Launch the default media receiver app
                 await client.LaunchApplicationAsync(CHROMECAST_RECEIVER_ID); // Default Media Receiver
-                
+
                 //Error Handling Best Practices
                 try
                 {
@@ -1743,9 +1723,9 @@ namespace TMRADIO
             }
         }
 
-        private async void OnDisconnected(object sender, EventArgs e)
+        private void OnDisconnected(object sender, EventArgs e)
         {
-            await DisplayAlert("TMRADIO - Cast dialog", $"Disconnected from Chromecast", "close");
+            client.Dispose();
         }
 
         private void OnMediaStatusChanged(object sender, MediaStatus status)
@@ -1886,7 +1866,14 @@ namespace TMRADIO
             {
                 try
                 {
-                    await client.MediaChannel?.SetVolumeAsync((double)(client.MediaStatus.Volume.Level += 0.2));
+                    if (client.MediaStatus.Volume.Level >= 1.0)
+                    {
+                        await client.MediaChannel?.SetVolumeAsync(1.0);
+                    }
+                    else
+                    {
+                        await client.MediaChannel?.SetVolumeAsync((double)(client.MediaStatus.Volume.Level += 0.1));
+                    }
                 }
                 catch { }
             };
@@ -1904,7 +1891,14 @@ namespace TMRADIO
             {
                 try
                 {
-                    await client.MediaChannel?.SetVolumeAsync((double)(client.MediaStatus.Volume.Level -= 0.2));
+                    if (client.MediaStatus.Volume.Level < 0)
+                    {
+                        await client.MediaChannel?.SetVolumeAsync(0);
+                    }
+                    else
+                    {
+                        await client.MediaChannel?.SetVolumeAsync((double)(client.MediaStatus.Volume.Level -= 0.1));
+                    }
                 }
                 catch { }
             };
@@ -1938,6 +1932,44 @@ namespace TMRADIO
         private void ChromecastVolumeMinusReleased(object sender, EventArgs e)
         {
             StopVolumeTimer();
+        }
+       
+        private async void ChromecastVolumeMinusClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                if (client.MediaStatus.Volume.Level < 0)
+                {
+                    await client.MediaChannel?.SetVolumeAsync(0);
+                }
+                else
+                {
+                    await client.MediaChannel?.SetVolumeAsync((double)(client.MediaStatus.Volume.Level -= 0.1));
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+        private async void ChromecastVolumePlusClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                if (client.MediaStatus.Volume.Level >= 1.0)
+                {
+                    await client.MediaChannel?.SetVolumeAsync(1.0);
+                }
+                else
+                {
+                    await client.MediaChannel?.SetVolumeAsync((double)(client.MediaStatus.Volume.Level += 0.1));
+                }
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         #endregion
@@ -2035,8 +2067,6 @@ namespace TMRADIO
             {
                 ClosePopupForEpisode();
 
-                session.Stop();
-
                 grid_nowPlaying.IsVisible = true;
                 await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
 
@@ -2046,6 +2076,8 @@ namespace TMRADIO
                 session.LoadMedia(nowPlayingTarget);
 
                 session.MediaParse();
+
+                session.Stop();
 
                 long episodeDuration = session.GetMediaDuration();
 

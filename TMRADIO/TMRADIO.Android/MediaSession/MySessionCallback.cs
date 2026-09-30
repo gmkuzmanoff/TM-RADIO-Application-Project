@@ -1,10 +1,8 @@
 ﻿using Android.Content;
 using Android.Graphics;
-using Android.Media.Session;
 using Android.OS;
 using Android.Support.V4.Media.Session;
 using Android.Views;
-using Android.Widget;
 using System;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
@@ -136,16 +134,6 @@ namespace TMRADIO.Droid.MediaSession
             return base.OnMediaButtonEvent(mediaButtonEvent);
         }
 
-        public override void OnPlayFromMediaId(string mediaId, Bundle extras)
-        {
-            base.OnPlayFromMediaId(mediaId, extras);
-        }
-
-        public override void OnPlayFromSearch(string query, Bundle extras)
-        {
-            base.OnPlayFromSearch(query, extras);
-        }
-
         public override void OnPlay()
         {
             base.OnPlay();
@@ -161,6 +149,19 @@ namespace TMRADIO.Droid.MediaSession
             base.OnStop();
         }
 
-        
+        public override void OnSkipToNext()
+        {
+            base.OnSkipToNext();
+        }
+
+        public override void OnSkipToPrevious()
+        {
+            base.OnSkipToPrevious();
+        }
+
+        public override void OnPlayFromMediaId(string mediaId, Bundle extras)
+        {
+            base.OnPlayFromMediaId(mediaId, extras);
+        }
     }
 }

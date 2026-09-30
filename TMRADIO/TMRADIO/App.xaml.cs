@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using TMRADIO.Interfaces;
 using Xamarin.Forms;
 using static TMRADIO.Constants.Links;
 
@@ -15,7 +16,6 @@ namespace TMRADIO
         protected override void OnStart()
         {
             base.OnStart();
-
             Directory.CreateDirectory(THUMBNAILS_DIR);
         }
 

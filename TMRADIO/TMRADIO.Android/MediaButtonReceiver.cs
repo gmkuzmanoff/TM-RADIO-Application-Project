@@ -1,4 +1,5 @@
-﻿using Android.Content;
+﻿using Android.App;
+using Android.Content;
 using Android.Graphics;
 using Android.Views;
 using LibVLCSharp.Shared;
@@ -11,7 +12,8 @@ using static TMRADIO.Constants.Links;
 
 namespace TMRADIO.Droid
 {
-    [BroadcastReceiver(Exported = true, Enabled = true)]
+    [BroadcastReceiver(Exported = true)]
+    [IntentFilter(new[] { Intent.ActionMediaButton })]
     public class MediaButtonReceiver : BroadcastReceiver
     {
         private readonly IPlayerConnector session;

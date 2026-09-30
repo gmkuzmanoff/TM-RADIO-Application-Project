@@ -146,6 +146,7 @@ namespace TMRADIO.Services
             HtmlWeb htmlWeb = new HtmlWeb();
             HtmlDocument htmlDoc;
             HtmlNodeCollection mainShows;
+            HtmlNodeCollection oldShows;
             ShowViewModel viewModel;
 
             try
@@ -163,6 +164,20 @@ namespace TMRADIO.Services
                     viewModel.ImageUrl = show.PreviousSibling.GetAttributeValue("style", "").Replace("background-image:url('", "").Replace("');", "");
                     viewModel.Description = string.Join(" ", Regex.Split(description.Trim(), @"(?=[A-Z])")).Replace("  ", " ").Replace("Airs", "| Airs");
                     viewModel.GroupType = GroupType.Main;
+                    list.Add(viewModel);
+                }
+
+                oldShows = htmlDoc.DocumentNode.SelectNodes("//a[@class='text-nowrap']");
+
+                foreach (var show in oldShows)
+                {
+                    viewModel = new ShowViewModel
+                    {
+                        Title = WebUtility.HtmlDecode(show.InnerText).Replace("• ", ""),
+                        Id = show.GetAttributeValue("href", string.Empty).Replace("/shows.php?id=", ""),
+                        GroupType = GroupType.Old
+                    };
+
                     list.Add(viewModel);
                 }
             }

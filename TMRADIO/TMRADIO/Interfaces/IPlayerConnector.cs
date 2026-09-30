@@ -1,4 +1,5 @@
 ﻿using LibVLCSharp.Shared;
+using System.Collections.ObjectModel;
 using TMRADIO.Models;
 
 namespace TMRADIO.Interfaces
@@ -6,6 +7,7 @@ namespace TMRADIO.Interfaces
     public interface IPlayerConnector
     {
         void InitializeSession();
+        void SetPlaylist(ObservableCollection<PlaylistEntity> playlist, string playlistTitle);
         void LoadMedia(string uri);
         long GetCurrentTime();
         long SetCurrentTime(double sliderValue);

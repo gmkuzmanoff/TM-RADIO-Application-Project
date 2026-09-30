@@ -27,8 +27,8 @@ namespace TMRADIO.Models
         public Vlc()
         {
             Core.Initialize();
-            LibVLC = new LibVLC(enableDebugLogs: true);
-            Player = new MediaPlayer(LibVLC) { EnableHardwareDecoding = false };
+            libVLC = new LibVLC(enableDebugLogs: true);
+            player = new MediaPlayer(LibVLC) { EnableHardwareDecoding = false };
         }
 
         public Media Media
@@ -64,15 +64,15 @@ namespace TMRADIO.Models
             }
         }
 
-        public long CurrentTime { get => Player.Time; set => Player.Time = value; }
+        public long CurrentTime { get => player.Time; set => player.Time = value; }
 
-        public float CurrentPosition { get => Player.Position; set => Player.Position = value; }
+        public float CurrentPosition { get => player.Position; set => player.Position = value; }
 
         public VLCState PlayerState()
         {
             try
             {
-                return Player.State;
+                return player.State;
             }
             catch
             {
@@ -85,9 +85,9 @@ namespace TMRADIO.Models
         {
             try
             {
-                Media = new Media(LibVLC, url, FromType.FromLocation);
+                media = new Media(LibVLC, url, FromType.FromLocation);
                 //Media.AddOption(":network-caching=5000");
-                Media.AddOption(":no-video");
+                media.AddOption(":no-video");
                 //Media.AddOption(":avcodec-hw=dxva2");//Hardware accelleration - directX
                 //Media.AddOption("-vvv");
                 //Media.AddOption($":http-user-agent={userAgents[0]}");
@@ -99,13 +99,13 @@ namespace TMRADIO.Models
                 //Media.AddOption($":start-time={Player.Time / 1000}");
                 //Media.AddOption(":avcodec-fast");
                 //Media.AddOption(":file-caching=2000");
-                //Media.AddOption(":http-reconnect");
+                media.AddOption(":http-reconnect");
                 
-                Player.Media = Media;
+                player.Media = media;
             }
             catch
             {
-                Media = null;
+                media = null;
             }
             
         }
@@ -114,8 +114,8 @@ namespace TMRADIO.Models
         {
             try
             {
-                Player.Dispose();
-                LibVLC.Dispose();
+                player.Dispose();
+                libVLC.Dispose();
             }
             catch
             {
@@ -127,7 +127,7 @@ namespace TMRADIO.Models
         {
             try
             {
-                Player.Play();
+                player.Play();
             }
             catch { }
         }
@@ -136,7 +136,7 @@ namespace TMRADIO.Models
         {
             try
             {
-                return Media.Duration;
+                return media.Duration;
             }
             catch
             {
@@ -148,7 +148,7 @@ namespace TMRADIO.Models
         {
             try
             {
-                Media.Parse(MediaParseOptions.ParseNetwork);
+                media.Parse(MediaParseOptions.ParseNetwork);
                 while (media.ParsedStatus != MediaParsedStatus.Done)
                 {
                     System.Threading.Thread.Sleep(50);
@@ -164,7 +164,7 @@ namespace TMRADIO.Models
         {
             try
             {
-                Player.Stop();
+                player.Stop();
             }
             catch { }
         }
@@ -173,7 +173,7 @@ namespace TMRADIO.Models
         {
             try
             {
-                Player.Pause();
+                player.Pause();
             }
             catch { }
         }
@@ -182,14 +182,14 @@ namespace TMRADIO.Models
         {
             try
             {
-                if (Player.Time + 30000 < Media.Duration)
+                if (player.Time + 30000 < media.Duration)
                 {
-                    Player.Time += 30000;
+                    player.Time += 30000;
                 }
                 else
                 {
-                    Player.Time = Media.Duration;
-                    Player.Stop();
+                    player.Time = media.Duration;
+                    player.Stop();
                 }
             }
             catch { }
@@ -209,7 +209,7 @@ namespace TMRADIO.Models
         {
             try
             {
-                Player.Time -= 30000;
+                player.Time -= 30000;
             }
             catch { }
         }
@@ -228,7 +228,7 @@ namespace TMRADIO.Models
         {
             try
             {
-                if (Player.IsPlaying)
+                if (player.IsPlaying)
                 {
                     return true;
                 }
@@ -246,7 +246,7 @@ namespace TMRADIO.Models
 
         public bool IsMediaLoaded()
         {
-            if (Media == null)
+            if (media == null)
             {
                 return false;
             }
@@ -257,7 +257,7 @@ namespace TMRADIO.Models
         {
             try
             {
-                return Player.Rate;
+                return player.Rate;
             }
             catch (Exception)
             {
@@ -275,14 +275,14 @@ namespace TMRADIO.Models
             {
                 try
                 {
-                    if (Player.Time + 8000 < Media.Duration)
+                    if (player.Time + 8000 < media.Duration)
                     {
-                        Player.Time += 8000;
+                        player.Time += 8000;
                     }
                     else
                     {
-                        Player.Time = Media.Duration;
-                        Player.Stop();
+                        player.Time = media.Duration;
+                        player.Stop();
                     }
                 }
                 catch { }
@@ -300,7 +300,7 @@ namespace TMRADIO.Models
             {
                 try
                 {
-                    Player.Time -= 8000;
+                    player.Time -= 8000;
                 }
                 catch { }
             };
