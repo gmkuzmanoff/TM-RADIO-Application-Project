@@ -43,7 +43,7 @@ namespace TMRADIO.Droid
         private readonly Vlc vlcPlayer;
         private Android.Content.Intent actionIntent;
         private Notification notification;
-        private readonly MediaSessionCompat mediaSession;
+        private MediaSessionCompat mediaSession;
         private NotificationChannel channel;
         private readonly Context context;
         private const int NOTIFICATION_ID = 1001;
@@ -53,7 +53,7 @@ namespace TMRADIO.Droid
         private string title, artist, album, albumArt;
 
         //Android Auto Requirements
-        MediaDescriptionCompat mediaDescription;
+        private MediaDescriptionCompat mediaDescription;
         private JavaList<MediaBrowserCompat.MediaItem> mediaItems;
         MediaBrowserCompat.MediaItem mediaItem;
 
@@ -63,20 +63,16 @@ namespace TMRADIO.Droid
             playbackState = new PlaybackStateCompat.Builder();
             mediaMetadata = new MediaMetadataCompat.Builder();
             context = Android.App.Application.Context;
-            mediaSession = new MediaSessionCompat(context, "TMRADIO_MediaSession");
             vlcPlayer = new Vlc();
-            
         }
 
         public void InitializeSession()
         {
-            // Initialize MediaSession
-            mediaSession.SetFlags((int)MediaSessionFlags.HandlesMediaButtons | (int)MediaSessionFlags.HandlesTransportControls);
+            mediaSession = new MediaSessionCompat(context, "TMRADIO_MediaSession");
             mediaSession.SetCallback(new MySessionCallback());
-            SetButtonReceiver();
-            
-            // Set the session active
-             mediaSession.Active = true;
+            mediaSession.SetFlags((int)MediaSessionFlags.HandlesMediaButtons | (int)MediaSessionFlags.HandlesTransportControls);
+            mediaSession.SetMediaButtonReceiver(ButtonReceiverIntent());
+            mediaSession.Active = true;
         }
 
         public void SetPlaylist(ObservableCollection<PlaylistEntity> playlist, string playlistTitle)
@@ -105,21 +101,19 @@ namespace TMRADIO.Droid
 
         public IList<MediaSessionCompat.QueueItem> SessionPlaylist { get => mediaSession.Controller.Queue; }
 
-        public void SetButtonReceiver()
+        public PendingIntent ButtonReceiverIntent()
         {
             // Android 12+ safe media button receiver
             var mediaButtonIntent = new Intent(Intent.ActionMediaButton);
             mediaButtonIntent.SetClass(context, typeof(MediaButtonReceiver));
             mediaButtonIntent.SetComponent(new ComponentName(context, nameof(MediaButtonReceiver)));
 
-            var pendingIntent = PendingIntent.GetBroadcast(
+            return PendingIntent.GetBroadcast(
                 context,
                 mediaButtonIntent.GetHashCode(),
                 mediaButtonIntent,
                 PendingIntentFlags.Mutable
             );
-            
-            mediaSession.SetMediaButtonReceiver(pendingIntent);
         }
 
         public void SetPlaybackState()
@@ -438,60 +432,59 @@ namespace TMRADIO.Droid
 
         public override BrowserRoot OnGetRoot(string clientPackageName, int clientUid, Bundle rootHints)
         {
-            Bundle style = GetDefaultStyle();
-
-            return new BrowserRoot("Root", null);
-            
+            return new BrowserRoot("root", null);
         }
 
         public override void OnLoadChildren(string parentId, Result result)
         {
-            if (string.Equals("Root", parentId))
+            if (parentId == "root")
             {
-                MediaBrowserCompat.MediaItem[] array = {new MediaBrowserCompat.MediaItem(
-                    new MediaDescriptionCompat.Builder()
-                    .SetMediaId("LIVE")
-                    .SetTitle("Live Stream")
-                    .Build(),
-                    (int)Android.Media.Browse.MediaItemFlags.Browsable)};
-                
+                result.SendResult("live");
+            }
+            else
+            {
+                MediaBrowserCompat.MediaItem[] array = {
+                new MediaBrowserCompat.MediaItem(
+                new MediaDescriptionCompat.Builder()
+                .SetMediaId("live")
+                .SetTitle("Live Stream")
+                .SetDescription("Best of Underground :: Techno, Tech House, Progressive & Deep House")
+                .Build(),
+                (int)Android.Media.Browse.MediaItemFlags.Browsable)};
+
                 mediaItems.Add(new MediaBrowserCompat.MediaItem(
                     new MediaDescriptionCompat.Builder()
-                    .SetMediaId("LIVE")
-                    .SetTitle("Live Stream")
+                    .SetMediaId("on-demand")
+                    .SetTitle("On Demand")
+                    .SetDescription("All Shows on TM Radio, Show Archives, On-Demand Streaming")
                     .Build(),
                     (int)Android.Media.Browse.MediaItemFlags.Browsable));
 
 
                 result.SendResult(array);
             }
-            else
-            {
-                //mediaDescription = new MediaDescriptionCompat.Builder()
-                //        .SetMediaId("")
-                //        .SetTitle("TM-RADIO Live Stream")
-                //        .SetSubtitle("www.tm-radio.com")
-                //        .SetIconUri(Android.Net.Uri.Parse(TMRADIO_LOGO))
-                //        .SetDescription("")
-                //        .Build();
+            
+            
+            //else
+            //{
+            //    mediaDescription = new MediaDescriptionCompat.Builder()
+            //            .SetMediaId("")
+            //            .SetTitle("TM-RADIO Live Stream")
+            //            .SetSubtitle("www.tm-radio.com")
+            //            .SetIconUri(Android.Net.Uri.Parse(TMRADIO_LOGO))
+            //            .SetDescription("")
+            //            .Build();
 
-                //mediaItem = new MediaBrowserCompat.MediaItem(mediaDescription, (int)Android.Media.Browse.MediaItemFlags.Playable);
+            //    mediaItem = new MediaBrowserCompat.MediaItem(mediaDescription, (int)Android.Media.Browse.MediaItemFlags.Playable);
 
-                //result.SendResult(mediaItem);
-                result.Detach();
-            }
+            //    result.SendResult(mediaItem);
+            //    result.Detach();
+            //}
         }
 
         public override void OnLoadItem(string itemId, Result result)
         {
-            result.SendResult(new MediaBrowserCompat.MediaItem(
-                    new MediaDescriptionCompat.Builder()
-                    .SetMediaId("LIVE")
-                    .SetTitle("Live Stream")
-                    .Build(),
-                    (int)Android.Media.Browse.MediaItemFlags.Browsable));
-
-
+            
         }
     }
 }

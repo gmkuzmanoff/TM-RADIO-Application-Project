@@ -69,7 +69,7 @@ namespace TMRADIO
             DependencyService.Register<IPlayerConnector>();
             launchActivity = DependencyService.Get<ILaunchActivity>();
             session = DependencyService.Get<IPlayerConnector>();
-
+            session.InitializeSession();
             context = Android.App.Application.Context;
             time = new TimeSpan(0, 0, 0);
             isRadioSelected = false;
@@ -496,7 +496,7 @@ namespace TMRADIO
             {
                 session.SetPlaybackState();
                 session.SetMetadata(metadataViewModel);
-                session.InitializeSession();
+                //session.InitializeSession();
 
                 return false;
             });
