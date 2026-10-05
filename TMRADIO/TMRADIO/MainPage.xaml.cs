@@ -42,6 +42,7 @@ namespace TMRADIO
         private string selectedShow;
         private bool isRadioSelected;
         private bool isSheduleCalled;
+        private bool isStatePlaying;
         private bool isStateEnded;
         private bool isStateError;
         private bool isStateOpening;
@@ -171,6 +172,7 @@ namespace TMRADIO
         #region "Timer and Progress"
         private void Timer_Tick(object sender, ElapsedEventArgs e)
         {
+            isStatePlaying = session.GetCurrentState() == LibVLCSharp.Shared.VLCState.Playing;
             isStateOpening = session.GetCurrentState() == LibVLCSharp.Shared.VLCState.Opening;
             isStateEnded = session.GetCurrentState() == LibVLCSharp.Shared.VLCState.Ended;
             isStateError = session.GetCurrentState() == LibVLCSharp.Shared.VLCState.Error;
@@ -182,7 +184,7 @@ namespace TMRADIO
                 lbl_current_time.Text = time.ToString(@"h\:mm\:ss");
 
                 #region Event listener 'playing' GLOBAL (for radio and sessions)
-                if (session.IsPlaying() || isStateOpening)
+                if (isStatePlaying || isStateOpening)
                 {
                     btn_playTmRadio.IsVisible = false;
                 }
@@ -197,7 +199,7 @@ namespace TMRADIO
                     #region Event listener 'playing'
                     //pb_progress_bar.Progress = time.TotalMilliseconds / player.MediaDuration() * 1;
                     slider.Value = time.TotalMilliseconds / session.GetMediaDuration() * 1;
-                    notificationViewModel.Position = session.GetCurrentPosition();
+                    //notificationViewModel.Position = session.GetCurrentPosition();
                     lbl_duration.Text = TimeSpan.FromMilliseconds(session.GetMediaDuration()).ToString(@"h\:mm\:ss");
                     #endregion
 
@@ -415,20 +417,20 @@ namespace TMRADIO
                     AlbumName = radioViewModel.StreamDescription,
                     Images = new[]
                         {
-                            new Sharpcaster.Models.Media.Image() { Url = "https://www.tm-radio.com/pic/logo/MasterLogo_h250w435_png24.png" }
+                            new Sharpcaster.Models.Media.Image() { Url = TMRADIO_LOGO }
                         },
                     MetadataType = MetadataType.Music
                 }
             };
             //Create notification data
             notificationViewModel.Title = radioViewModel.Title;
-            notificationViewModel.Artist = radioViewModel.StreamTitle;
+            notificationViewModel.Artist = $"[🎧: {radioViewModel.StreamCurrentListeners}]";
             notificationViewModel.Album = radioViewModel.Info;
             notificationViewModel.Duration = 1000;
             //Create metadata
             byte[] tmlogo = new HttpClient().GetByteArrayAsync(TMRADIO_LOGO).Result;
             metadataViewModel.Title = radioViewModel.Title;
-            metadataViewModel.Artist = radioViewModel.StreamTitle;
+            metadataViewModel.Artist = $"[Listeners: {radioViewModel.StreamCurrentListeners}]";
             metadataViewModel.Album = radioViewModel.Info;
             metadataViewModel.AlbumArt = BitmapFactory.DecodeByteArray(tmlogo, 0, tmlogo.Length);
             metadataViewModel.Duration = 1000;
@@ -457,13 +459,13 @@ namespace TMRADIO
                         lbl_currListeners.Text = $"[Listeners: {radioViewModel.StreamCurrentListeners}]";
 
 
-                        //Create notification data
+                        //Create notification data 🎧
                         notificationViewModel.Title = radioViewModel.Title;
-                        notificationViewModel.Artist = radioViewModel.StreamTitle;
+                        notificationViewModel.Artist = $"[🎧: {radioViewModel.StreamCurrentListeners}]";
                         notificationViewModel.Album = radioViewModel.Info;
                         //Create metadata
                         metadataViewModel.Title = radioViewModel.Title;
-                        metadataViewModel.Artist = radioViewModel.StreamTitle;
+                        metadataViewModel.Artist = $"[Listeners: {radioViewModel.StreamCurrentListeners}]";
                         metadataViewModel.Album = radioViewModel.Info;
 
                         ShowNotification();
@@ -1268,12 +1270,17 @@ namespace TMRADIO
             session.Play();
             timer.Start();
 
+            ShowNotification();
             ShowMetadata();
         }
 
         private void SliderDragStarted(object sender, EventArgs e)
         {
-            session.Pause();
+            if (isStatePlaying)
+            {
+                session.Pause();
+            }
+            
             timer.Stop();
         }
         #endregion
@@ -1783,6 +1790,7 @@ namespace TMRADIO
             try
             {
                 await client.MediaChannel?.StopAsync();
+                await client.ReceiverChannel?.StopApplication();
             }
             catch (Exception)
             {
