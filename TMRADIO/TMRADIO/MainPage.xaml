@@ -507,7 +507,7 @@
                             <BoxView HeightRequest="1" Margin="5" BackgroundColor="LightGray" HorizontalOptions="FillAndExpand" />
                             <StackLayout Padding="5" HorizontalOptions="Fill" VerticalOptions="FillAndExpand" BackgroundColor="#140720">
                                 <Label Text="TMRADIO" Padding="5,0" FontSize="18" FontFamily="RobotoCondensed-Bold" TextColor="AntiqueWhite"/>
-                                <Label Text="v1.1 (30.09.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
+                                <Label Text="v1.1 (05.10.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="© 2026, gmkuzmanoff" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="Send Feedback" Padding="5" FontSize="14" FontFamily="RobotoCondensed-Regular" TextColor="CornflowerBlue" TextDecorations="Underline">
                                     <Label.GestureRecognizers>
@@ -556,9 +556,9 @@
                                     </ViewCell.ContextActions>-->
                                     <Grid Margin="10">
                                         <StackLayout VerticalOptions="Center">
-                                            <Label Text="{Binding Name}" FontSize="Title" TextColor="Wheat" MaxLines="1" LineBreakMode="TailTruncation"/>
-                                            <Label Text="{Binding Model}" FontSize="Subtitle" TextColor="LightGray" MaxLines="1" LineBreakMode="TailTruncation"/>
-                                            <Label Text="{Binding Status}" FontSize="Caption" TextColor="Yellow" MaxLines="2" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding Name}" FontSize="Title" TextColor="Wheat" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding Model}" FontSize="Subtitle" TextColor="LightGray" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding Status}" FontSize="Caption" TextColor="Yellow" LineBreakMode="TailTruncation"/>
                                         </StackLayout>
                                     </Grid>
                                 </ViewCell>

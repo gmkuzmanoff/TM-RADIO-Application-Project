@@ -55,7 +55,7 @@ namespace TMRADIO.Droid
                 {
                     case Keycode.MediaPlayPause:
 
-                        if (session.IsPlaying() || state == VLCState.Opening.ToString())
+                        if (session.IsPlaying() || session.GetCurrentState() == VLCState.Opening)
                         { session.Pause(); }
                         else { session.Play(); }
                             
@@ -120,7 +120,6 @@ namespace TMRADIO.Droid
             {
                 session.SetPlaybackState();
                 session.SetMetadata(metadataViewModel);
-                session.InitializeSession();
 
                 return false;
             });

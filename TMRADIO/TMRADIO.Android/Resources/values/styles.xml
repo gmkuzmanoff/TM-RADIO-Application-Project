@@ -14,5 +14,17 @@
          which is used to tint widgets -->
     <!--<item name="colorAccent">@android:color/darker_gray</item>-->
     <item name="android:colorActivatedHighlight">@android:color/transparent</item>
+
+    <!-- The following values are used for Splash Screen Android API Level 30 and below; ignored on Android API Level 31 and above -->
+
+    <item name="android:windowBackground">@mipmap/splash_old</item>
+    <item name="android:windowNoTitle">true</item>
+
+    <!-- The following values are used for Splash Screen Android API Level 31 and above; ignored on Android API Level 30 and below -->
+
+    <!-- Change this value to point to the new adaptive-icon xml file created abbove in Step 2 -->
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/splashscreenanimatedicon</item>
+    <!-- Change this value to be any Hex value or to refer to a custom color from your colors.xml file, eg `@color/colorPrimary` -->
+    <item name="android:windowSplashScreenBackground">#be375b</item>
   </style>
 </resources>

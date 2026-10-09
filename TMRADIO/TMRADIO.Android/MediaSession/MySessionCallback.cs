@@ -3,6 +3,8 @@ using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Media.Session;
 using Android.Views;
+using Android.Widget;
+using LibVLCSharp.Shared;
 using System;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
@@ -45,7 +47,7 @@ namespace TMRADIO.Droid.MediaSession
                 switch (keycode.KeyCode)
                 {
                     case Keycode.MediaPlayPause:
-                        if (session.IsPlaying())
+                        if (session.IsPlaying() || session.GetCurrentState() == VLCState.Opening)
                             session.Pause();
                         else
                             session.Play();
@@ -54,16 +56,10 @@ namespace TMRADIO.Droid.MediaSession
                         session.Play();
                         break;
                     case Keycode.MediaPause:
-                        if (mediaSource != TMRADIO_STREAM_URL)
-                            session.Pause();
-                        else
-                            session.Stop();
+                        session.Pause();
                         break;
                     case Keycode.MediaStop:
-                        if (mediaSource != TMRADIO_STREAM_URL)
-                            session.Pause();
-                        else
-                            session.Stop();
+                        session.Stop();
                         break;
                     case Keycode.MediaRewind:
                         if (mediaSource != TMRADIO_STREAM_URL)
@@ -76,7 +72,7 @@ namespace TMRADIO.Droid.MediaSession
                     default:
                         break;
                 }
-                //Toast.MakeText(context, $"Callback: {keycode.KeyCode} pressed!", ToastLength.Long).Show();
+                Toast.MakeText(context, $"Callback: {keycode.KeyCode} pressed!", ToastLength.Long).Show();
 
             }
 
@@ -93,7 +89,7 @@ namespace TMRADIO.Droid.MediaSession
                     default:
                         break;
                 }
-                //Toast.MakeText(context, $"Callback: {keycode.KeyCode} released!", ToastLength.Short).Show();
+                Toast.MakeText(context, $"Callback: {keycode.KeyCode} released!", ToastLength.Short).Show();
             }
 
             //Create notification
@@ -123,7 +119,6 @@ namespace TMRADIO.Droid.MediaSession
             {
                 session.SetPlaybackState();
                 session.SetMetadata(metadataViewModel);
-                session.InitializeSession();
 
                 return false;
             });
@@ -134,34 +129,34 @@ namespace TMRADIO.Droid.MediaSession
             return base.OnMediaButtonEvent(mediaButtonEvent);
         }
 
-        public override void OnPlay()
-        {
-            base.OnPlay();
-        }
+        //public override void OnPlay()
+        //{
+        //    base.OnPlay();
+        //}
 
-        public override void OnPause()
-        {
-            base.OnPause();
-        }
+        //public override void OnPause()
+        //{
+        //    base.OnPause();
+        //}
 
-        public override void OnStop()
-        {
-            base.OnStop();
-        }
+        //public override void OnStop()
+        //{
+        //    base.OnStop();
+        //}
 
-        public override void OnSkipToNext()
-        {
-            base.OnSkipToNext();
-        }
+        //public override void OnSkipToNext()
+        //{
+        //    base.OnSkipToNext();
+        //}
 
-        public override void OnSkipToPrevious()
-        {
-            base.OnSkipToPrevious();
-        }
+        //public override void OnSkipToPrevious()
+        //{
+        //    base.OnSkipToPrevious();
+        //}
 
-        public override void OnPlayFromMediaId(string mediaId, Bundle extras)
-        {
-            base.OnPlayFromMediaId(mediaId, extras);
-        }
+        //public override void OnPlayFromMediaId(string mediaId, Bundle extras)
+        //{
+        //    base.OnPlayFromMediaId(mediaId, extras);
+        //}
     }
 }

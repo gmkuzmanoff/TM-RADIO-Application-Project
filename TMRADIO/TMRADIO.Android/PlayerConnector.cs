@@ -187,13 +187,14 @@ namespace TMRADIO.Droid
             //create notification style
             notification = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .SetContentTitle(title)
-                .SetContentText($"{artist} - {album}")
+                .SetContentText($"{artist}")
+                .SetSubText($"{album}")
                 .SetContentIntent(PendingOpenApp())
                 .SetLargeIcon(mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources ,Resource.Drawable.logo) : (albumArt.Equals("tm_radio_episode") ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.tm_radio_episode) : BitmapFactory.DecodeFile(albumArt)) )
                 .SetSmallIcon(Resource.Drawable.logo_transparent)
                 .SetVisibility((int)NotificationVisibility.Public)
                 .SetPriority((int)NotificationPriority.High)
-                .SetProgress(1, (int)notificationViewModel.Position, false)
+                //.SetProgress(1, (int)notificationViewModel.Position, false)
                 .SetShowWhen(false)
                 .SetOnlyAlertOnce(true)
                 //.AddAction(new NotificationCompat.Action(Resource.Drawable.prev_not, "skip", null))
@@ -202,8 +203,13 @@ namespace TMRADIO.Droid
                 //.AddAction(Resource.Drawable.stop_not, "Stop", PendingStop())
                 .AddAction(new NotificationCompat.Action(Resource.Drawable.fastforward_not, "FastForward", PendingFastForward()))
                 //.AddAction(new NotificationCompat.Action(Resource.Drawable.next_not, "next", null))
-                .SetStyle(new AndroidX.Media.App.NotificationCompat.MediaStyle().SetMediaSession(mediaSession.SessionToken).SetShowActionsInCompactView(1))
-                .SetOngoing(vlcPlayer.IsPlayingMedia() || vlcPlayer.PlayerState() == VLCState.Opening)
+                .SetStyle(new AndroidX.Media.App.NotificationCompat.MediaStyle()
+                    .SetMediaSession(mediaSession.SessionToken)
+                    .SetShowActionsInCompactView(1)
+                )//end of style
+                .SetOngoing(true)
+                .SetColorized(true)
+                .SetColor(Android.Graphics.Color.BlueViolet)
                 .Build();
 
             //Notify

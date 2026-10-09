@@ -424,13 +424,13 @@ namespace TMRADIO
             };
             //Create notification data
             notificationViewModel.Title = radioViewModel.Title;
-            notificationViewModel.Artist = $"[🎧: {radioViewModel.StreamCurrentListeners}]";
-            notificationViewModel.Album = radioViewModel.Info;
+            notificationViewModel.Album = $"🎧 {radioViewModel.StreamCurrentListeners}";
+            notificationViewModel.Artist = radioViewModel.Info;
             notificationViewModel.Duration = 1000;
             //Create metadata
             byte[] tmlogo = new HttpClient().GetByteArrayAsync(TMRADIO_LOGO).Result;
             metadataViewModel.Title = radioViewModel.Title;
-            metadataViewModel.Artist = $"[Listeners: {radioViewModel.StreamCurrentListeners}]";
+            metadataViewModel.Artist = $"Listeners: {radioViewModel.StreamCurrentListeners}";
             metadataViewModel.Album = radioViewModel.Info;
             metadataViewModel.AlbumArt = BitmapFactory.DecodeByteArray(tmlogo, 0, tmlogo.Length);
             metadataViewModel.Duration = 1000;
@@ -461,11 +461,11 @@ namespace TMRADIO
 
                         //Create notification data 🎧
                         notificationViewModel.Title = radioViewModel.Title;
-                        notificationViewModel.Artist = $"[🎧: {radioViewModel.StreamCurrentListeners}]";
-                        notificationViewModel.Album = radioViewModel.Info;
+                        notificationViewModel.Album = $"🎧 {radioViewModel.StreamCurrentListeners}";
+                        notificationViewModel.Artist = radioViewModel.Info;
                         //Create metadata
                         metadataViewModel.Title = radioViewModel.Title;
-                        metadataViewModel.Artist = $"[Listeners: {radioViewModel.StreamCurrentListeners}]";
+                        metadataViewModel.Artist = $"Listeners: {radioViewModel.StreamCurrentListeners}";
                         metadataViewModel.Album = radioViewModel.Info;
 
                         ShowNotification();
@@ -498,7 +498,6 @@ namespace TMRADIO
             {
                 session.SetPlaybackState();
                 session.SetMetadata(metadataViewModel);
-                //session.InitializeSession();
 
                 return false;
             });
@@ -1231,7 +1230,7 @@ namespace TMRADIO
         #region "Social Media Buttons"
         private async void FacebookLinkClicked(object sender, EventArgs e)
         {
-            var isOk = await DisplayAlert("TMRADIO", "Open link?", "ok", "cancel");
+            var isOk = await DisplayAlert("TMRADIO", "Open the official tm-radio Facebook profile?", "ok", "cancel");
             if (isOk)
             {
                 await Browser.OpenAsync(TM_FACEBOOK, BrowserLaunchMode.SystemPreferred);
@@ -1240,7 +1239,7 @@ namespace TMRADIO
 
         private async void TwitterLinkClicked(object sender, EventArgs e)
         {
-            var isOk = await DisplayAlert("TMRADIO", "Open link?", "ok", "cancel");
+            var isOk = await DisplayAlert("TMRADIO", "Open the official tm-radio Twitter profile?", "ok", "cancel");
             if (isOk)
             {
                 await Browser.OpenAsync(TM_TWITTER, BrowserLaunchMode.SystemPreferred);
@@ -1249,7 +1248,7 @@ namespace TMRADIO
 
         private async void WebsiteLinkClicked(object sender, EventArgs e)
         {
-            var isOk = await DisplayAlert("TMRADIO", "Open link?", "ok", "cancel");
+            var isOk = await DisplayAlert("TMRADIO", "Open the official tm-radio web site?", "ok", "cancel");
             if (isOk)
             {
                 await Browser.OpenAsync(TM_WEBSITE, BrowserLaunchMode.SystemPreferred);

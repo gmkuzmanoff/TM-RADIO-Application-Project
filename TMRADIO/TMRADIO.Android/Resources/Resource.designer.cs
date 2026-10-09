@@ -20349,34 +20349,37 @@ namespace TMRADIO.Droid
 			public const int secondary_text_disabled_material_light = 2131034320;
 			
 			// aapt resource value: 0x7F0500D1
-			public const int switch_thumb_disabled_material_dark = 2131034321;
+			public const int splash_background = 2131034321;
 			
 			// aapt resource value: 0x7F0500D2
-			public const int switch_thumb_disabled_material_light = 2131034322;
+			public const int switch_thumb_disabled_material_dark = 2131034322;
 			
 			// aapt resource value: 0x7F0500D3
-			public const int switch_thumb_material_dark = 2131034323;
+			public const int switch_thumb_disabled_material_light = 2131034323;
 			
 			// aapt resource value: 0x7F0500D4
-			public const int switch_thumb_material_light = 2131034324;
+			public const int switch_thumb_material_dark = 2131034324;
 			
 			// aapt resource value: 0x7F0500D5
-			public const int switch_thumb_normal_material_dark = 2131034325;
+			public const int switch_thumb_material_light = 2131034325;
 			
 			// aapt resource value: 0x7F0500D6
-			public const int switch_thumb_normal_material_light = 2131034326;
+			public const int switch_thumb_normal_material_dark = 2131034326;
 			
 			// aapt resource value: 0x7F0500D7
-			public const int test_mtrl_calendar_day = 2131034327;
+			public const int switch_thumb_normal_material_light = 2131034327;
 			
 			// aapt resource value: 0x7F0500D8
-			public const int test_mtrl_calendar_day_selected = 2131034328;
+			public const int test_mtrl_calendar_day = 2131034328;
 			
 			// aapt resource value: 0x7F0500D9
-			public const int tooltip_background_dark = 2131034329;
+			public const int test_mtrl_calendar_day_selected = 2131034329;
 			
 			// aapt resource value: 0x7F0500DA
-			public const int tooltip_background_light = 2131034330;
+			public const int tooltip_background_dark = 2131034330;
+			
+			// aapt resource value: 0x7F0500DB
+			public const int tooltip_background_light = 2131034331;
 			
 			static Color()
 			{
@@ -24404,6 +24407,15 @@ namespace TMRADIO.Droid
 			
 			// aapt resource value: 0x7F0C0005
 			public const int launcher_foreground = 2131492869;
+			
+			// aapt resource value: 0x7F0C0006
+			public const int splash = 2131492870;
+			
+			// aapt resource value: 0x7F0C0008
+			public const int splashscreenanimatedicon = 2131492872;
+			
+			// aapt resource value: 0x7F0C0007
+			public const int splash_old = 2131492871;
 			
 			static Mipmap()
 			{
