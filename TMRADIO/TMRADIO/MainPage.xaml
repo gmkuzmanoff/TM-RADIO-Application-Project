@@ -157,8 +157,8 @@
                         </Frame>
                         <Frame Grid.Column="1" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
                             <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="1">
-                                <ImageButton x:Name="btn_shedule" WidthRequest="35" Margin="0" Padding="0" Source="calendar" BackgroundColor="Transparent" Clicked="SheduleMenuClicked"/>
-                                <Label Text="shedule" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="9" TextColor="Wheat"/>
+                                <ImageButton x:Name="btn_schedule" WidthRequest="35" Margin="0" Padding="0" Source="calendar" BackgroundColor="Transparent" Clicked="ScheduleMenuClicked"/>
+                                <Label Text="schedule" Margin="0" Padding="0" HorizontalOptions="Center" VerticalOptions="Start" FontSize="9" TextColor="Wheat"/>
                             </StackLayout>
                         </Frame>
                         <Frame Grid.Column="2" VerticalOptions="Center" BackgroundColor="Transparent" Padding="7,0" Margin="0" IsClippedToBounds="True">
@@ -366,8 +366,8 @@
                 </Frame>
             </Grid>
             <!--#endregion-->
-            <!--#region View Shedule-->
-            <Grid x:Name="grid_shedule" Style="{DynamicResource MainGridStyle}" TranslationY="800" IsVisible="false">
+            <!--#region View Schedule-->
+            <Grid x:Name="grid_schedule" Style="{DynamicResource MainGridStyle}" TranslationY="800" IsVisible="false">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="70"/>
                     <RowDefinition/>
@@ -375,14 +375,14 @@
                 </Grid.RowDefinitions>
                 <Frame Grid.Row="0" Padding="0" Margin="10" VerticalOptions="Center" BackgroundColor="Transparent">
                     <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center">
-                        <ImageButton x:Name="btn_sheduleBack" BackgroundColor="Transparent" Source="arrow_back" Clicked="SheduleBackArrowClicked"/>
-                        <Label Text="Shedule" FontFamily="AguafinaScript-Regular" CharacterSpacing="1.3" TextColor="Wheat" FontSize="33" WidthRequest="190" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
+                        <ImageButton x:Name="btn_sheduleBack" BackgroundColor="Transparent" Source="arrow_back" Clicked="ScheduleBackArrowClicked"/>
+                        <Label Text="Schedule" FontFamily="AguafinaScript-Regular" CharacterSpacing="1.3" TextColor="Wheat" FontSize="33" WidthRequest="190" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
                         <Image Source="calendar" WidthRequest="34" BackgroundColor="Transparent"/>
                     </FlexLayout>
                 </Frame>
                 <Frame Grid.Row="1" BackgroundColor="Transparent">
                     <StackLayout>
-                        <ListView x:Name="list_shedule" ItemsSource="{Binding sheduleViewModels}" HasUnevenRows="True">
+                        <ListView x:Name="list_schedule" ItemsSource="{Binding sheduleViewModels}" HasUnevenRows="True">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <ViewCell>
@@ -404,7 +404,7 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                             <ListView.Footer>
-                                <Label x:Name="lbl_shedule" TextColor="Wheat" FontSize="Body"/>
+                                <Label x:Name="lbl_schedule" TextColor="Wheat" FontSize="Body"/>
                             </ListView.Footer>
                         </ListView>
                     </StackLayout>
@@ -507,7 +507,7 @@
                             <BoxView HeightRequest="1" Margin="5" BackgroundColor="LightGray" HorizontalOptions="FillAndExpand" />
                             <StackLayout Padding="5" HorizontalOptions="Fill" VerticalOptions="FillAndExpand" BackgroundColor="#140720">
                                 <Label Text="TMRADIO" Padding="5,0" FontSize="18" FontFamily="RobotoCondensed-Bold" TextColor="AntiqueWhite"/>
-                                <Label Text="v1.1 (05.10.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
+                                <Label x:Name="lbl_appVersion" Text="v1.1 (10.10.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="© 2026, gmkuzmanoff" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="Send Feedback" Padding="5" FontSize="14" FontFamily="RobotoCondensed-Regular" TextColor="CornflowerBlue" TextDecorations="Underline">
                                     <Label.GestureRecognizers>

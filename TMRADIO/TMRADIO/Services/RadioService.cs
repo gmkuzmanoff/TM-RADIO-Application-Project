@@ -117,7 +117,7 @@ namespace TMRADIO.Services
                             string date = node.PreviousSibling.InnerText;
                             string time = node.InnerText;
 
-                            if ((char.IsDigit(date[date.Length - 1])))
+                            if (char.IsDigit(date[date.Length - 1]))
                             {
                                 var dateTime = DateTime.ParseExact(date, "dddMMMdd", CultureInfo.InvariantCulture);
                                 date = dateTime.ToString("dddd, MMM dd");

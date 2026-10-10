@@ -3,12 +3,14 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
+using HtmlAgilityPack;
 using Sharpcaster;
 using Sharpcaster.Models;
 using Sharpcaster.Models.Media;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -41,7 +43,7 @@ namespace TMRADIO
         private string nowPlayingTarget;
         private string selectedShow;
         private bool isRadioSelected;
-        private bool isSheduleCalled;
+        private bool isScheduleCalled;
         private bool isStatePlaying;
         private bool isStateEnded;
         private bool isStateError;
@@ -74,7 +76,7 @@ namespace TMRADIO
             context = Android.App.Application.Context;
             time = new TimeSpan(0, 0, 0);
             isRadioSelected = false;
-            isSheduleCalled = false;
+            isScheduleCalled = false;
             selectedShow = string.Empty;
             radioService = new RadioService();
             radioViewModel = new XspfViewModel();
@@ -134,6 +136,8 @@ namespace TMRADIO
 
             try
             {
+                CheckForUpdate();
+
                 GetRadioMetadataLoop(radioViewModel);
 
                 lbl_aboutText.Text = ABOUT_TMRADIO;
@@ -274,12 +278,12 @@ namespace TMRADIO
                     grid_nowPlaying.IsVisible = false;
                 });
             }
-            else if (grid_shedule.IsVisible)
+            else if (grid_schedule.IsVisible)
             {
                 Device.BeginInvokeOnMainThread(async () =>
                 {
-                    await grid_shedule.TranslateTo(0, 800, 500, Easing.SpringIn);
-                    grid_shedule.IsVisible = false;
+                    await grid_schedule.TranslateTo(0, 800, 500, Easing.SpringIn);
+                    grid_schedule.IsVisible = false;
                 });
             }
             else if (grid_browser.IsVisible)
@@ -799,12 +803,12 @@ namespace TMRADIO
             await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
         }
 
-        private async void SheduleMenuClicked(object sender, EventArgs e)
+        private async void ScheduleMenuClicked(object sender, EventArgs e)
         {
-            grid_shedule.IsVisible = true;
-            await grid_shedule.TranslateTo(0, 0, 500, Easing.SpringOut);
+            grid_schedule.IsVisible = true;
+            await grid_schedule.TranslateTo(0, 0, 500, Easing.SpringOut);
 
-            if (!isSheduleCalled)
+            if (!isScheduleCalled)
             {
                 Device.StartTimer(TimeSpan.FromSeconds(1), () =>
                 {
@@ -816,20 +820,20 @@ namespace TMRADIO
                     return true;
                 });
 
-                list_shedule.ItemsSource = sheduleViewModels;
+                list_schedule.ItemsSource = sheduleViewModels;
 
                 await Task.Run(() =>
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        list_shedule.IsRefreshing = true;
+                        list_schedule.IsRefreshing = true;
                     });
 
                     GetShedule();
                 });
 
-                list_shedule.IsRefreshing = false;
-                isSheduleCalled = true;
+                list_schedule.IsRefreshing = false;
+                isScheduleCalled = true;
             }
 
             if (sheduleViewModels.Any(x => x.Date == DateTime.Now.ToString("dddd, MMM dd")))
@@ -837,7 +841,7 @@ namespace TMRADIO
                 Shedule targetdDate = sheduleViewModels
                     .Where(x => x.Date == DateTime.Now.ToString("dddd, MMM dd"))
                     .FirstOrDefault();
-                list_shedule.ScrollTo(targetdDate, ScrollToPosition.Start, true);
+                list_schedule.ScrollTo(targetdDate, ScrollToPosition.Start, true);
             }
         }
 
@@ -868,12 +872,12 @@ namespace TMRADIO
         #endregion
 
         #region "Back Arrows Buttons"
-        private void SheduleBackArrowClicked(object sender, EventArgs e)
+        private void ScheduleBackArrowClicked(object sender, EventArgs e)
         {
             Device.BeginInvokeOnMainThread(async () =>
             {
-                await grid_shedule.TranslateTo(0, 800, 500, Easing.SpringIn);
-                grid_shedule.IsVisible = false;
+                await grid_schedule.TranslateTo(0, 800, 500, Easing.SpringIn);
+                grid_schedule.IsVisible = false;
             });
 
         }
@@ -2290,5 +2294,59 @@ namespace TMRADIO
 
         #endregion
 
+        private async void CheckForUpdate()
+        {
+            //get old date
+            string oldDateStr = lbl_appVersion.Text.Split(' ')[1].Replace("(", "").Replace(")", "");
+
+            //get new date
+            HtmlWeb htmlWeb = new HtmlWeb();
+            HtmlDocument htmlDoc;
+            HtmlNode targetNode;
+            string newDateStr = string.Empty;
+            string fileApk = string.Empty;
+
+            try
+            {
+                htmlDoc = htmlWeb.Load("https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/tag/tm-radio");
+                targetNode = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:description']");
+                newDateStr = targetNode.GetAttributeValue("content", string.Empty).Split(' ')[1].Replace("(", "").Replace(")", "");
+            }
+            catch (Exception)
+            {
+
+            }
+
+            DateTime oldDate = DateTime.ParseExact(oldDateStr, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+            DateTime newDate = DateTime.ParseExact(newDateStr, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+
+            //compare dates
+            if (newDate > oldDate)
+            {
+                var isOK = await DisplayAlert("Check for update", "There is a new version!", "update", "cancel");
+
+                if (isOK)
+                {
+                    var sheet = await DisplayActionSheet("Select Version", "cancel", null, "arm64-v8a", "armeabi-v7a");
+
+                    switch (sheet)
+                    {
+                        case "arm64-v8a":
+                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-arm64-v8a-{newDateStr}.apk";
+                            break;
+                        case "armeabi-v7a":
+                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-armeabi-v7a-{newDateStr}.apk";
+                            break;
+                    }
+
+                    try
+                    {
+                        await Browser.OpenAsync(fileApk, BrowserLaunchMode.SystemPreferred);
+                    }
+                    catch { }
+                }
+            }
+            
+        }
     }
 }
