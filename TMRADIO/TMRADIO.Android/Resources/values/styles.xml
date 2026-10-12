@@ -19,6 +19,9 @@
 
     <item name="android:windowBackground">@mipmap/splash_old</item>
     <item name="android:windowNoTitle">true</item>
+    <item name="android:windowIsTranslucent">false</item>
+    <item name="android:windowIsFloating">false</item>
+    <item name="android:backgroundDimEnabled">true</item>
 
     <!-- The following values are used for Splash Screen Android API Level 31 and above; ignored on Android API Level 30 and below -->
 

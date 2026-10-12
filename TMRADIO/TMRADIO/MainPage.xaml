@@ -507,8 +507,13 @@
                             <BoxView HeightRequest="1" Margin="5" BackgroundColor="LightGray" HorizontalOptions="FillAndExpand" />
                             <StackLayout Padding="5" HorizontalOptions="Fill" VerticalOptions="FillAndExpand" BackgroundColor="#140720">
                                 <Label Text="TMRADIO" Padding="5,0" FontSize="18" FontFamily="RobotoCondensed-Bold" TextColor="AntiqueWhite"/>
-                                <Label x:Name="lbl_appVersion" Text="v1.1 (10.10.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
+                                <Label x:Name="lbl_appVersion" Text="v1.1 (12.10.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="© 2026, gmkuzmanoff" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
+                                <Label Text="Check for updates" Padding="5" FontSize="14" FontFamily="RobotoCondensed-Regular" TextColor="Lime" TextDecorations="Underline">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="CheckForUpdatesClicked"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
                                 <Label Text="Send Feedback" Padding="5" FontSize="14" FontFamily="RobotoCondensed-Regular" TextColor="CornflowerBlue" TextDecorations="Underline">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="AuthorEmailClicked"/>
@@ -609,7 +614,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="15,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" WidthRequest="150" HeightRequest="150" VerticalOptions="Center" HorizontalOptions="Center">
                         <Image x:Name="popup_show_imageSource" Aspect="AspectFill"/>
                     </Frame>
@@ -639,7 +644,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="15,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" WidthRequest="150" HeightRequest="150" VerticalOptions="Center" HorizontalOptions="Center">
                         <Image x:Name="popup_episode_imageSource" Aspect="AspectFill"/>
                     </Frame>
@@ -669,7 +674,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="15,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" WidthRequest="150" HeightRequest="150" VerticalOptions="Center" HorizontalOptions="Center">
                         <Image x:Name="popup_liveStream_imageSource" Source="logo" Aspect="AspectFill"/>
                     </Frame>
@@ -697,7 +702,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="15,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <Label Margin="10,0" Grid.Row="1" Grid.ColumnSpan="2" VerticalOptions="Center" HorizontalTextAlignment="Center">
                         <Label.FormattedText>
                             <FormattedString>
@@ -729,7 +734,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="15,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
+                    <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
                     <Label x:Name="lbl_popup_removeFavourite" Margin="10,0" MaxLines="3" LineBreakMode="TailTruncation" Grid.Row="1" Grid.ColumnSpan="2" FontSize="Body" VerticalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Regular" TextColor="#6b4935"/>
                     <Button x:Name="popup_removeFavourite_ok" BackgroundColor="Transparent" TextColor="#6b4935" Text="remove" Grid.Row="2" Grid.Column="0" Clicked="PopupRemoveFavouriteOkClicked"/>
                     <Button x:Name="popup_removeFavourite_cancel" BackgroundColor="Transparent" TextColor="#6b4935" Text="cancel" Grid.Row="2" Grid.Column="1" Clicked="PopupRemoveFavouriteCancelClicked"/>

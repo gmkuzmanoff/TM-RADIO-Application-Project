@@ -427,13 +427,13 @@ namespace TMRADIO
                 }
             };
             //Create notification data
-            notificationViewModel.Title = radioViewModel.Title;
+            notificationViewModel.Title = radioViewModel.Title.Replace(" - ", " | "); ;
             notificationViewModel.Album = $"🎧 {radioViewModel.StreamCurrentListeners}";
             notificationViewModel.Artist = radioViewModel.Info;
             notificationViewModel.Duration = 1000;
             //Create metadata
             byte[] tmlogo = new HttpClient().GetByteArrayAsync(TMRADIO_LOGO).Result;
-            metadataViewModel.Title = radioViewModel.Title;
+            metadataViewModel.Title = radioViewModel.Title.Replace(" - ", " | "); ;
             metadataViewModel.Artist = $"Listeners: {radioViewModel.StreamCurrentListeners}";
             metadataViewModel.Album = radioViewModel.Info;
             metadataViewModel.AlbumArt = BitmapFactory.DecodeByteArray(tmlogo, 0, tmlogo.Length);
@@ -464,11 +464,11 @@ namespace TMRADIO
 
 
                         //Create notification data 🎧
-                        notificationViewModel.Title = radioViewModel.Title;
+                        notificationViewModel.Title = radioViewModel.Title.Replace(" - ", " | "); ;
                         notificationViewModel.Album = $"🎧 {radioViewModel.StreamCurrentListeners}";
                         notificationViewModel.Artist = radioViewModel.Info;
                         //Create metadata
-                        metadataViewModel.Title = radioViewModel.Title;
+                        metadataViewModel.Title = radioViewModel.Title.Replace(" - ", " | "); ;
                         metadataViewModel.Artist = $"Listeners: {radioViewModel.StreamCurrentListeners}";
                         metadataViewModel.Album = radioViewModel.Info;
 
@@ -1586,6 +1586,64 @@ namespace TMRADIO
         #endregion
 
         #region "Author info"
+        private async void CheckForUpdatesClicked(object sender, EventArgs e)
+        {
+            //get old date
+            string oldDateStr = lbl_appVersion.Text.Split(' ')[1].Replace("(", "").Replace(")", "");
+
+            //get new date
+            HtmlWeb htmlWeb = new HtmlWeb();
+            HtmlDocument htmlDoc;
+            HtmlNode targetNode;
+            string newDateStr = string.Empty;
+            string fileApk = string.Empty;
+
+            try
+            {
+                htmlDoc = htmlWeb.Load("https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/tag/tm-radio");
+                targetNode = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:description']");
+                newDateStr = targetNode.GetAttributeValue("content", string.Empty).Split(' ')[1].Replace("(", "").Replace(")", "");
+            }
+            catch (Exception)
+            {
+
+            }
+
+            DateTime oldDate = DateTime.ParseExact(oldDateStr, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+            DateTime newDate = DateTime.ParseExact(newDateStr, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+
+            //compare dates
+            if (newDate > oldDate)
+            {
+                var isOK = await DisplayAlert("Check for update", "New version is now available. Tap “Update” to download.", "update", "cancel");
+
+                if (isOK)
+                {
+                    var sheet = await DisplayActionSheet("Select Version", "cancel", null, "arm64-v8a", "armeabi-v7a");
+
+                    switch (sheet)
+                    {
+                        case "arm64-v8a":
+                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-arm64-v8a-{newDateStr}.apk";
+                            break;
+                        case "armeabi-v7a":
+                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-armeabi-v7a-{newDateStr}.apk";
+                            break;
+                    }
+
+                    try
+                    {
+                        await Browser.OpenAsync(fileApk, BrowserLaunchMode.SystemPreferred);
+                    }
+                    catch { }
+                }
+            }
+            else
+            {
+                await DisplayAlert("Check for update", "Your application is fully up to date. No new updates are currently available.", "cancel");
+            }
+        }
+
         private async void GithubRepositoryClicked(object sender, EventArgs e)
         {
             var isOk = await DisplayAlert("TMRADIO", "Open github repository?", "ok", "cancel");
@@ -2323,7 +2381,7 @@ namespace TMRADIO
             //compare dates
             if (newDate > oldDate)
             {
-                var isOK = await DisplayAlert("Check for update", "There is a new version!", "update", "cancel");
+                var isOK = await DisplayAlert("Check for update", "New version is now available. Tap “Update” to download.", "update", "cancel");
 
                 if (isOK)
                 {

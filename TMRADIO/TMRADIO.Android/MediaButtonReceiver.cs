@@ -27,24 +27,11 @@ namespace TMRADIO.Droid
         [System.Obsolete]
         public override void OnReceive(Context context, Intent intent)
         {
-            var title = string.Empty;
-            var artist = string.Empty;
-            var album = string.Empty;
-            var albumArt = string.Empty;
-
-            string state = intent.Extras.GetString("PlayerState");
-            string mediaSource = intent.Extras.GetString("MediaSource");
-            
-            //Notification data
-            var notifData = intent.Extras.GetStringArrayList("NotificationData");
-            if (notifData != null)
-            {
-                title = notifData[0];
-                artist = notifData[1];
-                album = notifData[2];
-                albumArt = notifData[3];
-            }
-
+            var mediaSource = session.MediaSource();
+            var title = session.GetTitle();
+            var artist = session.GetArtist();
+            var album = session.GetAlbum();
+            var albumArt = session.GetAlbumArt();
 
             //KeyCodes
             var keycode = (KeyEvent)intent.Extras.GetParcelable(Intent.ExtraKeyEvent);
@@ -54,39 +41,33 @@ namespace TMRADIO.Droid
                 switch (keycode.KeyCode)
                 {
                     case Keycode.MediaPlayPause:
-
-                        if (session.IsPlaying() || session.GetCurrentState() == VLCState.Opening)
-                        { session.Pause(); }
-                        else { session.Play(); }
-                            
+                        if (session.IsPlaying() || session.GetCurrentState().Equals(VLCState.Opening))
+                            session.Pause();
+                        else
+                            session.Play();
                         break;
                     case Keycode.MediaPlay:
-
                         session.Play();
-
                         break;
                     case Keycode.MediaPause:
-                        if (mediaSource == TMRADIO_STREAM_URL)
-                        { session.Stop(); }
-                        else { session.Pause(); }
-
+                        if (TMRADIO_STREAM_URL.Equals(mediaSource))
+                            session.Stop();
+                        else
+                            session.Pause();
                         break;
                     case Keycode.MediaStop:
-
-                        session.Stop();
-                        
+                        if (TMRADIO_STREAM_URL.Equals(mediaSource))
+                            session.Stop();
+                        else
+                            session.Pause();
                         break;
                     case Keycode.MediaRewind:
-
-                        if (mediaSource != TMRADIO_STREAM_URL)
+                        if (TMRADIO_STREAM_URL.Equals(mediaSource))
                             session.Rewind();
-                        
                         break;
                     case Keycode.MediaFastForward:
-
-                        if (mediaSource != TMRADIO_STREAM_URL)
+                        if (TMRADIO_STREAM_URL.Equals(mediaSource))
                             session.FastForward();
-                        
                         break;
                     default:
                         break;

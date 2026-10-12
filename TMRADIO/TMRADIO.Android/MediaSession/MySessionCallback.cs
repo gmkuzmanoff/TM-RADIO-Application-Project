@@ -1,6 +1,5 @@
 ﻿using Android.Content;
 using Android.Graphics;
-using Android.OS;
 using Android.Support.V4.Media.Session;
 using Android.Views;
 using Android.Widget;
@@ -47,7 +46,7 @@ namespace TMRADIO.Droid.MediaSession
                 switch (keycode.KeyCode)
                 {
                     case Keycode.MediaPlayPause:
-                        if (session.IsPlaying() || session.GetCurrentState() == VLCState.Opening)
+                        if (session.IsPlaying() || session.GetCurrentState().Equals(VLCState.Opening))
                             session.Pause();
                         else
                             session.Play();
@@ -56,17 +55,23 @@ namespace TMRADIO.Droid.MediaSession
                         session.Play();
                         break;
                     case Keycode.MediaPause:
-                        session.Pause();
+                        if (TMRADIO_STREAM_URL.Equals(mediaSource))
+                            session.Stop();
+                        else
+                            session.Pause();
                         break;
                     case Keycode.MediaStop:
-                        session.Stop();
+                        if (TMRADIO_STREAM_URL.Equals(mediaSource))
+                            session.Stop();
+                        else
+                            session.Pause();
                         break;
                     case Keycode.MediaRewind:
-                        if (mediaSource != TMRADIO_STREAM_URL)
+                        if (TMRADIO_STREAM_URL.Equals(mediaSource))
                             session.RewindPressed();
                         break;
                     case Keycode.MediaFastForward:
-                        if (mediaSource != TMRADIO_STREAM_URL)
+                        if (TMRADIO_STREAM_URL.Equals(mediaSource))
                             session.FastForwardPressed();
                         break;
                     default:
@@ -114,6 +119,7 @@ namespace TMRADIO.Droid.MediaSession
                 Album = album,
                 Duration = session.GetMediaDuration()
             };
+            
             //Set metadata
             Device.StartTimer(TimeSpan.FromSeconds(WAIT_FOR_METADATA), () =>
             {
@@ -125,7 +131,6 @@ namespace TMRADIO.Droid.MediaSession
 
             //Log.Debug($"[{context.PackageName}]", $"Intent: {keycode}");
         
-
             return base.OnMediaButtonEvent(mediaButtonEvent);
         }
 

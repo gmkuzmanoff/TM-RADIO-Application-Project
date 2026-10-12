@@ -12,7 +12,7 @@ namespace TMRADIO.Droid
 {
     [Activity(
         Label = "TMRADIO", 
-        Icon = "@mipmap/icon",
+        Icon = "@mipmap/ic_launcher",
         RoundIcon = "@mipmap/ic_launcher_round",
         Theme = "@style/MainTheme", 
         MainLauncher = true,

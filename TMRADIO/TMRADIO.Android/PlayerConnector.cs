@@ -17,7 +17,6 @@ using System.Collections.ObjectModel;
 using TMRADIO.Droid;
 using TMRADIO.Droid.Interfaces;
 using TMRADIO.Droid.MediaSession;
-using TMRADIO.Droid.Services;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using Xamarin.Forms;
@@ -29,8 +28,8 @@ namespace TMRADIO.Droid
     [Service(
         Exported = true,
         ForegroundServiceType = ForegroundService.TypeMediaPlayback,
-        Label = "TMRADIO_MediaBrowserService",
-        Icon = "@mipmap/icon",
+        Label = "TMRADIO",
+        Icon = "@mipmap/ic_launcher",
         RoundIcon = "@mipmap/ic_launcher_round")]
     [IntentFilter(new[] { "android.media.browse.MediaBrowserService" })]
     public class PlayerConnector : MediaBrowserServiceCompat, IPlayerConnector
@@ -59,7 +58,6 @@ namespace TMRADIO.Droid
 
         public PlayerConnector()
         {
-            androidAutoRadioService = new AndroidAutoRadioService();
             playbackState = new PlaybackStateCompat.Builder();
             mediaMetadata = new MediaMetadataCompat.Builder();
             context = Android.App.Application.Context;
@@ -240,9 +238,6 @@ namespace TMRADIO.Droid
         {
             actionIntent = new Intent(context, typeof(MediaButtonReceiver));
             actionIntent.SetAction(Intent.ActionMediaButton);
-            actionIntent.PutExtra("MediaSource", mediaSource);
-            actionIntent.PutStringArrayListExtra("NotificationData", new string[] { title, artist, album, albumArt });
-            actionIntent.PutExtra("PlayerState", vlcPlayer.PlayerState().ToString());
             actionIntent.PutExtra(Intent.ExtraKeyEvent, new KeyEvent(KeyEventActions.Down, Keycode.MediaPlay));
             return PendingIntent.GetBroadcast(context, (int)Keycode.MediaPlay, actionIntent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable);
         }
@@ -251,8 +246,6 @@ namespace TMRADIO.Droid
         {
             actionIntent = new Intent(context, typeof(MediaButtonReceiver));
             actionIntent.SetAction(Intent.ActionMediaButton);
-            actionIntent.PutExtra("MediaSource", mediaSource);
-            actionIntent.PutStringArrayListExtra("NotificationData", new string[] { title, artist, album, albumArt });
             actionIntent.PutExtra(Intent.ExtraKeyEvent, new KeyEvent(KeyEventActions.Down, Keycode.MediaPause));
             return PendingIntent.GetBroadcast(context, (int)Keycode.MediaPause, actionIntent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable);
         }
@@ -261,8 +254,6 @@ namespace TMRADIO.Droid
         {
             actionIntent = new Intent(context, typeof(MediaButtonReceiver));
             actionIntent.SetAction(Intent.ActionMediaButton);
-            actionIntent.PutExtra("MediaSource", mediaSource);
-            actionIntent.PutStringArrayListExtra("NotificationData", new string[] { title, artist, album, albumArt });
             actionIntent.PutExtra(Intent.ExtraKeyEvent, new KeyEvent(KeyEventActions.Down, Keycode.MediaRewind));
             return PendingIntent.GetBroadcast(context, (int)Keycode.MediaRewind, actionIntent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable);
         }
@@ -271,8 +262,6 @@ namespace TMRADIO.Droid
         {
             actionIntent = new Intent(context, typeof(MediaButtonReceiver));
             actionIntent.SetAction(Intent.ActionMediaButton);
-            actionIntent.PutExtra("MediaSource", mediaSource);
-            actionIntent.PutStringArrayListExtra("NotificationData", new string[] { title, artist, album, albumArt });
             actionIntent.PutExtra(Intent.ExtraKeyEvent, new KeyEvent(KeyEventActions.Down, Keycode.MediaFastForward));
             return PendingIntent.GetBroadcast(context, (int)Keycode.MediaFastForward, actionIntent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable);
         }
