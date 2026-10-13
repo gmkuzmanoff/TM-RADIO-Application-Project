@@ -49,7 +49,7 @@ namespace TMRADIO
         private bool isStateError;
         private bool isStateOpening;
         private const int maxCountOfRecentlyPlayedEpisodes = 15;
-        private readonly ObservableCollection<Shedule> sheduleViewModels;
+        private readonly ObservableCollection<Schedule> sheduleViewModels;
         private readonly ObservableCollection<ShowViewModel> mainShowViewModels;
         private readonly ObservableCollection<ShowViewModel> oldShowViewModels;
         private readonly ObservableCollection<PlaylistEntity> playlistEpisodes;
@@ -82,7 +82,7 @@ namespace TMRADIO
             radioViewModel = new XspfViewModel();
             notificationViewModel = new NotificationViewModel();
             metadataViewModel = new MetadataViewModel();
-            sheduleViewModels = new ObservableCollection<Shedule>();
+            sheduleViewModels = new ObservableCollection<Schedule>();
             mainShowViewModels = new ObservableCollection<ShowViewModel>();
             oldShowViewModels = new ObservableCollection<ShowViewModel>();
             playlistEpisodes = new ObservableCollection<PlaylistEntity>();
@@ -333,7 +333,7 @@ namespace TMRADIO
 
         private void GetShedule()
         {
-            foreach (var item in radioService.GetSheduleMonthly())
+            foreach (var item in radioService.GetScheduleMonthly())
             {
                 sheduleViewModels.Add(item);
             }
@@ -838,7 +838,7 @@ namespace TMRADIO
 
             if (sheduleViewModels.Any(x => x.Date == DateTime.Now.ToString("dddd, MMM dd")))
             {
-                Shedule targetdDate = sheduleViewModels
+                Schedule targetdDate = sheduleViewModels
                     .Where(x => x.Date == DateTime.Now.ToString("dddd, MMM dd"))
                     .FirstOrDefault();
                 list_schedule.ScrollTo(targetdDate, ScrollToPosition.Start, true);

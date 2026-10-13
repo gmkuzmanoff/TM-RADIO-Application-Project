@@ -49,7 +49,7 @@ namespace TMRADIO.Services
             return model;
         }
 
-        public string SheduleOnString()
+        public string ScheduleOnString()
         {
             HtmlWeb htmlWeb = new HtmlWeb();
             HtmlDocument htmlDoc;
@@ -58,7 +58,7 @@ namespace TMRADIO.Services
 
             try
             {
-                htmlDoc = htmlWeb.Load(Constants.Links.SHEDULE);
+                htmlDoc = htmlWeb.Load(Constants.Links.SCHEDULE);
                 week = htmlDoc.DocumentNode.SelectNodes("//div[@class='row row-sched']");
 
 
@@ -90,17 +90,18 @@ namespace TMRADIO.Services
             return sb.ToString().Trim();
         }
 
-        public ObservableCollection<Shedule> GetSheduleMonthly()
+        public ObservableCollection<Schedule> GetScheduleMonthly()
         {
-            ObservableCollection<Shedule> list = new ObservableCollection<Shedule>();
+            ObservableCollection<Schedule> list = new ObservableCollection<Schedule>();
             HtmlWeb htmlWeb = new HtmlWeb();
             HtmlDocument htmlDoc;
             HtmlNodeCollection week;
-            Shedule viewModel;
+            Schedule viewModel;
+            Regex regex;
 
             try
             {
-                htmlDoc = htmlWeb.Load(Constants.Links.SHEDULE);
+                htmlDoc = htmlWeb.Load(SCHEDULE);
                 week = htmlDoc.DocumentNode.SelectNodes("//div[@class='row row-sched']");
 
                 foreach (var html in week)
@@ -113,7 +114,7 @@ namespace TMRADIO.Services
                     {
                         foreach (var node in data)
                         {
-                            viewModel = new Shedule();
+                            viewModel = new Schedule();
                             string date = node.PreviousSibling.InnerText;
                             string time = node.InnerText;
 
@@ -124,8 +125,24 @@ namespace TMRADIO.Services
 
                                 viewModel.Date = date;
                             }
-                            
-                            viewModel.Shows = string.Join(" ", Regex.Split(time.Trim(), @"(?=[A-Z])")).Replace("  ", " ");
+
+                            regex = new Regex("[0-9]+:[0-9]+ - [0-9]+:[0-9]+");
+                            string shows = string.Join(" ", Regex.Split(time.Trim(), @"(?=[A-Z])")).Replace("  ", " ");
+
+                            if (regex.IsMatch(shows))
+                            {
+                                string[] match = regex.Match(shows).Value.Split('-');
+                                DateTime startTime = DateTime.ParseExact(match[0].Trim(), "HH:mm", CultureInfo.InvariantCulture).ToLocalTime();
+                                DateTime endTime = DateTime.ParseExact(match[1].Trim(), "HH:mm", CultureInfo.InvariantCulture).ToLocalTime();
+
+                                if (startTime.ToString("tt") == "AM" && startTime.Hour > 00)
+                                    viewModel.Shows = regex.Replace(shows, $"🌑 [Start after midnight]\n{startTime.ToShortTimeString()} - {endTime.ToShortTimeString()}");
+                                else if (startTime.ToString("tt") == "AM" && startTime.Hour == 00)
+                                    viewModel.Shows = regex.Replace(shows, $"🌑 [Start at midnight]\n{startTime.ToShortTimeString()} - {endTime.ToShortTimeString()}");
+                                else
+                                    viewModel.Shows = regex.Replace(shows, $"{startTime.ToShortTimeString()} - {endTime.ToShortTimeString()}");
+
+                            }
 
                             list.Add(viewModel);
                         }
@@ -134,7 +151,7 @@ namespace TMRADIO.Services
             }
             catch (Exception)
             {
-                return new ObservableCollection<Shedule>() { new Shedule() { Date = "Connection error!" } } ;
+                return new ObservableCollection<Schedule>() { new Schedule() { Date = "Connection error!" } } ;
             }
 
             return list;

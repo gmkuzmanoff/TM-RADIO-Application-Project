@@ -6,8 +6,8 @@ namespace TMRADIO.Interfaces
     public interface IRadioService
     {
         XspfViewModel LoadXspf();
-        string SheduleOnString();
-        ObservableCollection<Shedule> GetSheduleMonthly();
+        string ScheduleOnString();
+        ObservableCollection<Schedule> GetScheduleMonthly();
         ObservableCollection<ShowViewModel> GetMainShows();
         ObservableCollection<ShowViewModel> GetOldShows();
         ObservableCollection<PlaylistEntity> GetPlaylistEntities(string id);
