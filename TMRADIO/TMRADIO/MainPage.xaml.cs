@@ -48,7 +48,6 @@ namespace TMRADIO
         private bool isStateEnded;
         private bool isStateError;
         private bool isStateOpening;
-        private const int maxCountOfRecentlyPlayedEpisodes = 15;
         private readonly ObservableCollection<Schedule> sheduleViewModels;
         private readonly ObservableCollection<ShowViewModel> mainShowViewModels;
         private readonly ObservableCollection<ShowViewModel> oldShowViewModels;
@@ -1162,7 +1161,7 @@ namespace TMRADIO
             xdoc.Element("Episodes").AddFirst(newEpisode);
 
             //Delete the last episode from the file if all episodes > 16
-            if (recentlyPlayedEpisodes.Count > maxCountOfRecentlyPlayedEpisodes)
+            if (recentlyPlayedEpisodes.Count > MAX_COUNT_OF_RECENTLY_PLAYED_EPISODE)
             {
                 xdoc.Element("Episodes").LastNode.Remove();
             }

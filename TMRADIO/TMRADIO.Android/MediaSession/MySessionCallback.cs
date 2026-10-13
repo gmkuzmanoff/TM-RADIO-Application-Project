@@ -67,11 +67,11 @@ namespace TMRADIO.Droid.MediaSession
                             session.Pause();
                         break;
                     case Keycode.MediaRewind:
-                        if (TMRADIO_STREAM_URL.Equals(mediaSource))
+                        if (!TMRADIO_STREAM_URL.Equals(mediaSource))
                             session.RewindPressed();
                         break;
                     case Keycode.MediaFastForward:
-                        if (TMRADIO_STREAM_URL.Equals(mediaSource))
+                        if (!TMRADIO_STREAM_URL.Equals(mediaSource))
                             session.FastForwardPressed();
                         break;
                     default:
