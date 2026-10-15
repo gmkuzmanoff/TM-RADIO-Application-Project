@@ -22,6 +22,7 @@ using TMRADIO.Models;
 using TMRADIO.Services;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 using static TMRADIO.Constants.Digits;
 using static TMRADIO.Constants.Links;
 using static TMRADIO.Constants.Text;
@@ -130,7 +131,7 @@ namespace TMRADIO
             }
             GetRecentlyPlayed();
             cview_recently.ItemsSource = recentlyPlayedEpisodes;
-            session.SetPlaylist(recentlyPlayedEpisodes, "Recently played");
+            //session.SetPlaylist(recentlyPlayedEpisodes, "Recently played");
             #endregion
 
             try
@@ -398,6 +399,16 @@ namespace TMRADIO
             isRadioSelected = true;
 
             radioViewModel = radioService.LoadXspf();
+
+            var playlistRadioLiveEntity = new PlaylistEntity()
+            {
+                Title = radioViewModel.Title,
+                Description = radioViewModel.StreamDescription,
+                Url = radioViewModel.Location,
+                ImageArt = radioViewModel.Logo
+            };
+
+            session.SetPlaylist(new ObservableCollection<PlaylistEntity>() { playlistRadioLiveEntity }, "TM-RADIO LIVE STREAM");
 
             nowPlayingTarget = radioViewModel.Location;
 
@@ -1438,94 +1449,6 @@ namespace TMRADIO
             popup_episode_imageSource.Source = episode.ImageSource;
             popup_episode_title.Text = episode.Title;
             #endregion
-
-            //bool isOk = await DisplayAlert($"{episode.Show}", $"{episode.Title}", "play", "cancel");
-
-            //if (isOk)
-            //{
-            //    session.Stop();
-
-            //    grid_nowPlaying.IsVisible = true;
-            //    await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
-
-            //    isRadioSelected = false;
-            //    nowPlayingTarget = episode.Url;
-
-            //    session.LoadMedia(nowPlayingTarget);
-
-            //    session.MediaParse();
-
-            //    long episodeDuration = session.GetMediaDuration();
-
-            //    var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
-
-            //    //Create Chromecast metadata
-            //    chromecastMedia = new Media
-            //    {
-            //        ContentUrl = nowPlayingTarget,
-            //        ContentType = "audio/mpeg",
-            //        Metadata = new MusicTrackMetadata
-            //        {
-            //            Title = episode.Title,
-            //            AlbumName = episode.Show,
-            //            Artist = episode.Description,
-            //            Images = new[]
-            //                {
-            //                new Sharpcaster.Models.Media.Image() { Url = episode.ImageArt }
-            //            },
-            //            MetadataType = MetadataType.Music
-            //        }
-            //    };
-            //    //Create notification data
-            //    notificationViewModel.Title = episode.Title;
-            //    notificationViewModel.Artist = episode.Description;
-            //    notificationViewModel.Album = episode.Show;
-            //    notificationViewModel.AlbumArt = episode.ImageSource;
-            //    notificationViewModel.Duration = episodeDuration;
-
-            //    //Create metadata
-            //    metadataViewModel.Title = episode.Title;
-            //    metadataViewModel.Artist = episode.Description;
-            //    metadataViewModel.Album = episode.Show;
-            //    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
-            //    metadataViewModel.Duration = episodeDuration;
-
-            //    ShowMetadata();
-
-            //    Device.BeginInvokeOnMainThread(() =>
-            //    {
-            //        lbl_title.Text = episode.Title;
-            //        img_logo.Source = episode.ImageSource;
-            //        lbl_album.Text = episode.Show;
-            //        lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
-            //    });
-
-            //    session.Play();
-
-            //    ShowNotification();
-
-            //    if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
-            //    {
-            //        var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
-            //        //Add episode to first place of the list and remove it from the old place
-            //        var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
-            //        var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
-            //        targetedNode.Remove();
-            //        xdoc.Root.AddFirst(targetedNode);
-            //        xdoc.Save(XML_RECENTLYPLAYED_FILE);
-            //        //Refresh view
-            //        frame_recentlyPlayed.IsVisible = true;
-            //        recentlyPlayedEpisodes.Clear();
-            //        GetRecentlyPlayed();
-            //        cview_recently.ItemsSource = recentlyPlayedEpisodes;
-            //    }
-            //    else
-            //    {
-            //        CreateXmlRecentPlayed(episode);
-            //    }
-            //}
-
-            //cview_recently.SelectedItem = null;
         }
 
         private void FavouritesItemAppearing(object sender, ItemVisibilityEventArgs e)
@@ -1623,10 +1546,10 @@ namespace TMRADIO
                     switch (sheet)
                     {
                         case "arm64-v8a":
-                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-arm64-v8a-{newDateStr}.apk";
+                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-arm64-v8a.apk";
                             break;
                         case "armeabi-v7a":
-                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-armeabi-v7a-{newDateStr}.apk";
+                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-armeabi-v7a.apk";
                             break;
                     }
 
@@ -2199,6 +2122,8 @@ namespace TMRADIO
 
                 ShowNotification();
 
+                session.SetPlaylist(recentlyPlayedEpisodes, "Recently Played");
+
                 if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
                 {
                     var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
@@ -2389,10 +2314,10 @@ namespace TMRADIO
                     switch (sheet)
                     {
                         case "arm64-v8a":
-                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-arm64-v8a-{newDateStr}.apk";
+                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-arm64-v8a.apk";
                             break;
                         case "armeabi-v7a":
-                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-armeabi-v7a-{newDateStr}.apk";
+                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-armeabi-v7a.apk";
                             break;
                     }
 

@@ -5,7 +5,6 @@ using Android.Graphics;
 using Android.Media;
 using Android.Media.Session;
 using Android.OS;
-using Android.Runtime;
 using Android.Support.V4.Media;
 using Android.Support.V4.Media.Session;
 using Android.Views;
@@ -28,7 +27,7 @@ namespace TMRADIO.Droid
     [Service(
         Exported = true,
         ForegroundServiceType = ForegroundService.TypeMediaPlayback,
-        Label = "TMRADIO",
+        Label = "TMRADIO_MediaBrowserService",
         Icon = "@mipmap/ic_launcher",
         RoundIcon = "@mipmap/ic_launcher_round")]
     [IntentFilter(new[] { "android.media.browse.MediaBrowserService" })]
@@ -52,9 +51,9 @@ namespace TMRADIO.Droid
         private string title, artist, album, albumArt;
 
         //Android Auto Requirements
-        private MediaDescriptionCompat mediaDescription;
-        private JavaList<MediaBrowserCompat.MediaItem> mediaItems;
-        MediaBrowserCompat.MediaItem mediaItem;
+        //private MediaDescriptionCompat mediaDescription;
+        //private JavaList<MediaBrowserCompat.MediaItem> mediaItems;
+        //MediaBrowserCompat.MediaItem mediaItem;
 
         public PlayerConnector()
         {
@@ -93,7 +92,7 @@ namespace TMRADIO.Droid
                 
             }
 
-            mediaSession.SetQueueTitle(title);
+            mediaSession.SetQueueTitle(playlistTitle);
             mediaSession.SetQueue(list);
         }
 
@@ -122,7 +121,8 @@ namespace TMRADIO.Droid
             switch (currentState)
             {
                 case VLCState.NothingSpecial:
-                    sessionState = PlaybackStateCompat.StateNone;
+                    //sessionState = PlaybackStateCompat.StateNone;
+                    sessionState = PlaybackStateCompat.StateStopped;
                     break;
                 case VLCState.Opening:
                     sessionState = PlaybackStateCompat.StateConnecting;
@@ -151,10 +151,10 @@ namespace TMRADIO.Droid
                PlaybackStateCompat.ActionPause |
                PlaybackStateCompat.ActionStop |
                PlaybackStateCompat.ActionFastForward |
-               PlaybackStateCompat.ActionRewind |
-               PlaybackStateCompat.ActionSkipToNext |
-               PlaybackStateCompat.ActionSkipToPrevious |
-               PlaybackStateCompat.ActionSeekTo);
+               PlaybackStateCompat.ActionRewind);
+               //PlaybackStateCompat.ActionSkipToNext |
+               //PlaybackStateCompat.ActionSkipToPrevious |
+               //PlaybackStateCompat.ActionSeekTo);
 
             long position = (long)(vlcPlayer.CurrentPosition / 1 * vlcPlayer.MediaDuration());
 
@@ -200,14 +200,14 @@ namespace TMRADIO.Droid
                 .AddAction(DependencyService.Get<IPlayerConnector>().IsPlaying() || vlcPlayer.PlayerState() == VLCState.Opening ? new NotificationCompat.Action(Resource.Drawable.pause_not, "Pause", PendingPause()) : new NotificationCompat.Action(Resource.Drawable.play_not, "Play", PendingPlay()))
                 //.AddAction(Resource.Drawable.stop_not, "Stop", PendingStop())
                 .AddAction(new NotificationCompat.Action(Resource.Drawable.fastforward_not, "FastForward", PendingFastForward()))
-                //.AddAction(new NotificationCompat.Action(Resource.Drawable.next_not, "next", null))
+                .AddAction(new NotificationCompat.Action(Resource.Drawable.power_not, "Close", PendingExit()))
                 .SetStyle(new AndroidX.Media.App.NotificationCompat.MediaStyle()
                     .SetMediaSession(mediaSession.SessionToken)
                     .SetShowActionsInCompactView(1)
                 )//end of style
                 .SetOngoing(true)
-                .SetColorized(true)
-                .SetColor(Android.Graphics.Color.BlueViolet)
+                //.SetColorized(true)
+                //.SetColor(Android.Graphics.Color.BlueViolet)
                 .Build();
 
             //Notify
@@ -232,6 +232,14 @@ namespace TMRADIO.Droid
             Intent intent = new Intent(context, typeof(MainActivity));
             intent.AddFlags(ActivityFlags.SingleTop | ActivityFlags.ClearTop);
             return PendingIntent.GetActivity(context, 0, intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable);
+        }
+
+        private PendingIntent PendingExit()
+        {
+            actionIntent = new Intent(context, typeof(MediaButtonReceiver));
+            actionIntent.SetAction(Intent.ActionMediaButton);
+            actionIntent.PutExtra(Intent.ExtraKeyEvent, new KeyEvent(KeyEventActions.Down, Keycode.MediaClose));
+            return PendingIntent.GetBroadcast(context, (int)Keycode.MediaClose, actionIntent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable);
         }
 
         private PendingIntent PendingPlay()
@@ -362,8 +370,8 @@ namespace TMRADIO.Droid
                 {
                     notificationManager.Cancel(NOTIFICATION_ID);
                     mediaSession.Active = false;
-                    mediaSession.Dispose();
                     mediaSession.Release();
+                    mediaSession.Dispose();
                     vlcPlayer.PlayerDispose();
                     context.StopService(new Intent(this, typeof(PlayerConnector)));
                 }
@@ -405,79 +413,12 @@ namespace TMRADIO.Droid
             return albumArt;
         }
 
-
-        // Media Framework Content Style constants
-        private static readonly string CONTENT_STYLE_SUPPORTED =
-            "android.media.browse.CONTENT_STYLE_SUPPORTED";
-    public static string CONTENT_STYLE_PLAYABLE_HINT =
-            "android.media.browse.CONTENT_STYLE_PLAYABLE_HINT";
-    public static string CONTENT_STYLE_BROWSABLE_HINT =
-            "android.media.browse.CONTENT_STYLE_BROWSABLE_HINT";
-    public static int CONTENT_STYLE_LIST_ITEM_HINT_VALUE = 1;
-        public static int CONTENT_STYLE_GRID_ITEM_HINT_VALUE = 2;
-
-        private Bundle GetDefaultStyle()
-        {
-            Bundle style = new Bundle();
-            style.PutBoolean(CONTENT_STYLE_SUPPORTED, true);
-            style.PutInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_GRID_ITEM_HINT_VALUE);
-            style.PutInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE);
-            return style;
-        }
-
         public override BrowserRoot OnGetRoot(string clientPackageName, int clientUid, Bundle rootHints)
         {
-            return new BrowserRoot("root", null);
+            return new BrowserRoot("", null);
         }
 
         public override void OnLoadChildren(string parentId, Result result)
-        {
-            if (parentId == "root")
-            {
-                result.SendResult("live");
-            }
-            else
-            {
-                MediaBrowserCompat.MediaItem[] array = {
-                new MediaBrowserCompat.MediaItem(
-                new MediaDescriptionCompat.Builder()
-                .SetMediaId("live")
-                .SetTitle("Live Stream")
-                .SetDescription("Best of Underground :: Techno, Tech House, Progressive & Deep House")
-                .Build(),
-                (int)Android.Media.Browse.MediaItemFlags.Browsable)};
-
-                mediaItems.Add(new MediaBrowserCompat.MediaItem(
-                    new MediaDescriptionCompat.Builder()
-                    .SetMediaId("on-demand")
-                    .SetTitle("On Demand")
-                    .SetDescription("All Shows on TM Radio, Show Archives, On-Demand Streaming")
-                    .Build(),
-                    (int)Android.Media.Browse.MediaItemFlags.Browsable));
-
-
-                result.SendResult(array);
-            }
-            
-            
-            //else
-            //{
-            //    mediaDescription = new MediaDescriptionCompat.Builder()
-            //            .SetMediaId("")
-            //            .SetTitle("TM-RADIO Live Stream")
-            //            .SetSubtitle("www.tm-radio.com")
-            //            .SetIconUri(Android.Net.Uri.Parse(TMRADIO_LOGO))
-            //            .SetDescription("")
-            //            .Build();
-
-            //    mediaItem = new MediaBrowserCompat.MediaItem(mediaDescription, (int)Android.Media.Browse.MediaItemFlags.Playable);
-
-            //    result.SendResult(mediaItem);
-            //    result.Detach();
-            //}
-        }
-
-        public override void OnLoadItem(string itemId, Result result)
         {
             
         }

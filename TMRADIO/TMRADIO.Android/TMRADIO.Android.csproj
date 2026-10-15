@@ -176,6 +176,7 @@
     <AndroidResource Include="Resources\drawable\cast_off.png" />
     <AndroidResource Include="Resources\drawable\volume_minus.png" />
     <AndroidResource Include="Resources\drawable\volume_plus.png" />
+    <AndroidResource Include="Resources\drawable\fastforward_cast.png" />
     <Content Include="Resources\drawable\icon.ico" />
     <AndroidResource Include="Resources\drawable\twitter.png" />
     <AndroidResource Include="Resources\drawable\web.png" />
@@ -201,6 +202,10 @@
     <AndroidResource Include="Resources\mipmap-anydpi-v26\splashscreenanimatedicon.xml" />
     <AndroidResource Include="Resources\mipmap-hdpi\splash.png" />
     <AndroidResource Include="Resources\mipmap-hdpi\splash_old.png" />
+    <AndroidResource Include="Resources\drawable\power_not.png" />
+    <AndroidResource Include="Resources\drawable\pause_cast.png" />
+    <AndroidResource Include="Resources\drawable\play_cast.png" />
+    <AndroidResource Include="Resources\drawable\rewind_cast.png" />
     <Content Include="Resources\mipmap-ldpi\ic_launcher.png" />
     <Content Include="Resources\mipmap-ldpi\ic_launcher_round.png" />
     <AndroidResource Include="Resources\mipmap-mdpi\ic_launcher.png" />

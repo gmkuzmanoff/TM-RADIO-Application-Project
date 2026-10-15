@@ -69,6 +69,9 @@ namespace TMRADIO.Droid
                         if (!TMRADIO_STREAM_URL.Equals(mediaSource))
                             session.FastForward();
                         break;
+                    case Keycode.MediaClose:
+                        session.StopSession();
+                        break;
                     default:
                         break;
                 }

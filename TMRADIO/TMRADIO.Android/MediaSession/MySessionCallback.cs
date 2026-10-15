@@ -134,34 +134,5 @@ namespace TMRADIO.Droid.MediaSession
             return base.OnMediaButtonEvent(mediaButtonEvent);
         }
 
-        //public override void OnPlay()
-        //{
-        //    base.OnPlay();
-        //}
-
-        //public override void OnPause()
-        //{
-        //    base.OnPause();
-        //}
-
-        //public override void OnStop()
-        //{
-        //    base.OnStop();
-        //}
-
-        //public override void OnSkipToNext()
-        //{
-        //    base.OnSkipToNext();
-        //}
-
-        //public override void OnSkipToPrevious()
-        //{
-        //    base.OnSkipToPrevious();
-        //}
-
-        //public override void OnPlayFromMediaId(string mediaId, Bundle extras)
-        //{
-        //    base.OnPlayFromMediaId(mediaId, extras);
-        //}
     }
 }

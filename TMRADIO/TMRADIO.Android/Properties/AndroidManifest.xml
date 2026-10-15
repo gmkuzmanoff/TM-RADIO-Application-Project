@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.1" package="com.gmkuzmanoff.tmradio">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.2" package="com.gmkuzmanoff.tmradio">
 	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33" />
-	<application android:label="TMRADIO" android:theme="@style/MainTheme" android:appCategory="audio" android:allowBackup="true" >
+	<application android:label="TMRADIO" android:theme="@style/MainTheme" android:appCategory="audio" android:allowBackup="true">
 		<meta-data android:name="com.google.android.gms.car.application" android:resource="@xml/automotive_app_desc" />
 	</application>
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />

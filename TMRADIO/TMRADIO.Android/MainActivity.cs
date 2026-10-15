@@ -24,6 +24,7 @@ namespace TMRADIO.Droid
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            global::Xamarin.Forms.Forms.SetFlags("FastRenderers_Experimental");
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu) // Android 13+

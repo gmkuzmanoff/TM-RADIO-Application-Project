@@ -507,7 +507,7 @@
                             <BoxView HeightRequest="1" Margin="5" BackgroundColor="LightGray" HorizontalOptions="FillAndExpand" />
                             <StackLayout Padding="5" HorizontalOptions="Fill" VerticalOptions="FillAndExpand" BackgroundColor="#140720">
                                 <Label Text="TMRADIO" Padding="5,0" FontSize="18" FontFamily="RobotoCondensed-Bold" TextColor="AntiqueWhite"/>
-                                <Label x:Name="lbl_appVersion" Text="v1.1 (13.10.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
+                                <Label x:Name="lbl_appVersion" Text="v1.2 (15.10.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="© 2026, gmkuzmanoff" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="Check for updates" Padding="5" FontSize="14" FontFamily="RobotoCondensed-Regular" TextColor="Lime" TextDecorations="Underline">
                                     <Label.GestureRecognizers>
@@ -575,11 +575,11 @@
                     <StackLayout Grid.Row="3" BackgroundColor="#2D0F4A" HorizontalOptions="Center" VerticalOptions="Center">
                         <Label Margin="10,2" Text="Chromecast Remote Control" TextColor="Wheat" FontSize="Small" FontFamily="RobotoCondensed-Bold"/>
                         <FlexLayout Margin="10,0" JustifyContent="SpaceBetween" AlignItems="Center">
-                            <ImageButton Margin="5" Source="rewind_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Wheat" Padding="3" Pressed="ChromecastRewindPressed" Released="ChromecastRewindReleased"/>
-                            <ImageButton x:Name="btn_chromecast_play" Margin="5" Source="play_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Wheat" Padding="3" Clicked="ChromecastPlayClicked"/>
-                            <ImageButton x:Name="btn_chromecast_pause" Margin="5" Source="pause_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Wheat" Padding="3" Clicked="ChromecastPauseClicked"/>
+                            <ImageButton Margin="5" Source="rewind_cast" WidthRequest="30" HeightRequest="30" BackgroundColor="Wheat" Padding="3" Pressed="ChromecastRewindPressed" Released="ChromecastRewindReleased"/>
+                            <ImageButton x:Name="btn_chromecast_play" Margin="5" Source="play_cast" WidthRequest="30" HeightRequest="30" BackgroundColor="Wheat" Padding="3" Clicked="ChromecastPlayClicked"/>
+                            <ImageButton x:Name="btn_chromecast_pause" Margin="5" Source="pause_cast" WidthRequest="30" HeightRequest="30" BackgroundColor="Wheat" Padding="3" Clicked="ChromecastPauseClicked"/>
                             <!--<ImageButton Margin="5" Source="stop_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent" Clicked="ChromecastStopClicked"/>-->
-                            <ImageButton Margin="5" Source="fastforward_not" WidthRequest="30" HeightRequest="30" BackgroundColor="Wheat" Padding="3" Pressed="ChromecastFasForwardPressed" Released="ChromecastFasForwardReleased"/>
+                            <ImageButton Margin="5" Source="fastforward_cast" WidthRequest="30" HeightRequest="30" BackgroundColor="Wheat" Padding="3" Pressed="ChromecastFasForwardPressed" Released="ChromecastFasForwardReleased"/>
                             <ImageButton Margin="5" Source="volume_minus" WidthRequest="30" HeightRequest="30" BackgroundColor="DeepSkyBlue" Padding="3" Clicked="ChromecastVolumeMinusClicked" Pressed="ChromecastVolumeMinusPressed" Released="ChromecastVolumeMinusReleased"/>
                             <ImageButton Margin="5" Source="volume_plus" WidthRequest="30" HeightRequest="30" BackgroundColor="DeepSkyBlue" Padding="3" Clicked="ChromecastVolumePlusClicked" Pressed="ChromecastVolumePlusPressed" Released="ChromecastVolumePlusReleased"/>
                             <ImageButton Margin="5" Source="cast_off" WidthRequest="30" HeightRequest="30" BackgroundColor="Tomato" Padding="3" Clicked="ChromecastStopClicked"/>
