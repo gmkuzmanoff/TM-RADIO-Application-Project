@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -22,7 +23,6 @@ using TMRADIO.Models;
 using TMRADIO.Services;
 using Xamarin.Essentials;
 using Xamarin.Forms;
-using Xamarin.Forms.Internals;
 using static TMRADIO.Constants.Digits;
 using static TMRADIO.Constants.Links;
 using static TMRADIO.Constants.Text;
@@ -1608,7 +1608,7 @@ namespace TMRADIO
         private async Task<IEnumerable<ChromecastReceiver>> DiscoverChromecastDevicesAsync(IEnumerable<ChromecastReceiver> chromecasts)
         {
             listCastDevices.Clear();
-            lbl_castDevicesCount.Text = $"Chromecast Devices: 0";
+            lbl_castDevicesCount.Text = $"Receivers: 0";
             lv_castDevices.ItemsSource = listCastDevices;
 
             await Task.Run(async () =>
@@ -1652,7 +1652,7 @@ namespace TMRADIO
 
         private void ChromecastDevicesAppearing(object sender, ItemVisibilityEventArgs e)
         {
-            lbl_castDevicesCount.Text = $"Chromecast Devices: {listCastDevices.Count}";
+            lbl_castDevicesCount.Text = $"Receivers: {listCastDevices.Count}";
         }
 
         private async void ChromecastDeviceTapped(object sender, ItemTappedEventArgs e)
@@ -1664,6 +1664,7 @@ namespace TMRADIO
             bool isReadyToCast = await DisplayAlert($"Chromecast to", 
                 $"Device: {targetReceiver.Name}\n" +
                 $"Model: {targetReceiver.Model}\n" +
+                $"Version: {targetReceiver.Version}" +
                 $"Address: {targetReceiver.DeviceUri.Host}:{targetReceiver.Port}", 
                 "cast", "cancel");
 
