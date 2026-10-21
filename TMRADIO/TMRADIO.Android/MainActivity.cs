@@ -1,5 +1,6 @@
 ﻿using Android;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
@@ -27,6 +28,7 @@ namespace TMRADIO.Droid
             global::Xamarin.Forms.Forms.SetFlags("FastRenderers_Experimental");
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+            //Check permissions
             if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu) // Android 13+
             {
                 if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.PostNotifications)

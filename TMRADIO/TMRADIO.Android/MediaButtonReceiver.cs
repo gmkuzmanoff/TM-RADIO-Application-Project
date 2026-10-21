@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.Graphics;
 using Android.Views;
+using Android.Widget;
 using LibVLCSharp.Shared;
 using System;
 using TMRADIO.Interfaces;

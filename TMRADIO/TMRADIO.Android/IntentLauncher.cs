@@ -1,8 +1,12 @@
-﻿using Android.Content;
+﻿using Android.App;
+using Android.Content;
 using Android.Widget;
+using AndroidX.Core.Content;
+using Java.Util;
 using TMRADIO.Droid;
 using TMRADIO.Interfaces;
 using Xamarin.Forms;
+using Xamarin.Forms.PlatformConfiguration;
 
 [assembly: Dependency(typeof(IntentLauncher))]
 namespace TMRADIO.Droid
@@ -39,5 +43,6 @@ namespace TMRADIO.Droid
             intent.AddCategory(Intent.CategoryHome);
             context.StartActivity(intent);
         }
+
     }
 }

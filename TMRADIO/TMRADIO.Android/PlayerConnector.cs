@@ -121,8 +121,7 @@ namespace TMRADIO.Droid
             switch (currentState)
             {
                 case VLCState.NothingSpecial:
-                    //sessionState = PlaybackStateCompat.StateNone;
-                    sessionState = PlaybackStateCompat.StateStopped;
+                    sessionState = PlaybackStateCompat.StateNone;
                     break;
                 case VLCState.Opening:
                     sessionState = PlaybackStateCompat.StateConnecting;

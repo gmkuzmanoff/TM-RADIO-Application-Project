@@ -8,6 +8,9 @@
     <Version>$(VersionPrefix)</Version>
     <RepositoryUrl>https://github.com/gmkuzmanoff/TM-RADIO-Application-Project</RepositoryUrl>
     <PackageIcon></PackageIcon>
+    <Authors>gmkuzmanoff</Authors>
+    <Copyright>Copyright (C) 2026  gmkuzmanoff</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -39,6 +42,13 @@
     <EmbeddedResource Include="Resources\Fonts\RobotoCondensed\RobotoCondensed-LightItalic.ttf" />
     <EmbeddedResource Include="Resources\Fonts\RobotoCondensed\RobotoCondensed-Regular.ttf" />
     <EmbeddedResource Include="Resources\Fonts\Ubuntu\Ubuntu-Regular.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -32,6 +31,7 @@ namespace TMRADIO
     public partial class MainPage : ContentPage
     {
         private readonly Context context;
+        private readonly IApplicationUpdater appUpdater;
         private readonly ILaunchActivity launchActivity;
         private readonly IPlayerConnector session;
         private readonly Timer timer;
@@ -49,6 +49,7 @@ namespace TMRADIO
         private bool isStateEnded;
         private bool isStateError;
         private bool isStateOpening;
+        private bool isStateStopped;
         private readonly ObservableCollection<Schedule> sheduleViewModels;
         private readonly ObservableCollection<ShowViewModel> mainShowViewModels;
         private readonly ObservableCollection<ShowViewModel> oldShowViewModels;
@@ -68,8 +69,10 @@ namespace TMRADIO
 
         public MainPage()
         {
+            DependencyService.Register<IApplicationUpdater>();
             DependencyService.Register<ILaunchActivity>();
             DependencyService.Register<IPlayerConnector>();
+            appUpdater = DependencyService.Get<IApplicationUpdater>();
             launchActivity = DependencyService.Get<ILaunchActivity>();
             session = DependencyService.Get<IPlayerConnector>();
             session.InitializeSession();
@@ -91,6 +94,8 @@ namespace TMRADIO
             allShowsViewModels = new ObservableCollection<GroupedCollection<string, ShowViewModel>>();
 
             InitializeComponent();
+
+            appUpdater.OnFileDownloaded += OnUpdateDownloaded;
 
             //Command: Pull to refresh the list of chromecast devices 
             lv_castDevices.RefreshCommand = new Command(async () =>
@@ -176,10 +181,12 @@ namespace TMRADIO
         #region "Timer and Progress"
         private void Timer_Tick(object sender, ElapsedEventArgs e)
         {
-            isStatePlaying = session.GetCurrentState() == LibVLCSharp.Shared.VLCState.Playing;
-            isStateOpening = session.GetCurrentState() == LibVLCSharp.Shared.VLCState.Opening;
-            isStateEnded = session.GetCurrentState() == LibVLCSharp.Shared.VLCState.Ended;
-            isStateError = session.GetCurrentState() == LibVLCSharp.Shared.VLCState.Error;
+            var currentPlayerState = session.GetCurrentState();
+            isStatePlaying = currentPlayerState == LibVLCSharp.Shared.VLCState.Playing;
+            isStateOpening = currentPlayerState == LibVLCSharp.Shared.VLCState.Opening;
+            isStateStopped = currentPlayerState == LibVLCSharp.Shared.VLCState.Stopped;
+            isStateEnded = currentPlayerState == LibVLCSharp.Shared.VLCState.Ended;
+            isStateError = currentPlayerState == LibVLCSharp.Shared.VLCState.Error;
 
             time = TimeSpan.FromMilliseconds(session.GetCurrentTime());
 
@@ -205,6 +212,13 @@ namespace TMRADIO
                     slider.Value = time.TotalMilliseconds / session.GetMediaDuration() * 1;
                     //notificationViewModel.Position = session.GetCurrentPosition();
                     lbl_duration.Text = TimeSpan.FromMilliseconds(session.GetMediaDuration()).ToString(@"h\:mm\:ss");
+                    #endregion
+
+                    #region Event listener 'stopped'
+                    if (isStateStopped)
+                    {
+                        
+                    }
                     #endregion
 
                     #region Event listener 'ended (End Reached)'
@@ -442,11 +456,10 @@ namespace TMRADIO
             notificationViewModel.Artist = radioViewModel.Info;
             notificationViewModel.Duration = 1000;
             //Create metadata
-            byte[] tmlogo = new HttpClient().GetByteArrayAsync(TMRADIO_LOGO).Result;
             metadataViewModel.Title = radioViewModel.Title.Replace(" - ", " | "); ;
             metadataViewModel.Artist = $"Listeners: {radioViewModel.StreamCurrentListeners}";
             metadataViewModel.Album = radioViewModel.Info;
-            metadataViewModel.AlbumArt = BitmapFactory.DecodeByteArray(tmlogo, 0, tmlogo.Length);
+            metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(radioViewModel.Logo);
             metadataViewModel.Duration = 1000;
 
             ShowNotification();
@@ -975,43 +988,6 @@ namespace TMRADIO
             popup_show_imageSource.Source = show.ImageSource;
             popup_show_title.Text = show.Title;
             #endregion
-
-            //bool isOk = await DisplayAlert($"TMRADIO", $"Load episodes from {show.Title}?", "load", "cancel");
-
-            //if (isOk)
-            //{
-            //    grid_playlist.IsVisible = true;
-            //    await grid_playlist.FadeTo(0.9, 300);
-
-            //    Device.BeginInvokeOnMainThread(async () =>
-            //    {
-            //        await grid_browser.TranslateTo(0, 800, 500, Easing.SpringIn);
-            //        grid_browser.IsVisible = false;
-            //    });
-
-            //    grid_nowPlaying.IsVisible = true;
-            //    await grid_nowPlaying.TranslateTo(0, 0, 500, Easing.SpringOut);
-
-            //    if (selectedShow != show.Title)
-            //    {
-            //        selectedShow = show.Title;
-
-            //        playlistEpisodes.Clear();
-            //        lv_playlist.ItemsSource = playlistEpisodes;
-
-            //        await Task.Run(() =>
-            //        {
-            //            Device.BeginInvokeOnMainThread(() =>
-            //            {
-            //                lv_playlist.IsRefreshing = true;
-            //            });
-
-            //            GetPlaylistEntities(show);
-            //        });
-
-            //        lv_playlist.IsRefreshing = false;
-            //    }
-            //}
         }
         #endregion
 
@@ -1071,90 +1047,6 @@ namespace TMRADIO
             popup_episode_imageSource.Source = episode.ImageSource;
             popup_episode_title.Text = episode.Title;
             #endregion
-
-            //bool isOk = await DisplayAlert($"{selectedShow}", $"{episode.Title}", "play", "cancel");
-
-            //if (isOk)
-            //{
-            //    session.Stop();
-
-            //    isRadioSelected = false;
-            //    nowPlayingTarget = episode.Url;
-
-            //    session.LoadMedia(nowPlayingTarget);
-
-            //    session.MediaParse();
-
-            //    long episodeDuration = session.GetMediaDuration();
-
-            //    var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
-
-            //    //Create Chromecast metadata
-            //    chromecastMedia = new Media
-            //    {
-            //        ContentUrl = nowPlayingTarget,
-            //        ContentType = "audio/mpeg",
-            //        Metadata = new MusicTrackMetadata
-            //        {
-            //            Title = episode.Title,
-            //            AlbumName = selectedShow,
-            //            Artist = episode.Description,
-            //            Images = new[]
-            //                {
-            //                new Sharpcaster.Models.Media.Image() { Url = imageUrl }
-            //            },
-            //            MetadataType = MetadataType.Music
-            //        }
-            //    };
-
-            //    //Create notification data
-            //    notificationViewModel.Title = episode.Title;
-            //    notificationViewModel.Artist = episode.Description;
-            //    notificationViewModel.Album = selectedShow;
-            //    notificationViewModel.AlbumArt = episode.ImageSource;
-            //    notificationViewModel.Duration = episodeDuration;
-
-            //    //Create metadata
-            //    metadataViewModel.Title = episode.Title;
-            //    metadataViewModel.Artist = episode.Description;
-            //    metadataViewModel.Album = selectedShow;
-            //    metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
-            //    metadataViewModel.Duration = episodeDuration;
-
-            //    ShowMetadata();
-
-            //    Device.BeginInvokeOnMainThread(() =>
-            //    {
-            //        lbl_title.Text = episode.Title;
-            //        img_logo.Source = episode.ImageSource;
-            //        lbl_album.Text = selectedShow;
-            //        lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
-            //    });
-
-            //    session.Play();
-
-            //    ShowNotification();
-
-            //    if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
-            //    {
-            //        var target = recentlyPlayedEpisodes.First(x => x.Url == nowPlayingTarget);
-            //        //Add episode to first place of the list and remove it from the old place
-            //        var xdoc = XDocument.Load(XML_RECENTLYPLAYED_FILE);
-            //        var targetedNode = xdoc.Descendants("Episode").ToList()[recentlyPlayedEpisodes.IndexOf(target)];
-            //        targetedNode.Remove();
-            //        xdoc.Root.AddFirst(targetedNode);
-            //        xdoc.Save(XML_RECENTLYPLAYED_FILE);
-            //        //Refresh view
-            //        frame_recentlyPlayed.IsVisible = true;
-            //        recentlyPlayedEpisodes.Clear();
-            //        GetRecentlyPlayed();
-            //        cview_recently.ItemsSource = recentlyPlayedEpisodes;
-            //    }
-            //    else
-            //    {
-            //        CreateXmlRecentPlayed(episode);
-            //    }
-            //}
         }
 
         private void CreateXmlRecentPlayed(PlaylistEntity episode)
@@ -1537,27 +1429,18 @@ namespace TMRADIO
             //compare dates
             if (newDate > oldDate)
             {
-                var isOK = await DisplayAlert("Check for update", "New version is now available. Tap “Update” to download.", "update", "cancel");
+                var isOK = await DisplayAlert("Check for update", "New version is now available. Tap “GO TO RELEASES” to download it manualy.", "go to releases", "cancel");
 
                 if (isOK)
                 {
-                    var sheet = await DisplayActionSheet("Select Version", "cancel", null, "arm64-v8a", "armeabi-v7a");
-
-                    switch (sheet)
-                    {
-                        case "arm64-v8a":
-                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-arm64-v8a.apk";
-                            break;
-                        case "armeabi-v7a":
-                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-armeabi-v7a.apk";
-                            break;
-                    }
-
                     try
                     {
-                        await Browser.OpenAsync(fileApk, BrowserLaunchMode.SystemPreferred);
+                        await Browser.OpenAsync("https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases", BrowserLaunchMode.SystemPreferred);
+
+                        //appUpdater.DownloadFile(fileApk, EXTERNAL_CACHE_DIR);
                     }
                     catch { }
+
                 }
             }
             else
@@ -1621,8 +1504,8 @@ namespace TMRADIO
                 // Discover Chromecast devices
                 var locator = new ChromecastLocator();
                 chromecasts = await locator.FindReceiversAsync(
-                    TimeSpan.FromSeconds(1),
                     TimeSpan.FromSeconds(2),
+                    TimeSpan.FromSeconds(3),
                     TimeSpan.FromSeconds(5));
 
                 if (chromecasts.Any())
@@ -1664,7 +1547,7 @@ namespace TMRADIO
             bool isReadyToCast = await DisplayAlert($"Chromecast to", 
                 $"Device: {targetReceiver.Name}\n" +
                 $"Model: {targetReceiver.Model}\n" +
-                $"Version: {targetReceiver.Version}" +
+                $"Version: {targetReceiver.Version}\n" +
                 $"Address: {targetReceiver.DeviceUri.Host}:{targetReceiver.Port}", 
                 "cast", "cancel");
 
@@ -2073,11 +1956,10 @@ namespace TMRADIO
 
                 long episodeDuration = session.GetMediaDuration();
 
-                var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
-
                 selectedShow = string.IsNullOrEmpty(episode.Show) ? selectedShow : episode.Show;
 
                 //Create Chromecast metadata
+                var imageUrl = string.IsNullOrEmpty(episode.ImageArt) ? EMPTY_EPISODE_IMAGE : episode.ImageArt;
                 chromecastMedia = new Media
                 {
                     ContentUrl = nowPlayingTarget,
@@ -2101,6 +1983,7 @@ namespace TMRADIO
                 notificationViewModel.Album = selectedShow;
                 notificationViewModel.AlbumArt = episode.ImageSource;
                 notificationViewModel.Duration = episodeDuration;
+                notificationViewModel.Position = session.GetCurrentPosition();
 
                 //Create metadata
                 metadataViewModel.Title = episode.Title;
@@ -2108,8 +1991,6 @@ namespace TMRADIO
                 metadataViewModel.Album = selectedShow;
                 metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
                 metadataViewModel.Duration = episodeDuration;
-
-                ShowMetadata();
 
                 Device.BeginInvokeOnMainThread(() =>
                 {
@@ -2119,11 +2000,8 @@ namespace TMRADIO
                     lbl_duration.Text = TimeSpan.FromMilliseconds(episodeDuration).ToString(@"h\:mm\:ss");
                 });
 
-                session.Play();
 
-                ShowNotification();
-
-                session.SetPlaylist(recentlyPlayedEpisodes, "Recently Played");
+                //session.SetPlaylist(recentlyPlayedEpisodes, "Recently Played");
 
                 if (recentlyPlayedEpisodes.Any(x => x.Url == nowPlayingTarget))
                 {
@@ -2144,6 +2022,11 @@ namespace TMRADIO
                 {
                     CreateXmlRecentPlayed(episode);
                 }
+
+                session.Play();
+                
+                ShowNotification();
+                ShowMetadata();
             }
         }
 
@@ -2306,30 +2189,32 @@ namespace TMRADIO
             //compare dates
             if (newDate > oldDate)
             {
-                var isOK = await DisplayAlert("Check for update", "New version is now available. Tap “Update” to download.", "update", "cancel");
+                var isOK = await DisplayAlert("Check for update", "New version is now available. Tap “GO TO RELEASES” to download it manualy.", "go to releases", "cancel");
 
                 if (isOK)
                 {
-                    var sheet = await DisplayActionSheet("Select Version", "cancel", null, "arm64-v8a", "armeabi-v7a");
-
-                    switch (sheet)
-                    {
-                        case "arm64-v8a":
-                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-arm64-v8a.apk";
-                            break;
-                        case "armeabi-v7a":
-                            fileApk = $"https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases/download/tm-radio/com.gmkuzmanoff.tmradio-armeabi-v7a.apk";
-                            break;
-                    }
-
                     try
                     {
-                        await Browser.OpenAsync(fileApk, BrowserLaunchMode.SystemPreferred);
+                        await Browser.OpenAsync("https://github.com/gmkuzmanoff/TM-RADIO-Application-Project/releases", BrowserLaunchMode.SystemPreferred);
+
+                        //appUpdater.DownloadFile(fileApk, EXTERNAL_CACHE_DIR);
                     }
                     catch { }
+
                 }
             }
-            
+        }
+
+        private async void OnUpdateDownloaded(object sender, DownloadEventArgs e)
+        {
+            if (e.FileSaved)
+            {
+                 await DisplayAlert("Update info", "Update is downloaded successfully", "close");
+            }
+            else
+            {
+                await DisplayAlert("Update info", "Update is not downloaded", "close");
+            }
         }
     }
 }
