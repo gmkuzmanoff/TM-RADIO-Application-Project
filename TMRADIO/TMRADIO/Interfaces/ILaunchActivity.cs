@@ -3,8 +3,8 @@
     public interface ILaunchActivity
     {
         void StartNativeIntentOnBackButtonPressed();
-        void AddedToFavourites(string title);
-        void RemovedFromFavourites(string title);
-        void ExistInFavourites(string title);
+        void AddedToFavouritesToast(string title);
+        void RemovedFromFavouritesToast(string title);
+        void ExistInFavouritesToast(string title);
     }
 }

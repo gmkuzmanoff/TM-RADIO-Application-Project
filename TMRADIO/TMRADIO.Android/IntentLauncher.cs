@@ -20,17 +20,17 @@ namespace TMRADIO.Droid
             context = Android.App.Application.Context;
         }
 
-        public void AddedToFavourites(string title)
+        public void AddedToFavouritesToast(string title)
         {
             Toast.MakeText(context, $"Favourites: + {title}", ToastLength.Long).Show();
         }
 
-        public void ExistInFavourites(string title)
+        public void ExistInFavouritesToast(string title)
         {
             Toast.MakeText(context, $"{title} already in Favourites!", ToastLength.Long).Show();
         }
 
-        public void RemovedFromFavourites(string title)
+        public void RemovedFromFavouritesToast(string title)
         {
             Toast.MakeText(context, $"Favourites: - {title}", ToastLength.Long).Show();
         }

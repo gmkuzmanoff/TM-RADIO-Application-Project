@@ -3,8 +3,10 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.Media;
+using Android.Media.Browse;
 using Android.Media.Session;
 using Android.OS;
+using Android.Runtime;
 using Android.Support.V4.Media;
 using Android.Support.V4.Media.Session;
 using Android.Views;
@@ -14,7 +16,6 @@ using LibVLCSharp.Shared;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using TMRADIO.Droid;
-using TMRADIO.Droid.Interfaces;
 using TMRADIO.Droid.MediaSession;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
@@ -27,19 +28,17 @@ namespace TMRADIO.Droid
     [Service(
         Exported = true,
         ForegroundServiceType = ForegroundService.TypeMediaPlayback,
-        Label = "TMRADIO_MediaBrowserService",
+        Label = "TMRADIO",
         Icon = "@mipmap/ic_launcher",
         RoundIcon = "@mipmap/ic_launcher_round")]
     [IntentFilter(new[] { "android.media.browse.MediaBrowserService" })]
     public class PlayerConnector : MediaBrowserServiceCompat, IPlayerConnector
     {
-        private readonly IAndroidAutoRadioService androidAutoRadioService;
-        
         private readonly PlaybackStateCompat.Builder playbackState;
         private readonly MediaMetadataCompat.Builder mediaMetadata;
         private NotificationManager notificationManager;
         private readonly Vlc vlcPlayer;
-        private Android.Content.Intent actionIntent;
+        private Intent actionIntent;
         private Notification notification;
         private MediaSessionCompat mediaSession;
         private NotificationChannel channel;
@@ -51,6 +50,7 @@ namespace TMRADIO.Droid
         private string title, artist, album, albumArt;
 
         //Android Auto Requirements
+        //private IList<MediaSessionCompat.QueueItem> mediaSessionQueueItems = new JavaList<MediaSessionCompat.QueueItem>();
         //private MediaDescriptionCompat mediaDescription;
         //private JavaList<MediaBrowserCompat.MediaItem> mediaItems;
         //MediaBrowserCompat.MediaItem mediaItem;
@@ -121,7 +121,7 @@ namespace TMRADIO.Droid
             switch (currentState)
             {
                 case VLCState.NothingSpecial:
-                    sessionState = PlaybackStateCompat.StateNone;
+                    sessionState = PlaybackStateCompat.StateStopped;
                     break;
                 case VLCState.Opening:
                     sessionState = PlaybackStateCompat.StateConnecting;
@@ -412,13 +412,52 @@ namespace TMRADIO.Droid
             return albumArt;
         }
 
+        //AA and AAOS
+        public override void OnCreate()
+        {
+            base.OnCreate();
+
+            //try
+            //{
+            //    Intent intent = new Intent("android.car.intent.action.MEDIA_TEMPLATE");
+            //    intent.PutExtra("android.car.intent.extra.MEDIA_COMPONENT", new ComponentName(context, nameof(PlayerConnector)));
+            //    intent.SetFlags(ActivityFlags.NewTask);
+            //    context.StartActivity(intent);
+            //}
+            //catch
+            //{
+            //}
+
+        }
+
         public override BrowserRoot OnGetRoot(string clientPackageName, int clientUid, Bundle rootHints)
         {
-            return new BrowserRoot("", null);
+            return new BrowserRoot("root", null);
         }
 
         public override void OnLoadChildren(string parentId, Result result)
         {
+            if (parentId.Equals("root"))
+            {
+                // AAOS Media Center requires tabs (browsable items) at the root level.
+                var tabs = new JavaList<MediaBrowserCompat.MediaItem>()
+                {
+                    new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder()
+                    .SetMediaId("main_shows")
+                    .SetTitle("Main Shows")
+                    .Build(), (int)MediaItemFlags.Browsable)
+                };
+
+                result.SendResult(tabs);
+            }
+            else if (parentId.Equals("main_shows"))
+            {
+                //return playable content as new JavaList<MediaBrowserCompat.MediaItem>()
+            }
+            else
+            {
+                result.SendResult(new JavaList<MediaBrowserCompat.MediaItem>());
+            }
             
         }
     }

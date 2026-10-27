@@ -1,12 +1,10 @@
-﻿using Android.Webkit;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
 using TMRADIO.Droid.Services;
 using TMRADIO.Interfaces;
 using Xamarin.Forms;
-using static AndroidX.Concurrent.Futures.CallbackToFutureAdapter;
 using static TMRADIO.Constants.Links;
 
 [assembly: Dependency(typeof(ApplicationUpdater))]
@@ -14,7 +12,7 @@ namespace TMRADIO.Droid.Services
 {
     public class ApplicationUpdater : IApplicationUpdater
     {
-        public event EventHandler<TMRADIO.Interfaces.DownloadEventArgs> OnFileDownloaded;
+        public event EventHandler<DownloadEventArgs> OnFileDownloaded;
 
         public void DownloadFile(string url, string folder)
         {
@@ -35,11 +33,11 @@ namespace TMRADIO.Droid.Services
         {
             if (e.Error != null)
             {
-                OnFileDownloaded?.Invoke(this, new TMRADIO.Interfaces.DownloadEventArgs(false));
+                OnFileDownloaded?.Invoke(this, new DownloadEventArgs(false));
             }
             else
             {
-                OnFileDownloaded?.Invoke(this, new TMRADIO.Interfaces.DownloadEventArgs(true));
+                OnFileDownloaded?.Invoke(this, new DownloadEventArgs(true));
             }
         }
     }

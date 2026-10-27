@@ -613,13 +613,13 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
-                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" WidthRequest="150" HeightRequest="150" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" VerticalOptions="Center" HorizontalOptions="Center">
                         <Image x:Name="popup_show_imageSource" Aspect="AspectFill"/>
                     </Frame>
                     <Label Text="Load episodes from" Grid.Row="2" Grid.ColumnSpan="2" FontSize="Small" VerticalOptions="End" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Regular" TextColor="#6b4935"/>
                     <Label x:Name="popup_show_title" Margin="10,0" Grid.Row="3" Grid.ColumnSpan="2" FontSize="Body" VerticalOptions="Start" HorizontalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Bold" MaxLines="2" LineBreakMode="TailTruncation" TextColor="#6b4935"/>
                     <Button x:Name="popup_show_ok" BackgroundColor="Transparent" TextColor="#6b4935" Text="load" Grid.Row="4" Grid.Column="0" Clicked="PopupShowOkClicked"/>
-                    <Button x:Name="popup_show_cancel" BackgroundColor="Transparent" TextColor="#6b4935" Text="cancel" Grid.Row="4" Grid.Column="1" Clicked="PopupShowCancelClicked"/>
+                    <Button x:Name="popup_show_cancel" BackgroundColor="Transparent" TextColor="#6b4935" Text="close" Grid.Row="4" Grid.Column="1" Clicked="PopupShowCancelClicked"/>
                 </Grid>
             </Frame>
             <!--#endregion-->
@@ -643,13 +643,13 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
-                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" WidthRequest="150" HeightRequest="150" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" VerticalOptions="Center" HorizontalOptions="Center">
                         <Image x:Name="popup_episode_imageSource" Aspect="AspectFill"/>
                     </Frame>
                     <Label Text="Selected episode is" Grid.Row="2" Grid.ColumnSpan="2" FontSize="Small" VerticalOptions="End" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Regular" TextColor="#6b4935"/>
                     <Label x:Name="popup_episode_title" Margin="10,0" Grid.Row="3" Grid.ColumnSpan="2" FontSize="Body" VerticalOptions="Start" HorizontalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Bold" MaxLines="2" LineBreakMode="TailTruncation" TextColor="#6b4935"/>
                     <Button x:Name="popup_episode_ok" BackgroundColor="Transparent" TextColor="#6b4935" Text="play" Grid.Row="4" Grid.Column="0" Clicked="PopupEpisodeOkClicked"/>
-                    <Button x:Name="popup_episode_cancel" BackgroundColor="Transparent" TextColor="#6b4935" Text="cancel" Grid.Row="4" Grid.Column="1" Clicked="PopupEpisodeCancelClicked"/>
+                    <Button x:Name="popup_episode_cancel" BackgroundColor="Transparent" TextColor="#6b4935" Text="close" Grid.Row="4" Grid.Column="1" Clicked="PopupEpisodeCancelClicked"/>
                 </Grid>
             </Frame>
             <!--#endregion-->
@@ -673,13 +673,13 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
-                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" WidthRequest="150" HeightRequest="150" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" VerticalOptions="Center" HorizontalOptions="Center">
                         <Image x:Name="popup_liveStream_imageSource" Source="logo" Aspect="AspectFill"/>
                     </Frame>
                     <Label Text="Connect to" Grid.Row="2" Grid.ColumnSpan="2" FontSize="Small" VerticalOptions="End" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Regular" TextColor="#6b4935"/>
                     <Label Text="TM-Radio Live Stream" Margin="10,0" Grid.Row="3" Grid.ColumnSpan="2" FontSize="Body" VerticalOptions="Start" HorizontalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Bold" MaxLines="2" LineBreakMode="TailTruncation" TextColor="#6b4935"/>
                     <Button x:Name="popup_liveStream_ok" BackgroundColor="Transparent" TextColor="#6b4935" Text="connect" Grid.Row="4" Grid.Column="0" Clicked="PopupLiveStreamOkClicked"/>
-                    <Button x:Name="popup_liveStream_cancel" BackgroundColor="Transparent" TextColor="#6b4935" Text="cancel" Grid.Row="4" Grid.Column="1" Clicked="PopupLiveStreamCancelClicked"/>
+                    <Button x:Name="popup_liveStream_cancel" BackgroundColor="Transparent" TextColor="#6b4935" Text="close" Grid.Row="4" Grid.Column="1" Clicked="PopupLiveStreamCancelClicked"/>
                 </Grid>
             </Frame>
             <!--#endregion-->

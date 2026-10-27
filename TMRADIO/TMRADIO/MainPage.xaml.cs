@@ -1321,12 +1321,12 @@ namespace TMRADIO
             {
                 if (!favouriteEpisodes.Any(x => x.Url == episode.Url))
                 {
-                    launchActivity.AddedToFavourites(episode.Title);
+                    launchActivity.AddedToFavouritesToast(episode.Title);
                     CreateXmlFavouriteEntity(episode);
                 }
                 else
                 {
-                    launchActivity.ExistInFavourites(episode.Title);
+                    launchActivity.ExistInFavouritesToast(episode.Title);
                 }
             }
         }

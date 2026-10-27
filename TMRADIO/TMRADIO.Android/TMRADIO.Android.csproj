@@ -93,7 +93,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntentLauncher.cs" />
-    <Compile Include="Interfaces\IAndroidAutoRadioService.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="MediaButtonReceiver.cs" />
     <Compile Include="MediaSession\MySessionCallback.cs" />
@@ -147,7 +146,9 @@
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\tm_radio_episode.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\power_off.png" />
   </ItemGroup>
