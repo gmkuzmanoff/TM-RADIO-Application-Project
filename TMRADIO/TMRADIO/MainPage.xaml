@@ -513,7 +513,7 @@
                             <BoxView HeightRequest="1" Margin="5" BackgroundColor="LightGray" HorizontalOptions="FillAndExpand" />
                             <StackLayout Padding="5" HorizontalOptions="Fill" VerticalOptions="FillAndExpand" BackgroundColor="#140720">
                                 <Label Text="TMRADIO" Padding="5,0" FontSize="18" FontFamily="RobotoCondensed-Bold" TextColor="AntiqueWhite"/>
-                                <Label x:Name="lbl_appVersion" Text="v1.2 (27.10.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
+                                <Label x:Name="lbl_appVersion" Text="v1.2 (29.10.2026)" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="Copyright © 2026, gmkuzmanoff" Padding="5,0" FontSize="15" FontFamily="RobotoCondensed-Bold" TextColor="Gray"/>
                                 <Label Text="Check for updates" Padding="5" FontSize="14" FontFamily="RobotoCondensed-Regular" TextColor="Lime" TextDecorations="Underline">
                                     <Label.GestureRecognizers>
