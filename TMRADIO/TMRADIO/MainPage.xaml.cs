@@ -1410,7 +1410,6 @@ namespace TMRADIO
             HtmlDocument htmlDoc;
             HtmlNode targetNode;
             string newDateStr = string.Empty;
-            string fileApk = string.Empty;
 
             try
             {
@@ -2170,7 +2169,6 @@ namespace TMRADIO
             HtmlDocument htmlDoc;
             HtmlNode targetNode;
             string newDateStr = string.Empty;
-            string fileApk = string.Empty;
 
             try
             {

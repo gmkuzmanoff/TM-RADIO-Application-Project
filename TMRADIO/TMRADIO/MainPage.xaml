@@ -126,7 +126,13 @@
                                 <ColumnDefinition Width="1*"/>
                                 <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="logo_transparent" Grid.RowSpan="2" BackgroundColor="Transparent" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <Image
+                                 xct:TouchEffect.AnimationDuration="1000"
+                                 xct:TouchEffect.PulseCount="1"
+                                 xct:TouchEffect.NormalBackgroundColor="Transparent"
+                                 xct:TouchEffect.PressedBackgroundColor="Transparent"
+                                 xct:TouchEffect.PressedRotation="360"
+                                Source="logo_transparent" Grid.RowSpan="2" BackgroundColor="Transparent" VerticalOptions="Center" HorizontalOptions="Center"/>
 
                             <StackLayout Padding="0" Grid.Row="0" Grid.Column="1" Orientation="Vertical" VerticalOptions="Center">
                                 <Label x:Name="lbl_tmradiolive_title"  Text="{Binding Source={x:Reference lbl_title}, Path=Text}" TextColor="Aquamarine" FontFamily="RobotoCondensed-Italic" FontSize="Subtitle" MaxLines="2" LineBreakMode="TailTruncation"/>
@@ -223,7 +229,7 @@
                                 <GradientStop Color="Khaki" Offset="0.8"/>
                             </LinearGradientBrush>
                         </Frame.Background>
-                        <Image x:Name="img_logo" Margin="5" Source="logo" Aspect="Fill"/>
+                        <Image x:Name="img_logo" Margin="5" Source="logo" Aspect="Fill" />
                     </Frame>
                     <!--<Frame Grid.Column="2" WidthRequest="40" Margin="10,0" HorizontalOptions="End" Padding="0" BackgroundColor="Transparent">
                         
@@ -594,18 +600,18 @@
             </Grid>
             <!--#endregion-->
             <!--#region View Custom Popup for Show-->
-            <Frame x:Name="frame_popupMessage_show" IsVisible="false" Padding="0" CornerRadius="10" WidthRequest="240" HeightRequest="360" VerticalOptions="Center" HorizontalOptions="Center" BackgroundColor="DarkBlue"
+            <Frame x:Name="frame_popupMessage_show" IsVisible="false" Padding="0" CornerRadius="10" WidthRequest="240" HeightRequest="360" VerticalOptions="Center" HorizontalOptions="Center" BackgroundColor="MediumVioletRed"
                    xct:ShadowEffect.Color="Black"
                    xct:ShadowEffect.OffsetY="5"
                    xct:ShadowEffect.OffsetX="5"
                    xct:ShadowEffect.Radius="5"
                    xct:ShadowEffect.Opacity="0">
-                <Grid Opacity="1" BackgroundColor="#cbb99b">
+                <Grid BackgroundColor="#cbb99b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="45"/>
+                        <RowDefinition Height="160"/>
                         <RowDefinition />
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="50"/>
+                        <RowDefinition />
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -613,13 +619,13 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
-                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" WidthRequest="160" HeightRequest="160" VerticalOptions="Center" HorizontalOptions="Center">
                         <Image x:Name="popup_show_imageSource" Aspect="AspectFill"/>
                     </Frame>
-                    <Label Text="Load episodes from" Grid.Row="2" Grid.ColumnSpan="2" FontSize="Small" VerticalOptions="End" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Regular" TextColor="#6b4935"/>
-                    <Label x:Name="popup_show_title" Margin="10,0" Grid.Row="3" Grid.ColumnSpan="2" FontSize="Body" VerticalOptions="Start" HorizontalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Bold" MaxLines="2" LineBreakMode="TailTruncation" TextColor="#6b4935"/>
-                    <Button x:Name="popup_show_ok" BackgroundColor="Transparent" TextColor="#6b4935" Text="load" Grid.Row="4" Grid.Column="0" Clicked="PopupShowOkClicked"/>
-                    <Button x:Name="popup_show_cancel" BackgroundColor="Transparent" TextColor="#6b4935" Text="close" Grid.Row="4" Grid.Column="1" Clicked="PopupShowCancelClicked"/>
+                    <Label Text="Load episodes from" Grid.Row="2" Grid.ColumnSpan="2" FontSize="Small" VerticalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Regular" TextColor="#6b4935"/>
+                    <Label x:Name="popup_show_title" Margin="10,0" Grid.Row="3" Grid.ColumnSpan="2" FontSize="Body" VerticalOptions="Center" HorizontalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Bold" MaxLines="2" LineBreakMode="TailTruncation" TextColor="#6b4935"/>
+                    <Button x:Name="popup_show_ok" HorizontalOptions="Center" VerticalOptions="Center" BackgroundColor="Transparent" TextColor="#6b4935" Text="load" Grid.Row="4" Grid.Column="0" Clicked="PopupShowOkClicked"/>
+                    <Button x:Name="popup_show_cancel" HorizontalOptions="Center" VerticalOptions="Center" BackgroundColor="Transparent" TextColor="#6b4935" Text="close" Grid.Row="4" Grid.Column="1" Clicked="PopupShowCancelClicked"/>
                 </Grid>
             </Frame>
             <!--#endregion-->
@@ -630,12 +636,12 @@
                 xct:ShadowEffect.OffsetX="5"
                 xct:ShadowEffect.Radius="5"
                 xct:ShadowEffect.Opacity="0">
-                <Grid Opacity="1" BackgroundColor="#cbb99b">
+                <Grid BackgroundColor="#cbb99b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="45"/>
+                        <RowDefinition Height="160"/>
                         <RowDefinition />
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="50"/>
+                        <RowDefinition />
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -643,13 +649,13 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
-                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" HeightRequest="160" WidthRequest="160" VerticalOptions="Center" HorizontalOptions="Center">
                         <Image x:Name="popup_episode_imageSource" Aspect="AspectFill"/>
                     </Frame>
-                    <Label Text="Selected episode is" Grid.Row="2" Grid.ColumnSpan="2" FontSize="Small" VerticalOptions="End" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Regular" TextColor="#6b4935"/>
-                    <Label x:Name="popup_episode_title" Margin="10,0" Grid.Row="3" Grid.ColumnSpan="2" FontSize="Body" VerticalOptions="Start" HorizontalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Bold" MaxLines="2" LineBreakMode="TailTruncation" TextColor="#6b4935"/>
-                    <Button x:Name="popup_episode_ok" BackgroundColor="Transparent" TextColor="#6b4935" Text="play" Grid.Row="4" Grid.Column="0" Clicked="PopupEpisodeOkClicked"/>
-                    <Button x:Name="popup_episode_cancel" BackgroundColor="Transparent" TextColor="#6b4935" Text="close" Grid.Row="4" Grid.Column="1" Clicked="PopupEpisodeCancelClicked"/>
+                    <Label Text="Selected episode is" Grid.Row="2" Grid.ColumnSpan="2" FontSize="Small" VerticalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Regular" TextColor="#6b4935"/>
+                    <Label x:Name="popup_episode_title" Margin="10,0" Grid.Row="3" Grid.ColumnSpan="2" FontSize="Body" VerticalOptions="Center" HorizontalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Bold" MaxLines="2" LineBreakMode="TailTruncation" TextColor="#6b4935"/>
+                    <Button x:Name="popup_episode_ok" HorizontalOptions="Center" VerticalOptions="Center" BackgroundColor="Transparent" TextColor="#6b4935" Text="play" Grid.Row="4" Grid.Column="0" Clicked="PopupEpisodeOkClicked"/>
+                    <Button x:Name="popup_episode_cancel" HorizontalOptions="Center" VerticalOptions="Center" BackgroundColor="Transparent" TextColor="#6b4935" Text="close" Grid.Row="4" Grid.Column="1" Clicked="PopupEpisodeCancelClicked"/>
                 </Grid>
             </Frame>
             <!--#endregion-->
@@ -660,12 +666,12 @@
                 xct:ShadowEffect.OffsetX="5"
                 xct:ShadowEffect.Radius="5"
                 xct:ShadowEffect.Opacity="0">
-                <Grid Opacity="1" BackgroundColor="#cbb99b">
+                <Grid BackgroundColor="#cbb99b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="45"/>
+                        <RowDefinition Height="160"/>
                         <RowDefinition />
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="50"/>
+                        <RowDefinition />
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -673,11 +679,11 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Image Grid.Row="0" Grid.ColumnSpan="2" Source="logo_transparent" Margin="5,5,0,0" VerticalOptions="Center" HorizontalOptions="Start"/>
-                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Frame Grid.Row="1" Grid.ColumnSpan="2" CornerRadius="10" Padding="0" HeightRequest="160" WidthRequest="160" VerticalOptions="Center" HorizontalOptions="Center">
                         <Image x:Name="popup_liveStream_imageSource" Source="logo" Aspect="AspectFill"/>
                     </Frame>
-                    <Label Text="Connect to" Grid.Row="2" Grid.ColumnSpan="2" FontSize="Small" VerticalOptions="End" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Regular" TextColor="#6b4935"/>
-                    <Label Text="TM-Radio Live Stream" Margin="10,0" Grid.Row="3" Grid.ColumnSpan="2" FontSize="Body" VerticalOptions="Start" HorizontalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Bold" MaxLines="2" LineBreakMode="TailTruncation" TextColor="#6b4935"/>
+                    <Label Text="Connect to" Grid.Row="2" Grid.ColumnSpan="2" FontSize="Small" VerticalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Regular" TextColor="#6b4935"/>
+                    <Label Text="TM-Radio Live Stream" Margin="10,0" Grid.Row="3" Grid.ColumnSpan="2" FontSize="Body" VerticalOptions="Center" HorizontalOptions="Center" HorizontalTextAlignment="Center" FontFamily="RobotoCondensed-Bold" MaxLines="2" LineBreakMode="TailTruncation" TextColor="#6b4935"/>
                     <Button x:Name="popup_liveStream_ok" BackgroundColor="Transparent" TextColor="#6b4935" Text="connect" Grid.Row="4" Grid.Column="0" Clicked="PopupLiveStreamOkClicked"/>
                     <Button x:Name="popup_liveStream_cancel" BackgroundColor="Transparent" TextColor="#6b4935" Text="close" Grid.Row="4" Grid.Column="1" Clicked="PopupLiveStreamCancelClicked"/>
                 </Grid>

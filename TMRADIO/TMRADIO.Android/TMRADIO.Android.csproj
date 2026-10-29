@@ -96,7 +96,7 @@
     <Compile Include="MainActivity.cs" />
     <Compile Include="MediaButtonReceiver.cs" />
     <Compile Include="MediaSession\MySessionCallback.cs" />
-    <Compile Include="PlayerConnector.cs" />
+    <Compile Include="MediaSession\PlayerConnector.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ApplicationUpdater.cs" />
@@ -146,9 +146,7 @@
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\tm_radio_episode.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\power_off.png" />
   </ItemGroup>

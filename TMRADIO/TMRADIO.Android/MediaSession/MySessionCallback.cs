@@ -15,7 +15,7 @@ namespace TMRADIO.Droid.MediaSession
 {
     public class MySessionCallback : MediaSessionCompat.Callback
     {
-        private readonly Android.Content.Context context = Android.App.Application.Context;
+        private readonly Context context = Android.App.Application.Context;
         private readonly IPlayerConnector session;
 
         private string mediaSource = string.Empty;
@@ -134,5 +134,19 @@ namespace TMRADIO.Droid.MediaSession
             return base.OnMediaButtonEvent(mediaButtonEvent);
         }
 
+        public override void OnPrepare()
+        {
+            
+        }
+
+        public override void OnPlay()
+        {
+            
+        }
+
+        public override void OnPause()
+        {
+            
+        }
     }
 }

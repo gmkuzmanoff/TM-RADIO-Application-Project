@@ -6,16 +6,15 @@ using Android.Media;
 using Android.Media.Browse;
 using Android.Media.Session;
 using Android.OS;
-using Android.Runtime;
+using Android.Service.Media;
 using Android.Support.V4.Media;
 using Android.Support.V4.Media.Session;
 using Android.Views;
 using AndroidX.Core.App;
-using AndroidX.Media;
+using Java.Util;
 using LibVLCSharp.Shared;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using TMRADIO.Droid;
 using TMRADIO.Droid.MediaSession;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
@@ -23,7 +22,7 @@ using Xamarin.Forms;
 using static TMRADIO.Constants.Links;
 
 [assembly: Dependency(typeof(PlayerConnector))]
-namespace TMRADIO.Droid
+namespace TMRADIO.Droid.MediaSession
 {
     [Service(
         Exported = true,
@@ -32,7 +31,7 @@ namespace TMRADIO.Droid
         Icon = "@mipmap/ic_launcher",
         RoundIcon = "@mipmap/ic_launcher_round")]
     [IntentFilter(new[] { "android.media.browse.MediaBrowserService" })]
-    public class PlayerConnector : MediaBrowserServiceCompat, IPlayerConnector
+    public class PlayerConnector : MediaBrowserService, IPlayerConnector
     {
         private readonly PlaybackStateCompat.Builder playbackState;
         private readonly MediaMetadataCompat.Builder mediaMetadata;
@@ -76,19 +75,21 @@ namespace TMRADIO.Droid
         {
             IList<MediaSessionCompat.QueueItem> list = new ObservableCollection<MediaSessionCompat.QueueItem>();
             mediaSession.SetQueue(null);
+            long tracksCounter = 0;
             
             foreach (var item in playlist)
             {
+                tracksCounter++;
                 var mediaDescription = new MediaDescriptionCompat.Builder()
-                    .SetMediaId(playlist.IndexOf(item).ToString())
+                    .SetMediaId(item.Url)
                     .SetTitle(item.Title)
-                    .SetSubtitle(title)
+                    .SetSubtitle(playlistTitle)
                     .SetDescription(item.Description)
                     .SetIconUri(Android.Net.Uri.Parse(item.ImageArt))
                     .SetMediaUri(Android.Net.Uri.Parse(item.Url))
                     .Build();
 
-                list.Add(new MediaSessionCompat.QueueItem(mediaDescription, playlist.IndexOf(item)));
+                list.Add(new MediaSessionCompat.QueueItem(mediaDescription, tracksCounter));
                 
             }
 
@@ -145,15 +146,12 @@ namespace TMRADIO.Droid
                     break;
             }
 
-            playbackState.SetActions(
-               PlaybackStateCompat.ActionPlay |
-               PlaybackStateCompat.ActionPause |
-               PlaybackStateCompat.ActionStop |
-               PlaybackStateCompat.ActionFastForward |
-               PlaybackStateCompat.ActionRewind);
-               //PlaybackStateCompat.ActionSkipToNext |
-               //PlaybackStateCompat.ActionSkipToPrevious |
-               //PlaybackStateCompat.ActionSeekTo);
+            playbackState.SetActions(PlaybackStateCompat.ActionPlay);
+            playbackState.SetActions(PlaybackStateCompat.ActionPause);
+            playbackState.SetActions(PlaybackStateCompat.ActionFastForward);
+            playbackState.SetActions(PlaybackStateCompat.ActionRewind);
+            playbackState.SetActions(PlaybackStateCompat.ActionSkipToNext);
+            playbackState.SetActions(PlaybackStateCompat.ActionSkipToPrevious);
 
             long position = (long)(vlcPlayer.CurrentPosition / 1 * vlcPlayer.MediaDuration());
 
@@ -417,16 +415,18 @@ namespace TMRADIO.Droid
         {
             base.OnCreate();
 
-            //try
-            //{
-            //    Intent intent = new Intent("android.car.intent.action.MEDIA_TEMPLATE");
-            //    intent.PutExtra("android.car.intent.extra.MEDIA_COMPONENT", new ComponentName(context, nameof(PlayerConnector)));
-            //    intent.SetFlags(ActivityFlags.NewTask);
-            //    context.StartActivity(intent);
-            //}
-            //catch
-            //{
-            //}
+            InitializeSession();
+
+            try
+            {
+                Intent intent = new Intent("android.car.intent.action.MEDIA_TEMPLATE");
+                intent.PutExtra("android.car.intent.extra.MEDIA_COMPONENT", new ComponentName(context, nameof(PlayerConnector)));
+                intent.SetFlags(ActivityFlags.NewTask);
+                context.StartActivity(intent);
+            }
+            catch
+            {
+            }
 
         }
 
@@ -440,25 +440,34 @@ namespace TMRADIO.Droid
             if (parentId.Equals("root"))
             {
                 // AAOS Media Center requires tabs (browsable items) at the root level.
-                var tabs = new JavaList<MediaBrowserCompat.MediaItem>()
-                {
-                    new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder()
+                ArrayList tabs = new ArrayList();
+                tabs.Add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder()
                     .SetMediaId("main_shows")
                     .SetTitle("Main Shows")
-                    .Build(), (int)MediaItemFlags.Browsable)
-                };
+                    .Build(), (int)MediaItemFlags.Browsable));
 
                 result.SendResult(tabs);
             }
             else if (parentId.Equals("main_shows"))
             {
                 //return playable content as new JavaList<MediaBrowserCompat.MediaItem>()
+                ArrayList shows = new ArrayList();
+                shows.Add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder()
+                    .SetMediaId("show-1")
+                    .SetTitle("First Show")
+                    .Build(), (int)MediaItemFlags.Browsable));
+                shows.Add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder()
+                    .SetMediaId("show-2")
+                    .SetTitle("Second Show")
+                    .Build(), (int)MediaItemFlags.Browsable));
+
+                result.SendResult(shows);
             }
             else
             {
-                result.SendResult(new JavaList<MediaBrowserCompat.MediaItem>());
+                result.SendResult(null);
             }
-            
+
         }
     }
 }
