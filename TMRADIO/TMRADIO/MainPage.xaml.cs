@@ -14,6 +14,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml.Linq;
@@ -95,7 +96,7 @@ namespace TMRADIO
 
             InitializeComponent();
 
-            appUpdater.OnFileDownloaded += OnUpdateDownloaded;
+            //appUpdater.OnFileDownloaded += OnUpdateDownloaded;
 
             //Command: Pull to refresh the list of chromecast devices 
             lv_castDevices.RefreshCommand = new Command(async () =>
@@ -182,11 +183,11 @@ namespace TMRADIO
         private void Timer_Tick(object sender, ElapsedEventArgs e)
         {
             var currentPlayerState = session.GetCurrentState();
-            isStatePlaying = currentPlayerState == LibVLCSharp.Shared.VLCState.Playing;
-            isStateOpening = currentPlayerState == LibVLCSharp.Shared.VLCState.Opening;
-            isStateStopped = currentPlayerState == LibVLCSharp.Shared.VLCState.Stopped;
-            isStateEnded = currentPlayerState == LibVLCSharp.Shared.VLCState.Ended;
-            isStateError = currentPlayerState == LibVLCSharp.Shared.VLCState.Error;
+            isStatePlaying = currentPlayerState == 3;
+            isStateOpening = currentPlayerState == 1;
+            isStateStopped = currentPlayerState == 5;
+            isStateEnded = currentPlayerState == 6;
+            isStateError = currentPlayerState == 7;
 
             time = TimeSpan.FromMilliseconds(session.GetCurrentTime());
 
@@ -459,7 +460,7 @@ namespace TMRADIO
             metadataViewModel.Title = radioViewModel.Title.Replace(" - ", " | "); ;
             metadataViewModel.Artist = $"Listeners: {radioViewModel.StreamCurrentListeners}";
             metadataViewModel.Album = radioViewModel.Info;
-            metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(radioViewModel.Logo);
+            metadataViewModel.AlbumArt = BitmapFactory.DecodeResource(context.Resources, 2131165312);
             metadataViewModel.Duration = 1000;
 
             ShowNotification();

@@ -1,7 +1,4 @@
-﻿using Android.App;
-using LibVLCSharp.Shared;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using TMRADIO.Models;
 
 namespace TMRADIO.Interfaces
@@ -19,8 +16,9 @@ namespace TMRADIO.Interfaces
         string GetArtist();
         string GetAlbum();
         string GetAlbumArt();
-        VLCState GetCurrentState();
+        int GetCurrentState();
         long GetMediaDuration();
+        void OnSeekTo(long pos);
         void MediaParse();
         bool IsPlaying();
         void Play();

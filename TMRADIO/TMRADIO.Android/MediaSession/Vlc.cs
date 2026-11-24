@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Timers;
 
-namespace TMRADIO.Models
+namespace TMRADIO.Droid.MediaSession
 {
     public class Vlc
     {
@@ -45,7 +45,7 @@ namespace TMRADIO.Models
             get => libVLC;
             private set => Set(nameof(LibVLC), ref libVLC, value);
         }
-        
+
         /// <summary>
         /// Gets the <see cref="LibVLCSharp.Shared.MediaPlayer"/> instance.
         /// </summary>
@@ -78,7 +78,7 @@ namespace TMRADIO.Models
             {
                 return VLCState.NothingSpecial;
             }
-            
+
         }
 
         public void LoadMedia(string url)
@@ -100,14 +100,14 @@ namespace TMRADIO.Models
                 //Media.AddOption(":avcodec-fast");
                 //Media.AddOption(":file-caching=2000");
                 media.AddOption(":http-reconnect");
-                
+
                 player.Media = media;
             }
             catch
             {
                 media = null;
             }
-            
+
         }
 
         public void PlayerDispose()
@@ -156,7 +156,7 @@ namespace TMRADIO.Models
             }
             catch
             {
-                
+
             }
         }
 
@@ -213,7 +213,7 @@ namespace TMRADIO.Models
             }
             catch { }
         }
-        
+
         public void RewindPressed()
         {
             StartSeekRewindTimer();
@@ -241,7 +241,7 @@ namespace TMRADIO.Models
             {
                 return false;
             }
-            
+
         }
 
         public bool IsMediaLoaded()
@@ -270,7 +270,7 @@ namespace TMRADIO.Models
             if (isHolding) return;
             isHolding = true;
 
-            seekTimer = new Timer(300);//every 300ms
+            seekTimer = new Timer(300);//every 100ms
             seekTimer.Elapsed += (s, e) =>
             {
                 try

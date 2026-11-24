@@ -3,15 +3,12 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.Media;
-using Android.Media.Browse;
 using Android.Media.Session;
 using Android.OS;
-using Android.Service.Media;
 using Android.Support.V4.Media;
 using Android.Support.V4.Media.Session;
 using Android.Views;
 using AndroidX.Core.App;
-using Java.Util;
 using LibVLCSharp.Shared;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,8 +27,7 @@ namespace TMRADIO.Droid.MediaSession
         Label = "TMRADIO",
         Icon = "@mipmap/ic_launcher",
         RoundIcon = "@mipmap/ic_launcher_round")]
-    [IntentFilter(new[] { "android.media.browse.MediaBrowserService" })]
-    public class PlayerConnector : MediaBrowserService, IPlayerConnector
+    public class PlayerConnector : Service, IPlayerConnector
     {
         private readonly PlaybackStateCompat.Builder playbackState;
         private readonly MediaMetadataCompat.Builder mediaMetadata;
@@ -49,6 +45,9 @@ namespace TMRADIO.Droid.MediaSession
         private string title, artist, album, albumArt;
 
         //Android Auto Requirements
+
+        private AudioFocusCallback audioFocusCallback;
+        private bool isAudioFocusGained = false;
         //private IList<MediaSessionCompat.QueueItem> mediaSessionQueueItems = new JavaList<MediaSessionCompat.QueueItem>();
         //private MediaDescriptionCompat mediaDescription;
         //private JavaList<MediaBrowserCompat.MediaItem> mediaItems;
@@ -62,8 +61,11 @@ namespace TMRADIO.Droid.MediaSession
             vlcPlayer = new Vlc();
         }
 
+        [System.Obsolete]
         public void InitializeSession()
         {
+            audioFocusCallback = new AudioFocusCallback();
+            isAudioFocusGained = audioFocusCallback.RequestAudioFocus();
             mediaSession = new MediaSessionCompat(context, "TMRADIO_MediaSession");
             mediaSession.SetCallback(new MySessionCallback());
             mediaSession.SetFlags((int)MediaSessionFlags.HandlesMediaButtons | (int)MediaSessionFlags.HandlesTransportControls);
@@ -122,7 +124,7 @@ namespace TMRADIO.Droid.MediaSession
             switch (currentState)
             {
                 case VLCState.NothingSpecial:
-                    sessionState = PlaybackStateCompat.StateStopped;
+                    sessionState = PlaybackStateCompat.StateNone;
                     break;
                 case VLCState.Opening:
                     sessionState = PlaybackStateCompat.StateConnecting;
@@ -146,12 +148,15 @@ namespace TMRADIO.Droid.MediaSession
                     break;
             }
 
-            playbackState.SetActions(PlaybackStateCompat.ActionPlay);
-            playbackState.SetActions(PlaybackStateCompat.ActionPause);
-            playbackState.SetActions(PlaybackStateCompat.ActionFastForward);
-            playbackState.SetActions(PlaybackStateCompat.ActionRewind);
-            playbackState.SetActions(PlaybackStateCompat.ActionSkipToNext);
-            playbackState.SetActions(PlaybackStateCompat.ActionSkipToPrevious);
+            playbackState.SetActions(
+                    PlaybackStateCompat.ActionPlay |
+                    PlaybackStateCompat.ActionPause |
+                    PlaybackStateCompat.ActionPlayPause |
+                    PlaybackStateCompat.ActionSkipToNext |
+                    PlaybackStateCompat.ActionSkipToPrevious |
+                    PlaybackStateCompat.ActionFastForward |
+                    PlaybackStateCompat.ActionRewind |
+                    PlaybackStateCompat.ActionSeekTo);
 
             long position = (long)(vlcPlayer.CurrentPosition / 1 * vlcPlayer.MediaDuration());
 
@@ -344,19 +349,34 @@ namespace TMRADIO.Droid.MediaSession
             vlcPlayer.RewindReleased();
         }
 
+        public void OnSeekTo(long pos)
+        {
+            vlcPlayer.CurrentTime = pos;
+        }
+
         public void Pause()
         {
             vlcPlayer.PauseMedia();
+
+            audioFocusCallback.AbondonAudioFocus();
         }
 
+        [System.Obsolete]
         public void Play()
         {
-            vlcPlayer.PlayMedia();
+            isAudioFocusGained = audioFocusCallback.RequestAudioFocus();
+
+            if (isAudioFocusGained)
+            {
+                vlcPlayer.PlayMedia();
+            }
         }
 
         public void Stop()
         {
             vlcPlayer.StopMedia();
+
+            audioFocusCallback.AbondonAudioFocus();
         }
 
         public void StopSession()
@@ -385,9 +405,9 @@ namespace TMRADIO.Droid.MediaSession
             return mediaSource;
         }
 
-        public VLCState GetCurrentState()
+        public int GetCurrentState()
         {
-            return vlcPlayer.PlayerState();
+            return (int)vlcPlayer.PlayerState();
         }
 
         public string GetTitle()
@@ -411,63 +431,17 @@ namespace TMRADIO.Droid.MediaSession
         }
 
         //AA and AAOS
+        [System.Obsolete]
         public override void OnCreate()
         {
             base.OnCreate();
 
             InitializeSession();
-
-            try
-            {
-                Intent intent = new Intent("android.car.intent.action.MEDIA_TEMPLATE");
-                intent.PutExtra("android.car.intent.extra.MEDIA_COMPONENT", new ComponentName(context, nameof(PlayerConnector)));
-                intent.SetFlags(ActivityFlags.NewTask);
-                context.StartActivity(intent);
-            }
-            catch
-            {
-            }
-
         }
 
-        public override BrowserRoot OnGetRoot(string clientPackageName, int clientUid, Bundle rootHints)
+        public override IBinder OnBind(Intent intent)
         {
-            return new BrowserRoot("root", null);
-        }
-
-        public override void OnLoadChildren(string parentId, Result result)
-        {
-            if (parentId.Equals("root"))
-            {
-                // AAOS Media Center requires tabs (browsable items) at the root level.
-                ArrayList tabs = new ArrayList();
-                tabs.Add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder()
-                    .SetMediaId("main_shows")
-                    .SetTitle("Main Shows")
-                    .Build(), (int)MediaItemFlags.Browsable));
-
-                result.SendResult(tabs);
-            }
-            else if (parentId.Equals("main_shows"))
-            {
-                //return playable content as new JavaList<MediaBrowserCompat.MediaItem>()
-                ArrayList shows = new ArrayList();
-                shows.Add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder()
-                    .SetMediaId("show-1")
-                    .SetTitle("First Show")
-                    .Build(), (int)MediaItemFlags.Browsable));
-                shows.Add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder()
-                    .SetMediaId("show-2")
-                    .SetTitle("Second Show")
-                    .Build(), (int)MediaItemFlags.Browsable));
-
-                result.SendResult(shows);
-            }
-            else
-            {
-                result.SendResult(null);
-            }
-
+            return null;
         }
     }
 }

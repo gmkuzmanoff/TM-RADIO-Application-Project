@@ -1,8 +1,8 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Graphics;
+using Android.Media;
 using Android.Views;
-using Android.Widget;
 using LibVLCSharp.Shared;
 using System;
 using TMRADIO.Interfaces;
@@ -14,7 +14,7 @@ using static TMRADIO.Constants.Links;
 namespace TMRADIO.Droid
 {
     [BroadcastReceiver(Exported = true)]
-    [IntentFilter(new[] { Intent.ActionMediaButton })]
+    [IntentFilter(new[] { Intent.ActionMediaButton, AudioManager.ActionAudioBecomingNoisy })]
     public class MediaButtonReceiver : BroadcastReceiver
     {
         private readonly IPlayerConnector session;
@@ -25,7 +25,7 @@ namespace TMRADIO.Droid
             session = DependencyService.Get<IPlayerConnector>();
         }
 
-        [System.Obsolete]
+        [Obsolete]
         public override void OnReceive(Context context, Intent intent)
         {
             var mediaSource = session.MediaSource();
@@ -34,6 +34,14 @@ namespace TMRADIO.Droid
             var album = session.GetAlbum();
             var albumArt = session.GetAlbumArt();
 
+            if (AudioManager.ActionAudioBecomingNoisy.Equals(intent.Action))
+            {
+                if (TMRADIO_STREAM_URL.Equals(mediaSource))
+                    session.Stop();
+                else
+                    session.Pause();
+            }
+            
             //KeyCodes
             var keycode = (KeyEvent)intent.Extras.GetParcelable(Intent.ExtraKeyEvent);
 

@@ -264,7 +264,7 @@ namespace TMRADIO.Services
                 for (int i = 0; i < audioNodes.Count; i++)
                 {
                     string title = string.Empty;
-                    string img;
+                    string img = string.Empty;
                     string description = string.Empty;
                     string webAddress;
 
@@ -281,12 +281,19 @@ namespace TMRADIO.Services
                     {
                         img = audioNodes[i].ParentNode.ParentNode.ParentNode.ParentNode.ParentNode.FirstChild.FirstChild.NextSibling.FirstChild.GetAttributeValue("src", string.Empty);
 
-                        if (img == "/pic/tm-radio-episode.png")
+                        if (!img.StartsWith("http"))
                         {
-                            img = string.Empty;
+                            if (img == "/pic/tm-radio-episode.png")
+                            {
+                                img = string.Empty;
+                            }
+                            else
+                            {
+                                img = $"https://www.tm-radio.com{img}";
+                            }
                         }
                     }
-                    catch { img = string.Empty; }
+                    catch { }
 
                     try
                     {
