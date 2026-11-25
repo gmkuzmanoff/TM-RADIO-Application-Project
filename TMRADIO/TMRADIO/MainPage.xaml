@@ -240,14 +240,14 @@
                     <StackLayout Margin="20,10">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*"/>
-                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="25"/>
                             </Grid.ColumnDefinitions>
                             <StackLayout Grid.Column="0" HorizontalOptions="Start" VerticalOptions="Center">
                                 <Label x:Name="lbl_title" Text="" TextColor="Wheat" HorizontalTextAlignment="Start" HorizontalOptions="Start" FontSize="Subtitle" MaxLines="2" FontFamily="RobotoCondensed-Bold" LineBreakMode="TailTruncation"/>
                                 <Label x:Name="lbl_album" Text="" TextColor="Gray" HorizontalTextAlignment="Start" HorizontalOptions="Start" FontSize="Small" MaxLines="1" FontFamily="RobotoCondensed-Regular" LineBreakMode="TailTruncation"/>
                             </StackLayout>
-                            <ImageButton x:Name="btn_addToFavourites" Grid.Column="1" WidthRequest="25" HeightRequest="25" VerticalOptions="Center" HorizontalOptions="EndAndExpand" Source="heart_plus" BackgroundColor="Transparent" Clicked="AddToFavouritesClicked"/>
+                            <ImageButton x:Name="btn_addToFavourites" Grid.Column="1" WidthRequest="25" HeightRequest="25" VerticalOptions="End" HorizontalOptions="End" BackgroundColor="Transparent" Source="heart_plus" Clicked="AddToFavouritesClicked"/>
                         </Grid>
                         <StackLayout Margin="0,20,0,0">
                             <Slider x:Name="slider" ThumbColor="Goldenrod" Minimum="0" Maximum="1" Value="0" ValueChanged="SliderValueChanged" DragCompleted="SliderDragCompleted" DragStarted="SliderDragStarted"/>
