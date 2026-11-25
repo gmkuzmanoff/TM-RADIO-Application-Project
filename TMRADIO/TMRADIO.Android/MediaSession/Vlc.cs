@@ -65,8 +65,14 @@ namespace TMRADIO.Droid.MediaSession
         }
 
         public long CurrentTime { get => player.Time; set => player.Time = value; }
-
+        /// <summary>
+        /// Get or set media position
+        /// </summary>
         public float CurrentPosition { get => player.Position; set => player.Position = value; }
+        /// <summary>
+        /// Get or set media volume in percent (0 = mute, 100 = 0dB)
+        /// </summary>
+        public int Volume { get => player.Volume; set => player.Volume = value; }
 
         public VLCState PlayerState()
         {

@@ -10,6 +10,8 @@ namespace TMRADIO.Interfaces
         void LoadMedia(string uri);
         long GetCurrentTime();
         long SetCurrentTime(double sliderValue);
+        void SetVolume(int percents);
+        int GetVolume();
         float GetCurrentPosition();
         string MediaSource();
         string GetTitle();

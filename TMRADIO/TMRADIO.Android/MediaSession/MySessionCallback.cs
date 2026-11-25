@@ -2,13 +2,11 @@
 using Android.Graphics;
 using Android.Support.V4.Media.Session;
 using Android.Views;
-using Android.Widget;
 using LibVLCSharp.Shared;
 using System;
 using TMRADIO.Interfaces;
 using TMRADIO.Models;
 using Xamarin.Forms;
-using static TMRADIO.Constants.Digits;
 using static TMRADIO.Constants.Links;
 
 namespace TMRADIO.Droid.MediaSession
@@ -17,20 +15,18 @@ namespace TMRADIO.Droid.MediaSession
     {
         private readonly Context context = Android.App.Application.Context;
         private readonly IPlayerConnector session;
-        //private readonly AudioFocusCallback audioFocusCallback;
-        //private bool isAudioFocusGained = false;
 
         private string mediaSource = string.Empty;
         private string title = string.Empty;
         private string artist = string.Empty;
         private string album = string.Empty;
         private string albumArt = string.Empty;
+        private long mediaDuration;
+        private float mediaPosition;
 
         [Obsolete]
         public MySessionCallback()
         {
-            //audioFocusCallback = new AudioFocusCallback();
-            //isAudioFocusGained = audioFocusCallback.RequestAudioFocus();
             DependencyService.Register<IPlayerConnector>();
             session = DependencyService.Get<IPlayerConnector>();
         }
@@ -38,13 +34,7 @@ namespace TMRADIO.Droid.MediaSession
         [Obsolete]
         public override bool OnMediaButtonEvent(Intent mediaButtonEvent)
         {
-            //isAudioFocusGained = audioFocusCallback.RequestAudioFocus();
-
             mediaSource = session.MediaSource();
-            title = session.GetTitle();
-            artist = session.GetArtist();
-            album = session.GetAlbum();
-            albumArt = session.GetAlbumArt();
             
             var keycode = (KeyEvent)mediaButtonEvent.Extras.GetParcelable(Intent.ExtraKeyEvent);
 
@@ -112,50 +102,20 @@ namespace TMRADIO.Droid.MediaSession
                 //Toast.MakeText(context, $"Callback: {keycode.KeyCode} released!", ToastLength.Short).Show();
             }
 
-            //Create notification
-            NotificationViewModel notificationViewModel = new NotificationViewModel()
-            {
-                Title = title,
-                Artist = artist,
-                AlbumArt = albumArt,
-                Album = album,
-                Duration = session.GetMediaDuration(),
-                Position = session.GetCurrentPosition()
-            };
-            session.ShowMediaNotification(notificationViewModel);
+            SetMediaSessionReqs();
 
-            //Create metadata
-            //byte[] image = new HttpClient().GetByteArrayAsync(albumArt).Result;
-            MetadataViewModel metadataViewModel = new MetadataViewModel()
-            {
-                Title = title,
-                Artist = mediaSource == TMRADIO_STREAM_URL ? album : artist,
-                AlbumArt = mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt),
-                Album = mediaSource == TMRADIO_STREAM_URL ? artist : album,
-                Duration = session.GetMediaDuration()
-            };
-            
-            //Set metadata
-            Device.StartTimer(TimeSpan.FromSeconds(WAIT_FOR_METADATA), () =>
-            {
-                session.SetPlaybackState();
-                session.SetMetadata(metadataViewModel);
-
-                return false;
-            });
-
-            //Log.Debug($"[{context.PackageName}]", $"Intent: {keycode}");
-        
             return base.OnMediaButtonEvent(mediaButtonEvent);
         }
 
-        private void SetPlaybackStateForAA()
+        private void SetMediaSessionReqs()
         {
             mediaSource = session.MediaSource();
             title = session.GetTitle();
             artist = session.GetArtist();
             album = session.GetAlbum();
             albumArt = session.GetAlbumArt();
+            mediaDuration = session.GetMediaDuration();
+            mediaPosition = session.GetCurrentPosition();
 
             //Create notification
             NotificationViewModel notificationViewModel = new NotificationViewModel()
@@ -164,8 +124,8 @@ namespace TMRADIO.Droid.MediaSession
                 Artist = artist,
                 AlbumArt = albumArt,
                 Album = album,
-                Duration = session.GetMediaDuration(),
-                Position = session.GetCurrentPosition()
+                Duration = mediaDuration,
+                Position = mediaPosition
             };
             session.ShowMediaNotification(notificationViewModel);
 
@@ -174,14 +134,16 @@ namespace TMRADIO.Droid.MediaSession
             {
                 Title = title,
                 Artist = mediaSource == TMRADIO_STREAM_URL ? album : artist,
-                AlbumArt = mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : BitmapFactory.DecodeFile(albumArt),
+                AlbumArt = mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : (albumArt.Equals("tm_radio_episode") ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.tm_radio_episode) : BitmapFactory.DecodeFile(albumArt)),
                 Album = mediaSource == TMRADIO_STREAM_URL ? artist : album,
-                Duration = session.GetMediaDuration()
+                Duration = mediaDuration
             };
 
             //Set metadata
-            session.SetPlaybackState();
             session.SetMetadata(metadataViewModel);
+
+            session.SetPlaybackState();
+            
         }
 
         
@@ -190,7 +152,7 @@ namespace TMRADIO.Droid.MediaSession
             session.Play();
             
             //Toast.MakeText(context, $"OnPlay()", ToastLength.Short).Show();
-            SetPlaybackStateForAA();
+            SetMediaSessionReqs();
         }
 
         public override void OnPause()
@@ -198,7 +160,7 @@ namespace TMRADIO.Droid.MediaSession
             session.Pause();
 
             //Toast.MakeText(context, $"OnPause()", ToastLength.Short).Show();
-            SetPlaybackStateForAA();
+            SetMediaSessionReqs();
         }
 
         public override void OnSeekTo(long pos)
@@ -206,7 +168,7 @@ namespace TMRADIO.Droid.MediaSession
             session.OnSeekTo(pos);
             
             //Toast.MakeText(context, $"OnSeekTo()", ToastLength.Short).Show();
-            SetPlaybackStateForAA();
+            SetMediaSessionReqs();
         }
     }
 }

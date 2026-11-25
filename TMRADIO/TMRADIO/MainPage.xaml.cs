@@ -14,7 +14,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml.Linq;
@@ -1989,7 +1988,7 @@ namespace TMRADIO
                 metadataViewModel.Title = episode.Title;
                 metadataViewModel.Artist = episode.Description;
                 metadataViewModel.Album = selectedShow;
-                metadataViewModel.AlbumArt = BitmapFactory.DecodeFile(episode.ImageSource);
+                metadataViewModel.AlbumArt = episode.ImageSource.Equals("tm_radio_episode") ? BitmapFactory.DecodeResource(context.Resources, 2131165372) : BitmapFactory.DecodeFile(episode.ImageSource);
                 metadataViewModel.Duration = episodeDuration;
 
                 Device.BeginInvokeOnMainThread(() =>

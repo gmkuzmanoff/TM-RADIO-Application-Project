@@ -8,6 +8,7 @@ using Android.OS;
 using Android.Support.V4.Media;
 using Android.Support.V4.Media.Session;
 using Android.Views;
+using Android.Widget;
 using AndroidX.Core.App;
 using LibVLCSharp.Shared;
 using System.Collections.Generic;
@@ -65,7 +66,6 @@ namespace TMRADIO.Droid.MediaSession
         public void InitializeSession()
         {
             audioFocusCallback = new AudioFocusCallback();
-            isAudioFocusGained = audioFocusCallback.RequestAudioFocus();
             mediaSession = new MediaSessionCompat(context, "TMRADIO_MediaSession");
             mediaSession.SetCallback(new MySessionCallback());
             mediaSession.SetFlags((int)MediaSessionFlags.HandlesMediaButtons | (int)MediaSessionFlags.HandlesTransportControls);
@@ -152,10 +152,10 @@ namespace TMRADIO.Droid.MediaSession
                     PlaybackStateCompat.ActionPlay |
                     PlaybackStateCompat.ActionPause |
                     PlaybackStateCompat.ActionPlayPause |
-                    PlaybackStateCompat.ActionSkipToNext |
-                    PlaybackStateCompat.ActionSkipToPrevious |
-                    PlaybackStateCompat.ActionFastForward |
-                    PlaybackStateCompat.ActionRewind |
+                    //PlaybackStateCompat.ActionSkipToNext |
+                    //PlaybackStateCompat.ActionSkipToPrevious |
+                    //PlaybackStateCompat.ActionFastForward |
+                    //PlaybackStateCompat.ActionRewind |
                     PlaybackStateCompat.ActionSeekTo);
 
             long position = (long)(vlcPlayer.CurrentPosition / 1 * vlcPlayer.MediaDuration());
@@ -285,6 +285,7 @@ namespace TMRADIO.Droid.MediaSession
         public void LoadMedia(string uri)
         {
             vlcPlayer.LoadMedia(uri);
+            vlcPlayer.Volume = 100;
             mediaSource = uri;
         }
 
@@ -297,6 +298,16 @@ namespace TMRADIO.Droid.MediaSession
         {
             vlcPlayer.CurrentTime = (long)(sliderValue / 1 * vlcPlayer.MediaDuration());
             return vlcPlayer.CurrentTime;
+        }
+
+        public void SetVolume(int percents)
+        {
+            vlcPlayer.Volume = percents;
+        }
+
+        public int GetVolume()
+        {
+            return vlcPlayer.Volume;
         }
 
         public long GetMediaDuration()
@@ -428,15 +439,6 @@ namespace TMRADIO.Droid.MediaSession
         public string GetAlbumArt()
         {
             return albumArt;
-        }
-
-        //AA and AAOS
-        [System.Obsolete]
-        public override void OnCreate()
-        {
-            base.OnCreate();
-
-            InitializeSession();
         }
 
         public override IBinder OnBind(Intent intent)

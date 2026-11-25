@@ -1,7 +1,4 @@
-﻿using Android.Graphics;
-using static TMRADIO.Constants.Links;
-
-namespace TMRADIO.Models
+﻿namespace TMRADIO.Models
 {
     public class XspfViewModel
     {

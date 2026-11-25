@@ -1,10 +1,13 @@
-﻿using Android.Media;
+﻿using Android.Graphics;
+using Android.Media;
 using Android.OS;
 using Android.Runtime;
-using Android.Widget;
 using System;
 using TMRADIO.Interfaces;
+using TMRADIO.Models;
+using Xamarin.CommunityToolkit.Core;
 using Xamarin.Forms;
+using static TMRADIO.Constants.Links;
 using Context = Android.Content.Context;
 
 namespace TMRADIO.Droid.MediaSession
@@ -16,6 +19,14 @@ namespace TMRADIO.Droid.MediaSession
         private readonly IPlayerConnector session;
         private readonly AudioManager audioManager;
         private AudioFocusRequestClass audioFocusRequestClass;
+
+        private string mediaSource = string.Empty;
+        private string title = string.Empty;
+        private string artist = string.Empty;
+        private string album = string.Empty;
+        private string albumArt = string.Empty;
+        private long mediaDuration;
+        private float mediaPosition;
 
         public AudioFocusCallback()
         {
@@ -64,29 +75,67 @@ namespace TMRADIO.Droid.MediaSession
             switch (focusChange)
             {
                 case AudioFocus.Gain:
+                    session.SetVolume(100);
                     session.Play();
-                    session.SetPlaybackState();
+                    SetMediaSessionReqs();
                     // Resume or increase volume
                     break;
 
                 case AudioFocus.Loss:
                     session.Pause();
-                    session.SetPlaybackState();
+                    SetMediaSessionReqs();
                     // Stop playback completely
                     break;
 
                 case AudioFocus.LossTransient:
                     session.Pause();
-                    session.SetPlaybackState();
+                    SetMediaSessionReqs();
                     // Pause playback
                     break;
 
                 case AudioFocus.LossTransientCanDuck:
+                    session.SetVolume(20);
                     // Lower volume
                     break;
             }
 
             //Toast.MakeText(context, $"AudioFocus: {focusChange}", ToastLength.Long).Show();
+        }
+
+        private void SetMediaSessionReqs()
+        {
+            mediaSource = session.MediaSource();
+            title = session.GetTitle();
+            artist = session.GetArtist();
+            album = session.GetAlbum();
+            albumArt = session.GetAlbumArt();
+            mediaDuration = session.GetMediaDuration();
+            mediaPosition = session.GetCurrentPosition();
+
+            //Create notification
+            NotificationViewModel notificationViewModel = new NotificationViewModel()
+            {
+                Title = title,
+                Artist = artist,
+                AlbumArt = albumArt,
+                Album = album,
+                Duration = mediaDuration,
+                Position = mediaPosition
+            };
+            session.ShowMediaNotification(notificationViewModel);
+
+            //Create metadata
+            MetadataViewModel metadataViewModel = new MetadataViewModel()
+            {
+                Title = title,
+                Artist = mediaSource == TMRADIO_STREAM_URL ? album : artist,
+                AlbumArt = mediaSource == TMRADIO_STREAM_URL ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.logo) : (albumArt.Equals("tm_radio_episode") ? BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.tm_radio_episode) : BitmapFactory.DecodeFile(albumArt)),
+                Album = mediaSource == TMRADIO_STREAM_URL ? artist : album,
+                Duration = mediaDuration
+            };
+            session.SetMetadata(metadataViewModel);
+
+            session.SetPlaybackState();
         }
 
         public void AbondonAudioFocus()
