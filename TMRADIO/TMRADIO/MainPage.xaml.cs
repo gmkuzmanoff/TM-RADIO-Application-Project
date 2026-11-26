@@ -22,6 +22,7 @@ using TMRADIO.Models;
 using TMRADIO.Services;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using static Java.Util.Jar.Attributes;
 using static TMRADIO.Constants.Digits;
 using static TMRADIO.Constants.Links;
 using static TMRADIO.Constants.Text;
@@ -119,7 +120,7 @@ namespace TMRADIO
 
             #region 'Load and Show recently played episodes'
             //Load and Show recently played episodes
-            if (!System.IO.File.Exists(XML_RECENTLYPLAYED_FILE))
+            if (!File.Exists(XML_RECENTLYPLAYED_FILE))
             {
                 XDocument xdoc = new XDocument();
                 XElement root = new XElement("Episodes");
@@ -333,13 +334,14 @@ namespace TMRADIO
                 {
                     var downloadStream = await client.GetStreamAsync(fileUrl);
 
-                    using (var fileStream = System.IO.File.Create(file))
+                    using (var fileStream = File.Create(file))
                     {
                         await downloadStream.CopyToAsync(fileStream);
                     }
 
-                    byte[] newImage = radioService.ResizeImageAndroid(System.IO.File.ReadAllBytes(file));
-                    System.IO.File.WriteAllBytes(file, newImage);
+                    byte[] newImage = radioService.ResizeImageAndroid(File.ReadAllBytes(file));
+
+                    File.WriteAllBytes(file, newImage);
                 }
             }
             catch { }
@@ -371,38 +373,32 @@ namespace TMRADIO
 
         private async void GetMainShows()
         {
-            try
+            await Task.Run(async () =>
             {
-                await Task.Run(async () =>
+                Device.BeginInvokeOnMainThread(() =>
                 {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        list_browser.IsRefreshing = true;
-                    });
-
-                    foreach (var item in radioService.GetMainShows())
-                    {
-                        if (item.GroupType == GroupType.Main)
-                        {
-                            await DownloadAndResizeFileAsync(item.ImageUrl, EXTERNAL_CACHE_DIR, item.Title);
-
-                            mainShowViewModels.Add(item);
-                        }
-                        else
-                        {
-                            oldShowViewModels.Add(item);
-                        }
-                    }
-                    allShowsViewModels
-                        .Add(new GroupedCollection<string, ShowViewModel>("MAIN SHOWS", mainShowViewModels));
-                    allShowsViewModels
-                    .Add(new GroupedCollection<string, ShowViewModel>("Other shows on this radio...", oldShowViewModels));
+                    list_browser.IsRefreshing = true;
                 });
-            }
-            catch
-            {
-                allShowsViewModels.Add(new GroupedCollection<string, ShowViewModel>("Connection error!", mainShowViewModels));
-            }
+
+                foreach (var item in radioService.GetMainShows())
+                {
+                    if (item.GroupType == GroupType.Main)
+                    {
+                        await DownloadAndResizeFileAsync(item.ImageUrl, EXTERNAL_CACHE_DIR, item.Title);
+
+                        mainShowViewModels.Add(item);
+                    }
+                    else
+                    {
+                        oldShowViewModels.Add(item);
+                    }
+                }
+                allShowsViewModels
+                    .Add(new GroupedCollection<string, ShowViewModel>("MAIN SHOWS", mainShowViewModels));
+                allShowsViewModels
+                .Add(new GroupedCollection<string, ShowViewModel>("Other shows on this radio...", oldShowViewModels));
+
+            });
 
             list_browser.IsRefreshing = false;
             list_browser.ItemsSource = allShowsViewModels.OrderBy(x => x.Key);
@@ -1088,7 +1084,7 @@ namespace TMRADIO
             {
                 foreach (var episode in radioService.GetPlaylistEntities(show.Id))
                 {
-                    if (!System.IO.File.Exists($"{$"{THUMBNAILS_DIR}/{show.Id}/{episode.Title}.jpg"}"))
+                    if (!File.Exists($"{$"{THUMBNAILS_DIR}/{show.Id}/{episode.Title}.jpg"}"))
                     {
                         Directory.CreateDirectory($"{THUMBNAILS_DIR}/{ show.Id}");
                         await DownloadAndResizeFileAsync(episode.ImageArt, $"{THUMBNAILS_DIR}/{show.Id}", episode.Title);
