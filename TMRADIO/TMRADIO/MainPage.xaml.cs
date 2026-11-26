@@ -22,7 +22,6 @@ using TMRADIO.Models;
 using TMRADIO.Services;
 using Xamarin.Essentials;
 using Xamarin.Forms;
-using static Java.Util.Jar.Attributes;
 using static TMRADIO.Constants.Digits;
 using static TMRADIO.Constants.Links;
 using static TMRADIO.Constants.Text;
